@@ -1,0 +1,6 @@
+@uniflow_backend_HostAddress = http://localhost:5154
+
+GET {{uniflow_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
