@@ -1,15 +1,28 @@
-    using Domain.Models;
-    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore;
+using DataAccess.EntityConfiguration;
+using Domain.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
-    namespace DataAccess.Data;
+namespace DataAccess.Data;
 
-    public class AppDbContext : IdentityDbContext<User>
+public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+{
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options):base(options) { }
-        
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-        }
     }
+
+    public DbSet<StudentWallet> StudentWallets { get; set; }
+    public DbSet<TokenTransaction> TokenTransactions { get; set; }
+    public DbSet<Event> Events { get; set; }
+    public DbSet<Subject> Subjects { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.ApplyConfiguration(new StudentWalletConfiguration());
+        builder.ApplyConfiguration(new TokenTransactionConfiguration());
+        builder.ApplyConfiguration(new EventConfiguration());
+        builder.ApplyConfiguration(new SubjectConfiguration());
+    }
+}

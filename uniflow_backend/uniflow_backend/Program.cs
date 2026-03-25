@@ -1,4 +1,6 @@
 using DataAccess.Data;
+using Domain.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,10 @@ builder.Services.AddDbContext<AppDbContext>(options=>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
     });
 var app = builder.Build();
+
+builder.Services.AddIdentity<User, IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
