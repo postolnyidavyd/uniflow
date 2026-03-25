@@ -9,6 +9,8 @@ public class User : IdentityUser<Guid>
     public required string Group { get; set; }
 
     public StudentWallet StudentWallet { get; set; }
+
+    public ICollection<QueueEntry> QueueEntries { get; set; } = new List<QueueEntry>();
     // Можливо буде навігаційна властивість
     //public required string CalendarToken { get; set; }
 }

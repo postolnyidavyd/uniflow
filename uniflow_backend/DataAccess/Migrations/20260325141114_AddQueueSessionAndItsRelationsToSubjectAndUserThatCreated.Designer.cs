@@ -3,6 +3,7 @@ using System;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260325141114_AddQueueSessionAndItsRelationsToSubjectAndUserThatCreated")]
+    partial class AddQueueSessionAndItsRelationsToSubjectAndUserThatCreated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,36 +71,6 @@ namespace DataAccess.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("Domain.Models.QueueEntry", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("EffectiveWeight")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("JoinedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("QueueSessionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("UsedToken")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QueueSessionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("QueueEntries");
                 });
 
             modelBuilder.Entity("Domain.Models.QueueSession", b =>
@@ -463,25 +436,6 @@ namespace DataAccess.Migrations
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("Domain.Models.QueueEntry", b =>
-                {
-                    b.HasOne("Domain.Models.QueueSession", "QueueSession")
-                        .WithMany("QueueEntries")
-                        .HasForeignKey("QueueSessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.User", "User")
-                        .WithMany("QueueEntries")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("QueueSession");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Domain.Models.QueueSession", b =>
                 {
                     b.HasOne("Domain.Models.User", "CreatedByUser")
@@ -585,11 +539,6 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Models.QueueSession", b =>
-                {
-                    b.Navigation("QueueEntries");
-                });
-
             modelBuilder.Entity("Domain.Models.StudentWallet", b =>
                 {
                     b.Navigation("TokenTransactions");
@@ -604,8 +553,6 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Domain.Models.User", b =>
                 {
-                    b.Navigation("QueueEntries");
-
                     b.Navigation("StudentWallet")
                         .IsRequired();
                 });
