@@ -14,19 +14,31 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 
     public DbSet<StudentWallet> StudentWallets { get; set; }
     public DbSet<TokenTransaction> TokenTransactions { get; set; }
-    public DbSet<Event> Events { get; set; }
+    
     public DbSet<Subject> Subjects { get; set; }
+    
+    public DbSet<Event> Events { get; set; }
+    
     public DbSet<QueueSession> QueueSessions { get; set; }
     public DbSet<QueueEntry> QueueEntries { get; set; }
+    
+    public DbSet<UserCalendarSettings> UserCalendarSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.ApplyConfiguration(new UserConfiguration());
+        
         builder.ApplyConfiguration(new StudentWalletConfiguration());
         builder.ApplyConfiguration(new TokenTransactionConfiguration());
-        builder.ApplyConfiguration(new EventConfiguration());
+        
         builder.ApplyConfiguration(new SubjectConfiguration());
+
+        builder.ApplyConfiguration(new EventConfiguration());
+        
         builder.ApplyConfiguration(new QueueSessionConfiguration());
         builder.ApplyConfiguration(new QueueEntryConfiguration());
+        
+        builder.ApplyConfiguration(new UserCalendarSettingConfiguration());
     }
 }

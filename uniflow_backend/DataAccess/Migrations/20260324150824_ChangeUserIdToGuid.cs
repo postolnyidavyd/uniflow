@@ -11,77 +11,37 @@ namespace DataAccess.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<Guid>(
-                name: "UserId",
-                table: "StudentWallets",
-                type: "uuid",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
+            // Використовуємо сирий SQL для виконання суворих правил PostgreSQL
+            migrationBuilder.Sql(@"
+        -- 1. Видаляємо всі Foreign Keys, які блокують зміну типу
+        ALTER TABLE ""AspNetUserRoles"" DROP CONSTRAINT IF EXISTS ""FK_AspNetUserRoles_AspNetRoles_RoleId"";
+        ALTER TABLE ""AspNetUserRoles"" DROP CONSTRAINT IF EXISTS ""FK_AspNetUserRoles_AspNetUsers_UserId"";
+        ALTER TABLE ""AspNetUserClaims"" DROP CONSTRAINT IF EXISTS ""FK_AspNetUserClaims_AspNetUsers_UserId"";
+        ALTER TABLE ""AspNetUserLogins"" DROP CONSTRAINT IF EXISTS ""FK_AspNetUserLogins_AspNetUsers_UserId"";
+        ALTER TABLE ""AspNetUserTokens"" DROP CONSTRAINT IF EXISTS ""FK_AspNetUserTokens_AspNetUsers_UserId"";
+        ALTER TABLE ""AspNetRoleClaims"" DROP CONSTRAINT IF EXISTS ""FK_AspNetRoleClaims_AspNetRoles_RoleId"";
+        ALTER TABLE ""StudentWallets"" DROP CONSTRAINT IF EXISTS ""FK_StudentWallets_AspNetUsers_UserId"";
 
-            migrationBuilder.AlterColumn<Guid>(
-                name: "UserId",
-                table: "AspNetUserTokens",
-                type: "uuid",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
+        -- 2. Конвертуємо колонки в uuid з використанням USING (магія Postgres)
+        ALTER TABLE ""AspNetUsers"" ALTER COLUMN ""Id"" TYPE uuid USING ""Id""::uuid;
+        ALTER TABLE ""AspNetRoles"" ALTER COLUMN ""Id"" TYPE uuid USING ""Id""::uuid;
+        ALTER TABLE ""AspNetUserRoles"" ALTER COLUMN ""UserId"" TYPE uuid USING ""UserId""::uuid;
+        ALTER TABLE ""AspNetUserRoles"" ALTER COLUMN ""RoleId"" TYPE uuid USING ""RoleId""::uuid;
+        ALTER TABLE ""AspNetUserClaims"" ALTER COLUMN ""UserId"" TYPE uuid USING ""UserId""::uuid;
+        ALTER TABLE ""AspNetUserLogins"" ALTER COLUMN ""UserId"" TYPE uuid USING ""UserId""::uuid;
+        ALTER TABLE ""AspNetUserTokens"" ALTER COLUMN ""UserId"" TYPE uuid USING ""UserId""::uuid;
+        ALTER TABLE ""AspNetRoleClaims"" ALTER COLUMN ""RoleId"" TYPE uuid USING ""RoleId""::uuid;
+        ALTER TABLE ""StudentWallets"" ALTER COLUMN ""UserId"" TYPE uuid USING ""UserId""::uuid;
 
-            migrationBuilder.AlterColumn<Guid>(
-                name: "Id",
-                table: "AspNetUsers",
-                type: "uuid",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
-
-            migrationBuilder.AlterColumn<Guid>(
-                name: "RoleId",
-                table: "AspNetUserRoles",
-                type: "uuid",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
-
-            migrationBuilder.AlterColumn<Guid>(
-                name: "UserId",
-                table: "AspNetUserRoles",
-                type: "uuid",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
-
-            migrationBuilder.AlterColumn<Guid>(
-                name: "UserId",
-                table: "AspNetUserLogins",
-                type: "uuid",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
-
-            migrationBuilder.AlterColumn<Guid>(
-                name: "UserId",
-                table: "AspNetUserClaims",
-                type: "uuid",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
-
-            migrationBuilder.AlterColumn<Guid>(
-                name: "Id",
-                table: "AspNetRoles",
-                type: "uuid",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
-
-            migrationBuilder.AlterColumn<Guid>(
-                name: "RoleId",
-                table: "AspNetRoleClaims",
-                type: "uuid",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
+        -- 3. Відновлюємо Foreign Keys
+        ALTER TABLE ""AspNetUserRoles"" ADD CONSTRAINT ""FK_AspNetUserRoles_AspNetRoles_RoleId"" FOREIGN KEY (""RoleId"") REFERENCES ""AspNetRoles"" (""Id"") ON DELETE CASCADE;
+        ALTER TABLE ""AspNetUserRoles"" ADD CONSTRAINT ""FK_AspNetUserRoles_AspNetUsers_UserId"" FOREIGN KEY (""UserId"") REFERENCES ""AspNetUsers"" (""Id"") ON DELETE CASCADE;
+        ALTER TABLE ""AspNetUserClaims"" ADD CONSTRAINT ""FK_AspNetUserClaims_AspNetUsers_UserId"" FOREIGN KEY (""UserId"") REFERENCES ""AspNetUsers"" (""Id"") ON DELETE CASCADE;
+        ALTER TABLE ""AspNetUserLogins"" ADD CONSTRAINT ""FK_AspNetUserLogins_AspNetUsers_UserId"" FOREIGN KEY (""UserId"") REFERENCES ""AspNetUsers"" (""Id"") ON DELETE CASCADE;
+        ALTER TABLE ""AspNetUserTokens"" ADD CONSTRAINT ""FK_AspNetUserTokens_AspNetUsers_UserId"" FOREIGN KEY (""UserId"") REFERENCES ""AspNetUsers"" (""Id"") ON DELETE CASCADE;
+        ALTER TABLE ""AspNetRoleClaims"" ADD CONSTRAINT ""FK_AspNetRoleClaims_AspNetRoles_RoleId"" FOREIGN KEY (""RoleId"") REFERENCES ""AspNetRoles"" (""Id"") ON DELETE CASCADE;
+        ALTER TABLE ""StudentWallets"" ADD CONSTRAINT ""FK_StudentWallets_AspNetUsers_UserId"" FOREIGN KEY (""UserId"") REFERENCES ""AspNetUsers"" (""Id"") ON DELETE CASCADE;
+    ");
         }
 
         /// <inheritdoc />

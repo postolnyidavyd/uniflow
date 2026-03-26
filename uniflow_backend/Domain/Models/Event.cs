@@ -24,4 +24,6 @@ public class Event
 
     public Guid CreatedByUserId { get; set; }
     public User? CreatedByUser { get; set; }
+    
+    public ICollection<User> Subscribers { get; set; } = new List<User>();
 }
