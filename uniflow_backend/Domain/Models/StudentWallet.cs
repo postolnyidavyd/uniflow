@@ -3,7 +3,7 @@ namespace Domain.Models;
 public class StudentWallet
 {
     public Guid Id {get; set; }
-    public int Balance { get; set; }
+    public int Balance { get; set; } = 3;
 
 
     public Guid UserId { get; set; }
