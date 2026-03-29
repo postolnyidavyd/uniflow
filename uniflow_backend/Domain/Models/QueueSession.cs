@@ -34,4 +34,9 @@ public class QueueSession
     public User? CreatedByUser { get; set; }
     
     public ICollection<User> Subscribers { get; set; } = new List<User>();
+
+    public void Open() => QueueStatus = QueueStatus.Active;
+    public void Close() => QueueStatus = QueueStatus.Closed;
+    public void Cancel() => QueueStatus = QueueStatus.Cancelled;
+    public bool IsAcceptingEntries() => QueueStatus == QueueStatus.Registration || QueueStatus == QueueStatus.Active;
 }

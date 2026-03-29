@@ -67,7 +67,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.QueueEntry", b =>
@@ -97,7 +97,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("QueueEntries");
+                    b.ToTable("QueueEntries", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.QueueSession", b =>
@@ -156,7 +156,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("QueueSessions");
+                    b.ToTable("QueueSessions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.StudentWallet", b =>
@@ -176,7 +176,7 @@ namespace DataAccess.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("StudentWallets");
+                    b.ToTable("StudentWallets", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.Subject", b =>
@@ -209,7 +209,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("Subjects", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.TokenTransaction", b =>
@@ -234,7 +234,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("StudentWalletId");
 
-                    b.ToTable("TokenTransactions");
+                    b.ToTable("TokenTransactions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.User", b =>
@@ -334,7 +334,7 @@ namespace DataAccess.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserCalendarSettings");
+                    b.ToTable("UserCalendarSettings", (string)null);
                 });
 
             modelBuilder.Entity("EventUser", b =>

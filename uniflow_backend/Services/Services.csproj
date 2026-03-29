@@ -12,4 +12,8 @@
       <ProjectReference Include="..\DTOs\DTOs.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Hangfire.Core" Version="1.8.23" />
+    </ItemGroup>
+
 </Project>
