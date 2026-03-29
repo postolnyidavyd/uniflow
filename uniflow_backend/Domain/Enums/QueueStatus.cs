@@ -5,4 +5,6 @@ public enum QueueStatus
     Planned,
     Registration,
     Active,
+    Closed,
+    Cancelled
 }

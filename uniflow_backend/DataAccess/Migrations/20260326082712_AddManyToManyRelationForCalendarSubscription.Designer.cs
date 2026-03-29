@@ -3,6 +3,7 @@ using System;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260326082712_AddManyToManyRelationForCalendarSubscription")]
+    partial class AddManyToManyRelationForCalendarSubscription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,7 +70,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Events", (string)null);
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("Domain.Models.QueueEntry", b =>
@@ -97,7 +100,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("QueueEntries", (string)null);
+                    b.ToTable("QueueEntries");
                 });
 
             modelBuilder.Entity("Domain.Models.QueueSession", b =>
@@ -156,7 +159,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("QueueSessions", (string)null);
+                    b.ToTable("QueueSessions");
                 });
 
             modelBuilder.Entity("Domain.Models.StudentWallet", b =>
@@ -176,7 +179,7 @@ namespace DataAccess.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("StudentWallets", (string)null);
+                    b.ToTable("StudentWallets");
                 });
 
             modelBuilder.Entity("Domain.Models.Subject", b =>
@@ -209,7 +212,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("Subjects", (string)null);
+                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("Domain.Models.TokenTransaction", b =>
@@ -234,7 +237,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("StudentWalletId");
 
-                    b.ToTable("TokenTransactions", (string)null);
+                    b.ToTable("TokenTransactions");
                 });
 
             modelBuilder.Entity("Domain.Models.User", b =>
@@ -334,7 +337,7 @@ namespace DataAccess.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserCalendarSettings", (string)null);
+                    b.ToTable("UserCalendarSettings");
                 });
 
             modelBuilder.Entity("EventUser", b =>

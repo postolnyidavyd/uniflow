@@ -17,4 +17,6 @@ public class Subject
     
     public ICollection<Event> Events { get; set; } = new List<Event>();
     public ICollection<QueueSession> QueueSessions { get; set; } = new List<QueueSession>();
+    
+    public ICollection<User> Subscribers { get; set; } = new List<User>();
 }

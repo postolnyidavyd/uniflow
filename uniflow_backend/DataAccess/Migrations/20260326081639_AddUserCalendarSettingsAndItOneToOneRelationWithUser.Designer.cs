@@ -3,6 +3,7 @@ using System;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260326081639_AddUserCalendarSettingsAndItOneToOneRelationWithUser")]
+    partial class AddUserCalendarSettingsAndItOneToOneRelationWithUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,7 +70,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Events", (string)null);
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("Domain.Models.QueueEntry", b =>
@@ -97,7 +100,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("QueueEntries", (string)null);
+                    b.ToTable("QueueEntries");
                 });
 
             modelBuilder.Entity("Domain.Models.QueueSession", b =>
@@ -156,7 +159,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("QueueSessions", (string)null);
+                    b.ToTable("QueueSessions");
                 });
 
             modelBuilder.Entity("Domain.Models.StudentWallet", b =>
@@ -176,7 +179,7 @@ namespace DataAccess.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("StudentWallets", (string)null);
+                    b.ToTable("StudentWallets");
                 });
 
             modelBuilder.Entity("Domain.Models.Subject", b =>
@@ -209,7 +212,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("Subjects", (string)null);
+                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("Domain.Models.TokenTransaction", b =>
@@ -234,7 +237,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("StudentWalletId");
 
-                    b.ToTable("TokenTransactions", (string)null);
+                    b.ToTable("TokenTransactions");
                 });
 
             modelBuilder.Entity("Domain.Models.User", b =>
@@ -334,22 +337,7 @@ namespace DataAccess.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserCalendarSettings", (string)null);
-                });
-
-            modelBuilder.Entity("EventUser", b =>
-                {
-                    b.Property<Guid>("EventSubscriptionsId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("SubscribersId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("EventSubscriptionsId", "SubscribersId");
-
-                    b.HasIndex("SubscribersId");
-
-                    b.ToTable("UserEventSubscriptions", (string)null);
+                    b.ToTable("UserCalendarSettings");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -482,36 +470,6 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("QueueSessionUser", b =>
-                {
-                    b.Property<Guid>("QueueSubscriptionsId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("SubscribersId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("QueueSubscriptionsId", "SubscribersId");
-
-                    b.HasIndex("SubscribersId");
-
-                    b.ToTable("UserQueueSubscriptions", (string)null);
-                });
-
-            modelBuilder.Entity("SubjectUser", b =>
-                {
-                    b.Property<Guid>("SubjectSubscriptionsId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("SubscribersId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("SubjectSubscriptionsId", "SubscribersId");
-
-                    b.HasIndex("SubscribersId");
-
-                    b.ToTable("UserSubjectSubscriptions", (string)null);
-                });
-
             modelBuilder.Entity("Domain.Models.Event", b =>
                 {
                     b.HasOne("Domain.Models.User", "CreatedByUser")
@@ -613,21 +571,6 @@ namespace DataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("EventUser", b =>
-                {
-                    b.HasOne("Domain.Models.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventSubscriptionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("SubscribersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -675,36 +618,6 @@ namespace DataAccess.Migrations
                     b.HasOne("Domain.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("QueueSessionUser", b =>
-                {
-                    b.HasOne("Domain.Models.QueueSession", null)
-                        .WithMany()
-                        .HasForeignKey("QueueSubscriptionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("SubscribersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SubjectUser", b =>
-                {
-                    b.HasOne("Domain.Models.Subject", null)
-                        .WithMany()
-                        .HasForeignKey("SubjectSubscriptionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("SubscribersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
