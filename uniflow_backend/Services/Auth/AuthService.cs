@@ -24,7 +24,7 @@ public class AuthService : IAuthService
         _walletService = walletService;
     }
 
-    public async Task<AuthResponseDto> Register(RegisterDto dto)
+    public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
     {
         string role = dto.InviteCode != null && dto.InviteCode == _configuration["HeadmanInviteCode"]
             ? Roles.Headman
@@ -48,7 +48,7 @@ public class AuthService : IAuthService
     }
 
 
-    public async Task<AuthResponseDto> Login(LoginDto dto)
+    public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
         if (user == null)

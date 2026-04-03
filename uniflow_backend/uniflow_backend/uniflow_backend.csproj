@@ -4,14 +4,17 @@
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>0abb72ab-c22d-478d-9557-39933336db6e</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FluentValidation" Version="12.1.1" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
         <PackageReference Include="Hangfire" Version="1.8.23" />
         <PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
         <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.5">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -20,6 +23,8 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Scalar.AspNetCore" Version="2.13.18" />
+        <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="2.0.0" />
     </ItemGroup>
 
     <ItemGroup>
