@@ -4,6 +4,7 @@ public class Subject
 {
     public Guid Id { get; set; }
     public required string Name { get; set; }
+    public required string ShortName { get; set; }
     public required string Lecturer { get; set; }
 
     public string? MarkdownContent { get; set; }
