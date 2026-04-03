@@ -26,7 +26,7 @@ public class WalletService : IWalletService
     {
         var wallet = await _appDbContext.StudentWallets.FirstOrDefaultAsync(sw => sw.UserId == userId);
         if(wallet == null)
-            throw new KeyNotFoundException("Не існує користувача з таким id");
+            throw new KeyNotFoundException("Гаманець не знайдено");
         return wallet.Balance;
     }
 
