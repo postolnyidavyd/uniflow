@@ -10,6 +10,6 @@ public interface ISubjectService
     Task<Guid> CreateSubjectAsync(Guid userId, CreateSubjectDto dto );
     Task UpdateSubjectAsync(Guid subjectId, UpdateSubjectDto dto);
     Task UpdateMarkdownContentAsync(Guid subjectId, UpdateMarkdownDto dto);
-    
-    Task DeleteSubjectAsync(Guid subjectId)
+
+    Task DeleteSubjectAsync(Guid subjectId);
 }
