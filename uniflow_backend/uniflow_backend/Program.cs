@@ -11,8 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Services.Auth;
+using Services.Event;
 using Services.Photo;
 using Services.Settings;
+using Services.Subject;
 using Services.Wallet;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using uniflow_backend.Middleware;
@@ -69,7 +71,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IWalletService, WalletService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
-
+builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddControllers();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
