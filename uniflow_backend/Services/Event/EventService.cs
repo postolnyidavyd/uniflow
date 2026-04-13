@@ -24,7 +24,7 @@ public class EventService : IEventService
         return events;
     }
 
-    public async Task<EventDetailResponseDto> GetById(Guid userId, Guid eventId)
+    public async Task<EventDetailResponseDto> GetByIdAsync(Guid userId, Guid eventId)
     {
         var eventDetail = await _appDbContext.Events
                               .Where(e => e.Id == eventId)
@@ -97,23 +97,23 @@ public class EventService : IEventService
         await _appDbContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type)
+    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type, int take = 3)
     {
         return await _appDbContext.Events
             .Where(e => e.Date >= DateTime.UtcNow && e.EventType == type)
             .OrderBy(e => e.Date)
-            .Take(3)
+            .Take(take)
             .ProjectToShortDto(userId)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type, Guid subjectId)
+    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type, Guid subjectId, int take = 3)
     {
         return await _appDbContext.Events
             .Where(e => e.Date >= DateTime.UtcNow && e.EventType == type)
             .Where(e=> e.SubjectId == subjectId)
             .OrderBy(e => e.Date)
-            .Take(3)
+            .Take(take)
             .ProjectToShortDto(userId)
             .ToListAsync();
     }
