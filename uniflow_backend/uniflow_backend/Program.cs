@@ -16,6 +16,7 @@ using Services.Photo;
 using Services.Settings;
 using Services.Subject;
 using Services.Wallet;
+using Services.WeightStrategyFactory;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using uniflow_backend.Middleware;
 
@@ -73,6 +74,7 @@ builder.Services.AddScoped<IWalletService, WalletService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IWeightStrategyFactory, WeightStrategyFactory>();
 builder.Services.AddControllers();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));

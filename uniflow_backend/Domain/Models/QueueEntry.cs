@@ -1,3 +1,5 @@
+using Domain.Enums;
+
 namespace Domain.Models;
 
 public class QueueEntry
@@ -8,7 +10,8 @@ public class QueueEntry
     public DateTime JoinedAt { get; set; }
 
     public bool UsedToken { get; set; }
-    
+
+    public EntryType EntryType { get; set; }
     public Guid QueueSessionId { get; set; }
     public QueueSession? QueueSession { get; set; }
     
