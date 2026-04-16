@@ -11,6 +11,9 @@ public interface IEventService
     Task UpdateEventAsync(Guid eventId, UpdateEventDto dto);
     Task DeleteEventAsync(Guid eventId);
     
+    // Для віджету
     Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type, int take = 3);
     Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type, Guid subjectId, int take = 3);
+    //Для календаря
+    Task<IEnumerable<EventShortResponseDto>> GetEventsByMonthAsync(Guid userId, int year, int month);
 }

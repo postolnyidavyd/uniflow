@@ -31,4 +31,5 @@ public interface IQueueService
     Task<IEnumerable<QueueSessionShortResponseDto>> GetUpcomingAsync(Guid userId, int take = 3);
     //Тут будуть братися найближчі до предмета, і якщо юзер зареєстрований, надає відповідну інформацію
     Task<IEnumerable<QueueSessionShortResponseDto>> GetUpcomingAsync(Guid userId, Guid subjectId, int take = 3);
+    Task<IEnumerable<QueueSessionShortResponseDto>> GetSessionByMonth(Guid userId, int year, int month);
 }
