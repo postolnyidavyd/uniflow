@@ -7,5 +7,5 @@ public interface IWalletService
     Task ChargeTokensAsync(Guid userId, int amount, string? reason);
     Task SpendTokensAsync(Guid userId, int amount, string? reason);
     
-    Task ChargeTokensBulkAsync(IEnumerable<Guid> userIds, int amount, string? reason)
+    Task ChargeTokensBulkAsync(IEnumerable<Guid> userIds, int amount, string? reason);
 }
