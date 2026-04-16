@@ -23,7 +23,7 @@ public class QueueSession
     public QueueStatus QueueStatus { get; set; } 
 
     public bool IsAllowedToSubmitMoreThanOne { get; set; }
-    public SubmissionMode? SubmissionMode { get; set; }
+    public SubmissionMode SubmissionMode { get; set; }
 
     public Guid SubjectId { get; set; }
     public Subject? Subject { get; set; }

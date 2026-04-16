@@ -12,6 +12,6 @@ public class DefaultStrategy : IWeightStrategy
         if (avaliablePlaces < 1)
             return 0;
 
-        return 50;
+        return entry.UsedToken ? 100 : 50;
     }
 }

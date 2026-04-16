@@ -56,7 +56,6 @@ public class SubjectService : ISubjectService
                     Lecturer = subject.Lecturer,
                     Id = subject.Id,
                     MarkdownContent = subject.MarkdownContent
-                    //TODO додати поля як додам DTO для івентів і черги
                 }).FirstOrDefaultAsync();
 
         if (subject == null)
