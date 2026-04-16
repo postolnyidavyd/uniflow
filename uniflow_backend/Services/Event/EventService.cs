@@ -60,22 +60,22 @@ public class EventService : IEventService
     public async Task UpdateEventAsync(Guid eventId, UpdateEventDto dto)
     {
         var updatedEvent = await _appDbContext.Events.FindAsync(eventId) ?? throw new KeyNotFoundException("Подію не знайдено");
+        
+        updatedEvent.Description = dto.Description;
+        updatedEvent.Location = dto.Location;
+        updatedEvent.MeetUrl = dto.MeetUrl;
+        
         if (!string.IsNullOrWhiteSpace(dto.Title))
             updatedEvent.Title = dto.Title;
         if (!string.IsNullOrWhiteSpace(dto.ShortTitle))
             updatedEvent.ShortTitle = dto.ShortTitle;
-        if (!string.IsNullOrWhiteSpace(dto.Description))
-            updatedEvent.Description = dto.Description;
         if (dto.Date.HasValue)
             updatedEvent.Date = dto.Date.Value;
         if (dto.EventType.HasValue)
             updatedEvent.EventType = dto.EventType.GetValueOrDefault(updatedEvent.EventType);
         if (dto.EventFormat.HasValue)
             updatedEvent.EventFormat = dto.EventFormat.GetValueOrDefault(updatedEvent.EventFormat);
-        if (!string.IsNullOrWhiteSpace(dto.Location))
-            updatedEvent.Location = dto.Location;
-        if (!string.IsNullOrWhiteSpace(dto.MeetUrl))
-            updatedEvent.MeetUrl = dto.MeetUrl;
+       
         if (dto.SubjectId.HasValue)
         {
             if (!await _appDbContext.Subjects.AnyAsync(s => s.Id == dto.SubjectId.Value))

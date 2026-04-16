@@ -12,7 +12,7 @@ public static class EventMappings
             ShortTitle = e.ShortTitle,
             Date = e.Date,
             EventType = e.EventType,
-            SubjectName = e.Subject.Name,
+            SubjectName = e.Subject.ShortName,
             IsSubscribed =
                 e.Subscribers.Any(u => u.Id == userId) ||
                 e.Subject.Subscribers.Any(s => s.Id == userId) ||

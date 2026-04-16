@@ -2,8 +2,10 @@ namespace Services.Wallet;
 
 public interface IWalletService
 {
-    Task CreateWallet(Guid userId);
-    Task<int> GetBalance(Guid userId);
-    Task ChargeTokens(Guid userId, int amount, string reason);
-    Task SpendTokens(Guid userId, int amount, string reason);
+    Task CreateWalletAsync(Guid userId);
+    Task<int> GetBalanceAsync(Guid userId);
+    Task ChargeTokensAsync(Guid userId, int amount, string? reason);
+    Task SpendTokensAsync(Guid userId, int amount, string? reason);
+    
+    Task ChargeTokensBulkAsync(IEnumerable<Guid> userIds, int amount, string? reason)
 }

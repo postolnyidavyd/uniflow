@@ -43,7 +43,7 @@ public class AuthService : IAuthService
             throw new ArgumentException(string.Join(", ", result.Errors.Select(e => e.Description)));
 
         await _userManager.AddToRoleAsync(user, role);
-        await _walletService.CreateWallet(user.Id);
+        await _walletService.CreateWalletAsync(user.Id);
         return GenerateToken(user, role);
     }
 

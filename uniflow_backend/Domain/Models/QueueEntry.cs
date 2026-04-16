@@ -1,3 +1,5 @@
+using Domain.Enums;
+
 namespace Domain.Models;
 
 public class QueueEntry
@@ -6,8 +8,9 @@ public class QueueEntry
 
     public int EffectiveWeight { get; set; } // 100,50,10,0
     public DateTime JoinedAt { get; set; }
-
     public bool UsedToken { get; set; }
+    public EntryType EntryType { get; set; }
+    public QueueEntryStatus EntryStatus { get; set; } = QueueEntryStatus.Waiting;
     
     public Guid QueueSessionId { get; set; }
     public QueueSession? QueueSession { get; set; }
