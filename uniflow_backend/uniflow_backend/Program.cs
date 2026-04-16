@@ -13,7 +13,6 @@ using Scalar.AspNetCore;
 using Services.Auth;
 using Services.Event;
 using Services.Photo;
-using Services.Queue;
 using Services.Settings;
 using Services.Subject;
 using Services.Wallet;
@@ -76,7 +75,6 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IWeightStrategyFactory, WeightStrategyFactory>();
-builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddControllers();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
