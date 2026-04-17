@@ -2,6 +2,7 @@ using DataAccess.Data;
 using Domain.Enums;
 using DTOs.EventDTOs;
 using Microsoft.EntityFrameworkCore;
+
 namespace Services.Event;
 
 public class EventService : IEventService
@@ -17,7 +18,7 @@ public class EventService : IEventService
     {
         var events = await _appDbContext.Events
             .Where(e => e.SubjectId == subjectId)
-            .OrderBy(e=> e.Date)
+            .OrderBy(e => e.Date)
             .ProjectToShortDto(userId)
             .ToListAsync();
 
@@ -29,7 +30,7 @@ public class EventService : IEventService
         var eventDetail = await _appDbContext.Events
                               .Where(e => e.Id == eventId)
                               .ProjectToDetailDto(userId)
-                              .FirstOrDefaultAsync() 
+                              .FirstOrDefaultAsync()
                           ?? throw new KeyNotFoundException("Подію не знайдено");
 
         return eventDetail;
@@ -59,12 +60,13 @@ public class EventService : IEventService
 
     public async Task UpdateEventAsync(Guid eventId, UpdateEventDto dto)
     {
-        var updatedEvent = await _appDbContext.Events.FindAsync(eventId) ?? throw new KeyNotFoundException("Подію не знайдено");
-        
+        var updatedEvent = await _appDbContext.Events.FindAsync(eventId) ??
+                           throw new KeyNotFoundException("Подію не знайдено");
+
         updatedEvent.Description = dto.Description;
         updatedEvent.Location = dto.Location;
         updatedEvent.MeetUrl = dto.MeetUrl;
-        
+
         if (!string.IsNullOrWhiteSpace(dto.Title))
             updatedEvent.Title = dto.Title;
         if (!string.IsNullOrWhiteSpace(dto.ShortTitle))
@@ -75,12 +77,12 @@ public class EventService : IEventService
             updatedEvent.EventType = dto.EventType.GetValueOrDefault(updatedEvent.EventType);
         if (dto.EventFormat.HasValue)
             updatedEvent.EventFormat = dto.EventFormat.GetValueOrDefault(updatedEvent.EventFormat);
-       
+
         if (dto.SubjectId.HasValue)
         {
             if (!await _appDbContext.Subjects.AnyAsync(s => s.Id == dto.SubjectId.Value))
                 throw new KeyNotFoundException("Новий предмет не знайдено");
-            
+
             updatedEvent.SubjectId = dto.SubjectId.GetValueOrDefault();
         }
 
@@ -97,7 +99,8 @@ public class EventService : IEventService
         await _appDbContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type, int take = 3)
+    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type,
+        int take = 3)
     {
         return await _appDbContext.Events
             .Where(e => e.Date >= DateTime.UtcNow && e.EventType == type)
@@ -107,14 +110,27 @@ public class EventService : IEventService
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type, Guid subjectId, int take = 3)
+    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type,
+        Guid subjectId, int take = 3)
     {
         return await _appDbContext.Events
             .Where(e => e.Date >= DateTime.UtcNow && e.EventType == type)
-            .Where(e=> e.SubjectId == subjectId)
+            .Where(e => e.SubjectId == subjectId)
             .OrderBy(e => e.Date)
             .Take(take)
             .ProjectToShortDto(userId)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<EventSummaryResponseDto>> GetEventsByMonthAsync(Guid userId, int year, int month)
+    {
+        var startOfMonth = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        var startOfNextMonth = startOfMonth.AddMonths(1);
+        return await _appDbContext.Events
+            .Where(e => e.Date >= startOfMonth && e.Date < startOfNextMonth)
+            .OrderBy(e => e.Date)
+            .ProjectToSummaryDto(userId)
             .ToListAsync();
     }
 }

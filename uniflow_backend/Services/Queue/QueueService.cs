@@ -299,7 +299,7 @@ public class QueueService : IQueueService
         }
 
         await _appDbContext.SaveChangesAsync();
-        // Захист від того що якщо черга пуста і активна і користувач приєднався робимо його активним 
+        // Захист від того що якщо черга пуста й активна і користувач приєднався робимо його активним 
         if (session.QueueStatus == QueueStatus.Active)
         {
             bool isAnyoneInProgress = await _appDbContext.QueueEntries
@@ -441,7 +441,20 @@ public class QueueService : IQueueService
             .ProjectToSessionShortDto(userId)
             .ToListAsync();
     }
-    
+
+    public async Task<IEnumerable<QueueSummaryResponseDto>> GetSessionsByMonthAsync(Guid userId, int year, int month)
+    {
+        var startOfMonth = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        var startOfNextMonth = startOfMonth.AddMonths(1);
+        return await _appDbContext.QueueSessions
+            .Where(qs => qs.QueueStartTime >= startOfMonth && qs.QueueStartTime < startOfNextMonth)
+            .Where(qs => qs.QueueStatus != QueueStatus.Cancelled)
+            .OrderBy(qs => qs.QueueStartTime)
+            .ProjectToSummaryDto(userId)
+            .ToListAsync();
+    }
+
     private async Task MoveToNextStudentInternalAsync(Guid sessionId)
     {
         var nextEntryId = await _appDbContext.QueueEntries

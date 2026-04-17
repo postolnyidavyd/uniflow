@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Statistic">
+    <option name="excludedDirectories">
+      <list>
+        <option value="$PROJECT_DIR$/DataAccess/Migrations" />
+        <option value="$PROJECT_DIR$/DataAccess/bin" />
+        <option value="$PROJECT_DIR$/DataAccess/obj" />
+        <option value="$PROJECT_DIR$/Domain/bin" />
+        <option value="$PROJECT_DIR$/Domain/obj" />
+        <option value="$PROJECT_DIR$/DTOs/bin" />
+        <option value="$PROJECT_DIR$/DTOs/obj" />
+        <option value="$PROJECT_DIR$/Hubs/bin" />
+        <option value="$PROJECT_DIR$/Hubs/obj" />
+        <option value="$PROJECT_DIR$/Services/bin" />
+        <option value="$PROJECT_DIR$/Services/obj" />
+        <option value="$PROJECT_DIR$/uniflow_backend/bin" />
+        <option value="$PROJECT_DIR$/uniflow_backend/obj" />
+      </list>
+    </option>
+  </component>
+</project>
