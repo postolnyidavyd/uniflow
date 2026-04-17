@@ -442,7 +442,7 @@ public class QueueService : IQueueService
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<QueueSummaryResponseDto>> GetSessionByMonth(Guid userId, int year, int month)
+    public async Task<IEnumerable<QueueSummaryResponseDto>> GetSessionsByMonthAsync(Guid userId, int year, int month)
     {
         var startOfMonth = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
 
