@@ -66,4 +66,28 @@ public static class EventMappings
         SubjectId = dto.SubjectId,
         CreatedByUserId = userId
     };
+    
+    private static Expression<Func<Domain.Models.Event, EventSummaryResponseDto>>
+        SummaryDtoExpression(Guid userId) => e => new EventSummaryResponseDto()
+    {
+        Id = e.Id,
+        ShortTitle = e.ShortTitle,
+        SubjectName = e.Subject!.ShortName, 
+        Date = e.Date,
+        EventType = e.EventType,
+        Location = e.Location,
+        MeetUrl = e.MeetUrl,
+        
+        IsSubscribed =
+            e.Subscribers.Any(u => u.Id == userId) ||
+            e.Subject.Subscribers.Any(s => s.Id == userId) ||
+            e.Subject.Subscribers.Any(u =>
+                u.UserCalendarSettings != null &&
+                u.UserCalendarSettings.AutoAddAllEvents &&
+                u.Id == userId)
+    };
+
+    public static IQueryable<EventSummaryResponseDto> ProjectToSummaryDto(
+        this IQueryable<Domain.Models.Event> query, Guid userId) =>
+        query.Select(SummaryDtoExpression(userId));
 }

@@ -442,7 +442,7 @@ public class QueueService : IQueueService
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<QueueSessionShortResponseDto>> GetSessionByMonth(Guid userId, int year, int month)
+    public async Task<IEnumerable<QueueSummaryResponseDto>> GetSessionByMonth(Guid userId, int year, int month)
     {
         var startOfMonth = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -451,7 +451,7 @@ public class QueueService : IQueueService
             .Where(qs => qs.QueueStartTime >= startOfMonth && qs.QueueStartTime < startOfNextMonth)
             .Where(qs => qs.QueueStatus != QueueStatus.Cancelled)
             .OrderBy(qs => qs.QueueStartTime)
-            .ProjectToSessionShortDto(userId)
+            .ProjectToSummaryDto(userId)
             .ToListAsync();
     }
 

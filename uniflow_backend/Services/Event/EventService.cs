@@ -122,7 +122,7 @@ public class EventService : IEventService
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<EventShortResponseDto>> GetEventsByMonthAsync(Guid userId, int year, int month)
+    public async Task<IEnumerable<EventSummaryResponseDto>> GetEventsByMonthAsync(Guid userId, int year, int month)
     {
         var startOfMonth = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -130,7 +130,7 @@ public class EventService : IEventService
         return await _appDbContext.Events
             .Where(e => e.Date >= startOfMonth && e.Date < startOfNextMonth)
             .OrderBy(e => e.Date)
-            .ProjectToShortDto(userId)
+            .ProjectToSummaryDto(userId)
             .ToListAsync();
     }
 }

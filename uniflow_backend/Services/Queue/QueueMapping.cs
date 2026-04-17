@@ -92,4 +92,25 @@ public static class QueueMapping
     public static IQueryable<QueueSessionShortResponseDto> ProjectToSessionShortDto(this IQueryable<QueueSession> query,
         Guid? userId) =>
         query.Select(SessionShortResponseDtoExpression(userId));
+    
+    
+    private static Expression<Func<Domain.Models.QueueSession, QueueSummaryResponseDto>>
+        SummaryDtoExpression(Guid userId) => qs => new QueueSummaryResponseDto()
+    {
+        Id = qs.Id,
+        ShortTitle = qs.ShortTitle,
+        SubjectName = qs.Subject!.ShortName, 
+        QueueStartTime = qs.QueueStartTime,
+        Location = qs.Location,
+        MeetUrl = qs.MeetUrl,
+        
+        IsSubscribed = qs.QueueEntries.Any(qn =>
+            qn.UserId == userId && 
+            qn.EntryType == EntryType.Primary && 
+            (qn.EntryStatus == QueueEntryStatus.Waiting || qn.EntryStatus == QueueEntryStatus.InProgress))
+    };
+
+    public static IQueryable<QueueSummaryResponseDto> ProjectToSummaryDto(
+        this IQueryable<QueueSession> query, Guid userId) =>
+        query.Select(SummaryDtoExpression(userId));
 }

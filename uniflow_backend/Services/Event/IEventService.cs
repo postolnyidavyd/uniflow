@@ -15,5 +15,5 @@ public interface IEventService
     Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type, int take = 3);
     Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type, Guid subjectId, int take = 3);
     //Для календаря
-    Task<IEnumerable<EventShortResponseDto>> GetEventsByMonthAsync(Guid userId, int year, int month);
+    Task<IEnumerable<EventSummaryResponseDto>> GetEventsByMonthAsync(Guid userId, int year, int month);
 }
