@@ -17,6 +17,33 @@ public class QueueController : RequireAuthController
         _queueService = queueService;
     }
 
+    // 🔥 НОВЕ: Ендпоінт для блоку "Мої черги" (Червоні/Зелені/Жовті картки з макету)
+    [HttpGet("my-active")]
+    public async Task<IActionResult> GetMyActiveQueues()
+    {
+        var userId = GetUserId();
+        return Ok(await _queueService.GetUserSession(userId));
+    }
+
+    // 🔥 НОВЕ: Ендпоінт для блоку "Всі черги" (З пагінацією та фільтрацією по предмету)
+    [HttpGet("")]
+    public async Task<IActionResult> GetAllSessions(
+        [FromQuery] int page = 1, 
+        [FromQuery] int pageSize = 10, 
+        [FromQuery] Guid? subjectId = null)
+    {
+        var userId = GetUserId();
+
+        // Якщо з фронта передали subjectId (натиснули на таблетку-фільтр)
+        if (subjectId.HasValue)
+        {
+            return Ok(await _queueService.GetAllSessions(userId, page, pageSize, subjectId.Value));
+        }
+        
+        // Якщо предмет не обрано (кнопка "Всі предмети")
+        return Ok(await _queueService.GetAllSessions(userId, page, pageSize));
+    }
+
     [HttpGet("{sessionId:guid}")]
     public async Task<IActionResult> GetSessionById([FromRoute] Guid sessionId)
     {
@@ -30,6 +57,7 @@ public class QueueController : RequireAuthController
         var userId = GetUserId();
         return Ok(await _queueService.GetSessionEntriesAsync(userId, sessionId));
     }
+    
     [HttpPost("")]
     [Authorize(Roles = Roles.Headman)]
     public async Task<IActionResult> CreateSession([FromBody] CreateQueueSessionDto dto)
