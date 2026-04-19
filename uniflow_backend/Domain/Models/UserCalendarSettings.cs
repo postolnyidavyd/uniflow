@@ -7,6 +7,7 @@ public class UserCalendarSettings
     public bool AutoAddAllEvents { get; set; }
     public bool AutoAddUserQueueEvents { get; set; }
 
+    public string SyncToken { get; set; }
     public Guid UserId { get; set; }
     public User? User { get; set; }
 }

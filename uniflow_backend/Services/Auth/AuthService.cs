@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Services.Wallet;
 using Microsoft.IdentityModel.Tokens;
+using Services.Subscription;
 
 namespace Services.Auth;
 
@@ -16,12 +17,14 @@ public class AuthService : IAuthService
     private readonly UserManager<User> _userManager;
     private readonly IConfiguration _configuration;
     private readonly IWalletService _walletService;
+    private readonly ISubscriptionService _subscriptionService;
 
-    public AuthService(UserManager<User> userManager, IConfiguration configuration, IWalletService walletService)
+    public AuthService(UserManager<User> userManager, IConfiguration configuration, IWalletService walletService, ISubscriptionService subscriptionService)
     {
         _userManager = userManager;
         _configuration = configuration;
         _walletService = walletService;
+        _subscriptionService = subscriptionService;
     }
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -44,6 +47,7 @@ public class AuthService : IAuthService
 
         await _userManager.AddToRoleAsync(user, role);
         await _walletService.CreateWalletAsync(user.Id);
+        await _subscriptionService.CreateUserCalendarSettings(user.Id);
         return GenerateToken(user, role);
     }
 
