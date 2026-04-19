@@ -16,16 +16,14 @@ public class QueueController : RequireAuthController
     {
         _queueService = queueService;
     }
-
-    // 🔥 НОВЕ: Ендпоінт для блоку "Мої черги" (Червоні/Зелені/Жовті картки з макету)
+    
     [HttpGet("my-active")]
     public async Task<IActionResult> GetMyActiveQueues()
     {
         var userId = GetUserId();
         return Ok(await _queueService.GetUserSession(userId));
     }
-
-    // 🔥 НОВЕ: Ендпоінт для блоку "Всі черги" (З пагінацією та фільтрацією по предмету)
+    
     [HttpGet("")]
     public async Task<IActionResult> GetAllSessions(
         [FromQuery] int page = 1, 
@@ -34,13 +32,13 @@ public class QueueController : RequireAuthController
     {
         var userId = GetUserId();
 
-        // Якщо з фронта передали subjectId (натиснули на таблетку-фільтр)
+
         if (subjectId.HasValue)
         {
             return Ok(await _queueService.GetAllSessions(userId, page, pageSize, subjectId.Value));
         }
         
-        // Якщо предмет не обрано (кнопка "Всі предмети")
+
         return Ok(await _queueService.GetAllSessions(userId, page, pageSize));
     }
 

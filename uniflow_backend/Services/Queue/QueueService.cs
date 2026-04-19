@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices.JavaScript;
 using DataAccess.Data;
 using Domain.Enums;
 using Domain.Models;
@@ -6,7 +5,6 @@ using DTOs.Common;
 using DTOs.QueueDTOs;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design.Internal;
 using Services.Wallet;
 using Services.WeightStrategyFactory;
 
@@ -249,11 +247,7 @@ public class QueueService : IQueueService
         if (usersToRefund.Count > 0)
         {
             string reason = $"Компенсація за скасовану чергу '{sessionValues.Title}' ({sessionValues.SubjectName})";
-
-            foreach (var userId in usersToRefund)
-            {
-                await _walletService.ChargeTokensAsync(userId, 1, reason);
-            }
+            await _walletService.ChargeTokensBulkAsync(usersToRefund, 1, reason);
         }
     }
 
