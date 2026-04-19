@@ -104,10 +104,14 @@ public static class QueueMapping
         Location = qs.Location,
         MeetUrl = qs.MeetUrl,
         
-        IsSubscribed = qs.QueueEntries.Any(qn =>
-            qn.UserId == userId && 
-            qn.EntryType == EntryType.Primary && 
-            (qn.EntryStatus == QueueEntryStatus.Waiting || qn.EntryStatus == QueueEntryStatus.InProgress))
+        IsSubscribed = 
+            qs.Subscribers.Any(u => u.Id == userId) 
+            ||
+            qs.QueueEntries.Any(qe => 
+                qe.UserId == userId && 
+                (qe.EntryStatus == QueueEntryStatus.Waiting || qe.EntryStatus == QueueEntryStatus.InProgress) &&
+                qe.User!.UserCalendarSettings != null && 
+                qe.User.UserCalendarSettings.AutoAddUserQueueEvents)
     };
 
     public static IQueryable<QueueSummaryResponseDto> ProjectToSummaryDto(
