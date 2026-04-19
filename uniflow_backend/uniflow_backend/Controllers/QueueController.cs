@@ -16,6 +16,31 @@ public class QueueController : RequireAuthController
     {
         _queueService = queueService;
     }
+    
+    [HttpGet("my-active")]
+    public async Task<IActionResult> GetMyActiveQueues()
+    {
+        var userId = GetUserId();
+        return Ok(await _queueService.GetUserSession(userId));
+    }
+    
+    [HttpGet("")]
+    public async Task<IActionResult> GetAllSessions(
+        [FromQuery] int page = 1, 
+        [FromQuery] int pageSize = 10, 
+        [FromQuery] Guid? subjectId = null)
+    {
+        var userId = GetUserId();
+
+
+        if (subjectId.HasValue)
+        {
+            return Ok(await _queueService.GetAllSessions(userId, page, pageSize, subjectId.Value));
+        }
+        
+
+        return Ok(await _queueService.GetAllSessions(userId, page, pageSize));
+    }
 
     [HttpGet("{sessionId:guid}")]
     public async Task<IActionResult> GetSessionById([FromRoute] Guid sessionId)
@@ -30,6 +55,7 @@ public class QueueController : RequireAuthController
         var userId = GetUserId();
         return Ok(await _queueService.GetSessionEntriesAsync(userId, sessionId));
     }
+    
     [HttpPost("")]
     [Authorize(Roles = Roles.Headman)]
     public async Task<IActionResult> CreateSession([FromBody] CreateQueueSessionDto dto)

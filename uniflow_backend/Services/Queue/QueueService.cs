@@ -1,11 +1,10 @@
-using System.Runtime.InteropServices.JavaScript;
 using DataAccess.Data;
 using Domain.Enums;
 using Domain.Models;
+using DTOs.Common;
 using DTOs.QueueDTOs;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design.Internal;
 using Services.Wallet;
 using Services.WeightStrategyFactory;
 
@@ -49,6 +48,68 @@ public class QueueService : IQueueService
         {
             Entries = entries,
             UserEntry = entries.FirstOrDefault(e => e.UserId == userId)
+        };
+    }
+
+    public async Task<IEnumerable<MyQueueCardResponseDto>> GetUserSession(Guid userId)
+    {
+        return await _appDbContext.QueueSessions.Where(qs => qs.QueueEntries.Any(e =>
+                e.UserId == userId &&
+                (e.EntryStatus == QueueEntryStatus.Waiting || e.EntryStatus == QueueEntryStatus.InProgress)))
+            .ProjectToMyQueueCardDto(userId)
+            .ToListAsync();
+    }
+
+    public async Task<PaginationResult<QueueCardResponseDto>> GetAllSessions(Guid userId, int page, int pageSize)
+    {
+        var query = _appDbContext.QueueSessions
+            .Where(qs => qs.QueueStartTime > DateTime.UtcNow)
+            .Where(qs => qs.QueueStatus != QueueStatus.Cancelled && qs.QueueStatus != QueueStatus.Closed);
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(qs => qs.QueueStartTime)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ProjectToQueueCardDto(userId)
+            .ToListAsync();
+
+        return new PaginationResult<QueueCardResponseDto>()
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
+    }
+
+    public async Task<PaginationResult<QueueCardResponseDto>> GetAllSessions(Guid userId, int page, int pageSize,
+        Guid subjectId)
+    {
+        if (!await _appDbContext.Subjects.AnyAsync(s => s.Id == subjectId))
+            throw new KeyNotFoundException("Предмет для якого ви шукаєте черги не існує");
+
+        var query = _appDbContext.QueueSessions
+            .Where(qs => qs.QueueStartTime > DateTime.UtcNow)
+            .Where(qs => qs.QueueStatus != QueueStatus.Cancelled && qs.QueueStatus != QueueStatus.Closed)
+            .Where(qs => qs.SubjectId == subjectId);
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(qs => qs.QueueStartTime)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ProjectToQueueCardDto(userId)
+            .ToListAsync();
+
+        return new PaginationResult<QueueCardResponseDto>()
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
         };
     }
 
@@ -148,50 +209,47 @@ public class QueueService : IQueueService
         await _appDbContext.SaveChangesAsync();
     }
 
-    public async Task DeleteSessionAsync(Guid sessionId) 
+    public async Task DeleteSessionAsync(Guid sessionId)
     {
-    var sessionValues = await _appDbContext.QueueSessions
-        .Where(qs => qs.Id == sessionId)
-        .Select(qs => new {
-            Title = qs.Title,
-            SubjectName = qs.Subject!.Name,
-            QueueStatus = qs.QueueStatus
-        })
-        .FirstOrDefaultAsync()
-        ?? throw new KeyNotFoundException("Чергу не знайдено");
+        var sessionValues = await _appDbContext.QueueSessions
+                                .Where(qs => qs.Id == sessionId)
+                                .Select(qs => new
+                                {
+                                    Title = qs.Title,
+                                    SubjectName = qs.Subject!.Name,
+                                    QueueStatus = qs.QueueStatus
+                                })
+                                .FirstOrDefaultAsync()
+                            ?? throw new KeyNotFoundException("Чергу не знайдено");
 
-    
-    if (sessionValues.QueueStatus == QueueStatus.Cancelled || sessionValues.QueueStatus == QueueStatus.Closed)
-        throw new InvalidOperationException("Цю чергу вже завершено або скасовано.");
 
-    
-    var usersToRefund = await _appDbContext.QueueEntries
-        .Where(qn => qn.QueueSessionId == sessionId && 
-                     qn.EntryStatus == QueueEntryStatus.Waiting && 
-                     qn.UsedToken)
-        .Select(qn => qn.UserId)
-        .Distinct()
-        .ToListAsync();
-    
-    await _appDbContext.QueueEntries
-        .Where(qn => qn.QueueSessionId == sessionId && 
-                     (qn.EntryStatus == QueueEntryStatus.Waiting || qn.EntryStatus == QueueEntryStatus.InProgress))
-        .ExecuteUpdateAsync(s => s.SetProperty(e => e.EntryStatus, QueueEntryStatus.Cancelled));
+        if (sessionValues.QueueStatus == QueueStatus.Cancelled || sessionValues.QueueStatus == QueueStatus.Closed)
+            throw new InvalidOperationException("Цю чергу вже завершено або скасовано.");
 
-    await _appDbContext.QueueSessions
-        .Where(qs => qs.Id == sessionId)
-        .ExecuteUpdateAsync(s => s.SetProperty(q => q.QueueStatus, QueueStatus.Cancelled));
 
-    if (usersToRefund.Count > 0                         )
-    {
-        string reason = $"Компенсація за скасовану чергу '{sessionValues.Title}' ({sessionValues.SubjectName})";
-        
-        foreach (var userId in usersToRefund)
+        var usersToRefund = await _appDbContext.QueueEntries
+            .Where(qn => qn.QueueSessionId == sessionId &&
+                         qn.EntryStatus == QueueEntryStatus.Waiting &&
+                         qn.UsedToken)
+            .Select(qn => qn.UserId)
+            .Distinct()
+            .ToListAsync();
+
+        await _appDbContext.QueueEntries
+            .Where(qn => qn.QueueSessionId == sessionId &&
+                         (qn.EntryStatus == QueueEntryStatus.Waiting || qn.EntryStatus == QueueEntryStatus.InProgress))
+            .ExecuteUpdateAsync(s => s.SetProperty(e => e.EntryStatus, QueueEntryStatus.Cancelled));
+
+        await _appDbContext.QueueSessions
+            .Where(qs => qs.Id == sessionId)
+            .ExecuteUpdateAsync(s => s.SetProperty(q => q.QueueStatus, QueueStatus.Cancelled));
+
+        if (usersToRefund.Count > 0)
         {
-            await _walletService.ChargeTokensAsync(userId, 1, reason);
+            string reason = $"Компенсація за скасовану чергу '{sessionValues.Title}' ({sessionValues.SubjectName})";
+            await _walletService.ChargeTokensBulkAsync(usersToRefund, 1, reason);
         }
     }
-}
 
     public async Task AutoOpenSessionRegistrationAsync(Guid sessionId)
     {
@@ -209,7 +267,7 @@ public class QueueService : IQueueService
             .Where(q => q.QueueStatus != QueueStatus.Cancelled)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.QueueStatus, QueueStatus.Active));
-        
+
         //Переводимо першого студента в активний стан, щоб почати цикл 
         await MoveToNextStudentInternalAsync(sessionId);
     }
@@ -231,15 +289,16 @@ public class QueueService : IQueueService
 
         if (session.QueueStatus != QueueStatus.Registration && session.QueueStatus != QueueStatus.Active)
             throw new InvalidOperationException("Реєстрація в цю чергу зараз закрита.");
-        
+
         if (!session.IsAllowedToSubmitMoreThanOne && dto.SubmitSecondWork)
             throw new InvalidOperationException(
                 "В цій черзі не можна здавати 2 роботи, спробуйте знову тільки з однією.");
-        
+
         if (dto.UsedToken)
         {
             if (session.QueueStatus == QueueStatus.Active)
-                throw new InvalidOperationException("Використовувати токени можна лише під час реєстрації, до початку пари.");
+                throw new InvalidOperationException(
+                    "Використовувати токени можна лише під час реєстрації, до початку пари.");
             var userBalance = await _walletService.GetBalanceAsync(userId);
             if (userBalance < 1)
                 throw new InvalidOperationException("Недостатньо токенів для отримання пріоритету в черзі.");
@@ -315,14 +374,15 @@ public class QueueService : IQueueService
     public async Task LeaveSessionAsync(Guid userId, Guid sessionId)
     {
         var sessionValues = await _appDbContext.QueueSessions
-                          .Where(qs => qs.Id == sessionId)
-                          .Select(qs => new {
-                              Title = qs.Title,
-                              SubjectName= qs.Subject!.Name,
-                              QueueStatus = (QueueStatus?)qs.QueueStatus,
-                          })
-                          .FirstOrDefaultAsync()
-                      ?? throw new KeyNotFoundException("Черга, яку ви намагаєтесь покинути, не існує");
+                                .Where(qs => qs.Id == sessionId)
+                                .Select(qs => new
+                                {
+                                    Title = qs.Title,
+                                    SubjectName = qs.Subject!.Name,
+                                    QueueStatus = (QueueStatus?)qs.QueueStatus,
+                                })
+                                .FirstOrDefaultAsync()
+                            ?? throw new KeyNotFoundException("Черга, яку ви намагаєтесь покинути, не існує");
 
         var usedToken = await _appDbContext.QueueEntries
             .AnyAsync(qn => qn.QueueSessionId == sessionId &&
@@ -335,7 +395,7 @@ public class QueueService : IQueueService
                          qn.UserId == userId &&
                          qn.EntryStatus == QueueEntryStatus.Waiting)
             .ExecuteUpdateAsync(s => s.SetProperty(e => e.EntryStatus, QueueEntryStatus.Cancelled));
-        
+
         if (updatedRows == 0)
             return;
 
@@ -343,9 +403,10 @@ public class QueueService : IQueueService
         {
             if (sessionValues.QueueStatus == QueueStatus.Registration)
             {
-                string reason = $"Повернення токена з скасування пріоритетного запису для черги '{sessionValues.Title}' ({sessionValues.SubjectName})";
+                string reason =
+                    $"Повернення токена з скасування пріоритетного запису для черги '{sessionValues.Title}' ({sessionValues.SubjectName})";
 
-                await _walletService.ChargeTokensAsync(userId, 1, reason); 
+                await _walletService.ChargeTokensAsync(userId, 1, reason);
             }
         }
     }
@@ -354,18 +415,19 @@ public class QueueService : IQueueService
     {
         if (!await _appDbContext.QueueSessions.AnyAsync(qs => qs.Id == sessionId))
             throw new KeyNotFoundException("Чергу не знайдено");
-        
+
         var currentEntry = await _appDbContext.QueueEntries
             .Where(e => e.QueueSessionId == sessionId && e.EntryStatus == QueueEntryStatus.InProgress)
             .Select(e => new { e.Id, e.UserId })
             .FirstOrDefaultAsync();
-        
+
         if (currentEntry != null)
-        { 
+        {
             if (currentEntry.UserId != userId)
             {
                 throw new UnauthorizedAccessException("Тільки студент, який зараз відповідає можуть завершити запис.");
             }
+
             await _appDbContext.QueueEntries
                 .Where(e => e.Id == currentEntry.Id)
                 .ExecuteUpdateAsync(s => s.SetProperty(e => e.EntryStatus, QueueEntryStatus.Completed));
@@ -388,8 +450,8 @@ public class QueueService : IQueueService
                 .Where(e => e.Id == currentEntryId)
                 .ExecuteUpdateAsync(s => s.SetProperty(e => e.EntryStatus, QueueEntryStatus.Cancelled));
         }
-        
-        
+
+
         await MoveToNextStudentInternalAsync(sessionId);
     }
 
@@ -397,31 +459,31 @@ public class QueueService : IQueueService
     {
         if (!await _appDbContext.QueueSessions.AnyAsync(qs => qs.Id == sessionId))
             throw new KeyNotFoundException("Чергу не знайдено");
-        
+
         var currentEntryId = await _appDbContext.QueueEntries
             .Where(e => e.QueueSessionId == sessionId && e.EntryStatus == QueueEntryStatus.InProgress)
             .Select(e => e.Id)
             .FirstOrDefaultAsync();
-        
+
         if (currentEntryId != Guid.Empty)
         {
             await _appDbContext.QueueEntries
                 .Where(e => e.Id == currentEntryId)
                 .ExecuteUpdateAsync(s => s.SetProperty(e => e.EntryStatus, QueueEntryStatus.Completed));
         }
-        
-        
+
+
         await MoveToNextStudentInternalAsync(sessionId);
     }
 
     public async Task<IEnumerable<QueueSessionShortResponseDto>> GetUpcomingAsync(Guid userId, int take = 3)
     {
         return await _appDbContext.QueueSessions
-            .Where(qs => qs.QueueEntries.Any(e => 
-                e.UserId == userId && 
+            .Where(qs => qs.QueueEntries.Any(e =>
+                e.UserId == userId &&
                 (e.EntryStatus == QueueEntryStatus.Waiting || e.EntryStatus == QueueEntryStatus.InProgress)))
             .Where(qs => qs.QueueStatus == QueueStatus.Registration || qs.QueueStatus == QueueStatus.Active)
-            .OrderBy(qs => qs.QueueStatus == QueueStatus.Active ? 0 : 1)// Спочатку активні потім де реєстрація
+            .OrderBy(qs => qs.QueueStatus == QueueStatus.Active ? 0 : 1) // Спочатку активні потім де реєстрація
             .ThenBy(qs => qs.QueueStartTime)
             .Take(take)
             .ProjectToSessionShortDto(userId)
@@ -431,7 +493,7 @@ public class QueueService : IQueueService
     public async Task<IEnumerable<QueueSessionShortResponseDto>> GetUpcomingAsync(Guid userId, Guid subjectId,
         int take = 3)
     {
-        // Повертаємо 3 черги для КОНКРЕТНОГО ПРЕДМЕТА, незалежно чи є користувач в ній чи ні
+        // Повертаємо 3 черги для предмету незалежно чи є користувач в ній чи ні
         return await _appDbContext.QueueSessions
             .Where(qs => qs.SubjectId == subjectId)
             .Where(qs => qs.QueueStatus == QueueStatus.Registration || qs.QueueStatus == QueueStatus.Active)

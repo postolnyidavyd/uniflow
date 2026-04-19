@@ -1,12 +1,16 @@
+using DTOs.Common;
 using DTOs.QueueDTOs;
 
 namespace Services.Queue;
 
 public interface IQueueService
 {
+    // Гетери
     Task<QueueSessionDetailResponseDto> GetSessionByIdAsync( Guid userId, Guid sessionId);
     Task<QueueStateResponseDto> GetSessionEntriesAsync(Guid userId, Guid sessionId);
-    
+    Task<IEnumerable<MyQueueCardResponseDto>> GetUserSession(Guid userId);
+    Task<PaginationResult<QueueCardResponseDto>> GetAllSessions(Guid userId, int page, int pageSize);
+    Task<PaginationResult<QueueCardResponseDto>> GetAllSessions(Guid userId, int page, int pageSize, Guid subjectId);
     //Crud операції
     Task CreateSessionAsync(Guid userId, CreateQueueSessionDto dto);
     Task UpdateSessionAsync(Guid sessionId, UpdateQueueSessionDto dto);
