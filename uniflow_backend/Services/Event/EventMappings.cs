@@ -78,13 +78,13 @@ public static class EventMappings
         Location = e.Location,
         MeetUrl = e.MeetUrl,
         
-        IsSubscribed =
-            e.Subscribers.Any(u => u.Id == userId) ||
-            e.Subject.Subscribers.Any(s => s.Id == userId) ||
-            e.Subject.Subscribers.Any(u =>
-                u.UserCalendarSettings != null &&
-                u.UserCalendarSettings.AutoAddAllEvents &&
-                u.Id == userId)
+        IsSubscribed = 
+            e.Subscribers.Any(u => u.Id == userId) 
+            ||
+            e.Subject!.Subscribers.Any(u => 
+                u.Id == userId && 
+                u.UserCalendarSettings != null && 
+                u.UserCalendarSettings.AutoAddAllEvents)
     };
 
     public static IQueryable<EventSummaryResponseDto> ProjectToSummaryDto(
