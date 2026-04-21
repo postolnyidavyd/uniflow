@@ -13,6 +13,7 @@ using Scalar.AspNetCore;
 using Services.Auth;
 using Services.Calendar;
 using Services.Event;
+using Services.ICalBuilder;
 using Services.Photo;
 using Services.Queue;
 using Services.Settings;
@@ -81,6 +82,8 @@ builder.Services.AddScoped<IWeightStrategyFactory, WeightStrategyFactory>();
 builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<IICalbuilder, ICalBuilder>();
+
 builder.Services.AddControllers();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
@@ -115,3 +118,4 @@ app.UseHttpsRedirection();
 
 
 app.Run();
+
