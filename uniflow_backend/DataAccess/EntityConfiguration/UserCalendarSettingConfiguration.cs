@@ -11,5 +11,12 @@ public class UserCalendarSettingConfiguration : IEntityTypeConfiguration<UserCal
         builder.HasKey(ucs => ucs.Id);
         builder.HasOne(ucs => ucs.User).WithOne(u => u.UserCalendarSettings)
             .HasForeignKey<UserCalendarSettings>(ucs => ucs.UserId);
+        
+        builder.Property(x => x.SyncToken)
+            .HasMaxLength(64)
+            .IsRequired();
+        
+        builder.HasIndex(x => x.SyncToken)
+            .IsUnique();
     }
 }
