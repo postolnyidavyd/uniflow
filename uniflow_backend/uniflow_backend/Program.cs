@@ -13,10 +13,12 @@ using Scalar.AspNetCore;
 using Services.Auth;
 using Services.Calendar;
 using Services.Event;
+using Services.ICalBuilder;
 using Services.Photo;
 using Services.Queue;
 using Services.Settings;
 using Services.Subject;
+using Services.Subscription;
 using Services.Wallet;
 using Services.WeightStrategyFactory;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
@@ -79,6 +81,9 @@ builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IWeightStrategyFactory, WeightStrategyFactory>();
 builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<IICalbuilder, ICalBuilder>();
+
 builder.Services.AddControllers();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
@@ -113,3 +118,4 @@ app.UseHttpsRedirection();
 
 
 app.Run();
+

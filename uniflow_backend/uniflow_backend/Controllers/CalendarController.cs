@@ -1,3 +1,5 @@
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Calendar;
 
@@ -32,5 +34,19 @@ public class CalendarController : RequireAuthController
         var userId = GetUserId();
         return Ok(await _calendarService.GetUpcomingAsync(userId, subjectId));
     }
+    
+    [HttpGet("export/{token}.ics")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ExportCalendar([FromRoute] string token)
+    {
+        var userId = await _calendarService.GetUserIdBySyncTokenAsync(token);
+    
+        if (userId == null)
+            return Unauthorized("Недійсний токен синхронізації");
 
+        string iCalContent = await _calendarService.GenerateICalContentAsync(userId.Value);
+
+        var bytes = Encoding.UTF8.GetBytes(iCalContent);
+        return File(bytes, "text/calendar", "uniflow-schedule.ics");
+    }
 }

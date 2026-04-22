@@ -11,8 +11,6 @@ public class User : IdentityUser<Guid>
     public StudentWallet? StudentWallet { get; set; }
 
     public ICollection<QueueEntry> QueueEntries { get; set; } = new List<QueueEntry>();
-    // Можливо буде навігаційна властивість
-    //public required string CalendarToken { get; set; }
     
     public UserCalendarSettings? UserCalendarSettings { get; set; }
     
