@@ -4,6 +4,9 @@ using Domain.Models;
 using DTOs.Common;
 using DTOs.QueueDTOs;
 using Hangfire;
+using Hubs.Clients;
+using Hubs.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Services.Wallet;
 using Services.WeightStrategyFactory;
@@ -16,17 +19,19 @@ public class QueueService : IQueueService
     private readonly IWalletService _walletService;
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly IWeightStrategyFactory _weightStrategyFactory;
+    private readonly IHubContext<QueueHub, IQueueClient> _hubContext;
 
     public QueueService(AppDbContext appDbContext, IWalletService walletService,
-        IBackgroundJobClient backgroundJobClient, IWeightStrategyFactory weightStrategyFactory)
+        IBackgroundJobClient backgroundJobClient, IWeightStrategyFactory weightStrategyFactory, IHubContext<QueueHub,IQueueClient> hubContext)
     {
         _appDbContext = appDbContext;
         _walletService = walletService;
         _backgroundJobClient = backgroundJobClient;
         _weightStrategyFactory = weightStrategyFactory;
+        _hubContext = hubContext;
     }
 
-    public async Task<QueueSessionDetailResponseDto> GetSessionByIdAsync(Guid userId, Guid sessionId)
+    public async Task<QueueSessionDetailResponseDto> GetSessionByIdAsync(Guid sessionId)
     {
         return await _appDbContext.QueueSessions
                    .ProjectToSessionDetailDto()
@@ -36,13 +41,7 @@ public class QueueService : IQueueService
 
     public async Task<QueueStateResponseDto> GetSessionEntriesAsync(Guid userId, Guid sessionId)
     {
-        var entries = await _appDbContext.QueueEntries.Where(qn =>
-                qn.QueueSessionId == sessionId && (qn.EntryStatus == QueueEntryStatus.Waiting ||
-                                                   qn.EntryStatus == QueueEntryStatus.InProgress))
-            .OrderByDescending(qn => qn.EffectiveWeight)
-            .ThenBy(qn => qn.JoinedAt)
-            .ProjectToDto()
-            .ToListAsync();
+        var entries = await GetQueueEntryDtosAsync(sessionId);
 
         return new QueueStateResponseDto
         {
@@ -50,6 +49,8 @@ public class QueueService : IQueueService
             UserEntry = entries.FirstOrDefault(e => e.UserId == userId)
         };
     }
+
+
 
     public async Task<IEnumerable<MyQueueCardResponseDto>> GetUserSession(Guid userId)
     {
@@ -207,6 +208,8 @@ public class QueueService : IQueueService
         // if (dto.DurationMinutes.HasValue)
         //     session.Duration = TimeSpan.FromMinutes(dto.DurationMinutes.Value);
         await _appDbContext.SaveChangesAsync();
+
+        await BroadcastSessionDetailAsync(sessionId);
     }
 
     public async Task DeleteSessionAsync(Guid sessionId)
@@ -249,6 +252,8 @@ public class QueueService : IQueueService
             string reason = $"Компенсація за скасовану чергу '{sessionValues.Title}' ({sessionValues.SubjectName})";
             await _walletService.ChargeTokensBulkAsync(usersToRefund, 1, reason);
         }
+        
+        await BroadcastSessionDetailAsync(sessionId);
     }
 
     public async Task AutoOpenSessionRegistrationAsync(Guid sessionId)
@@ -258,6 +263,8 @@ public class QueueService : IQueueService
             .Where(q => q.QueueStatus != QueueStatus.Cancelled)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.QueueStatus, QueueStatus.Registration));
+        
+        await BroadcastSessionDetailAsync(sessionId);
     }
 
     public async Task AutoActivateSessionAsync(Guid sessionId)
@@ -267,9 +274,13 @@ public class QueueService : IQueueService
             .Where(q => q.QueueStatus != QueueStatus.Cancelled)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.QueueStatus, QueueStatus.Active));
-
+        
+        //Спочатку оновлюємо деталі черги потім переводим студента
+        await BroadcastSessionDetailAsync(sessionId);
         //Переводимо першого студента в активний стан, щоб почати цикл 
         await MoveToNextStudentInternalAsync(sessionId);
+        //Бродкастим новий список 
+        await BroadcastQueueEntriesAsync(sessionId);
     }
 
     public async Task AutoCloseSessionAsync(Guid sessionId)
@@ -279,6 +290,8 @@ public class QueueService : IQueueService
             .Where(q => q.QueueStatus != QueueStatus.Cancelled)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.QueueStatus, QueueStatus.Closed));
+
+        await BroadcastSessionDetailAsync(sessionId);
     }
 
     public async Task JoinSessionAsync(Guid userId, Guid sessionId, JoinQueueDto dto)
@@ -369,6 +382,8 @@ public class QueueService : IQueueService
                 await MoveToNextStudentInternalAsync(sessionId);
             }
         }
+
+        await BroadcastQueueEntriesAsync(sessionId);
     }
 
     public async Task LeaveSessionAsync(Guid userId, Guid sessionId)
@@ -409,6 +424,8 @@ public class QueueService : IQueueService
                 await _walletService.ChargeTokensAsync(userId, 1, reason);
             }
         }
+
+        await BroadcastQueueEntriesAsync(sessionId);
     }
 
     public async Task CompleteCurrentAsync(Guid userId, Guid sessionId)
@@ -434,6 +451,8 @@ public class QueueService : IQueueService
         }
 
         await MoveToNextStudentInternalAsync(sessionId);
+
+        await BroadcastQueueEntriesAsync(sessionId);
     }
 
     public async Task SkipCurrentAsync(Guid sessionId)
@@ -453,6 +472,8 @@ public class QueueService : IQueueService
 
 
         await MoveToNextStudentInternalAsync(sessionId);
+
+        await BroadcastQueueEntriesAsync(sessionId);
     }
 
     public async Task ForceCompleteCurrentAsync(Guid sessionId)
@@ -474,6 +495,8 @@ public class QueueService : IQueueService
 
 
         await MoveToNextStudentInternalAsync(sessionId);
+
+        await BroadcastQueueEntriesAsync(sessionId);
     }
 
     public async Task<IEnumerable<QueueSessionShortResponseDto>> GetUpcomingAsync(Guid userId, int take = 3)
@@ -533,5 +556,30 @@ public class QueueService : IQueueService
                 .Where(e => e.Id == nextEntryId)
                 .ExecuteUpdateAsync(s => s.SetProperty(e => e.EntryStatus, QueueEntryStatus.InProgress));
         }
+    }
+    private async Task<List<QueueEntryDto>> GetQueueEntryDtosAsync(Guid sessionId)
+    {
+        var entries = await _appDbContext.QueueEntries.Where(qn =>
+                qn.QueueSessionId == sessionId && (qn.EntryStatus == QueueEntryStatus.Waiting ||
+                                                   qn.EntryStatus == QueueEntryStatus.InProgress))
+            .OrderByDescending(qn => qn.EffectiveWeight)
+            .ThenBy(qn => qn.JoinedAt)
+            .ProjectToDto()
+            .ToListAsync();
+        return entries;
+    }
+    
+    private async Task BroadcastSessionDetailAsync(Guid sessionId){
+        var details = await GetSessionByIdAsync(sessionId);
+        //Компілятор каже що тут завжди true, бо наш метод не повертає nullable
+        if (details != null)
+            await _hubContext.Clients.Group(sessionId.ToString()).SessionDetailUpdated(details);
+    }
+    
+    private async Task BroadcastQueueEntriesAsync(Guid sessionId)
+    {
+        var entries = await  GetQueueEntryDtosAsync(sessionId);
+        
+        await _hubContext.Clients.Group(sessionId.ToString()).QueueEntriesUpdated(entries);
     }
 }

@@ -127,7 +127,6 @@ public static class QueueMapping
         QueueStartTime = q.QueueStartTime,
         Duration = q.Duration,
         AverageMinutesPerStudent = q.AverageMinutesPerStudent,
-        EntriesCount = q.QueueEntries.Count,
         GuaranteedSlots = (int)q.Duration.TotalMinutes / q.AverageMinutesPerStudent,
         QueueStatus = q.QueueStatus,
         IsAllowedToSubmitMoreThanOne = q.IsAllowedToSubmitMoreThanOne,

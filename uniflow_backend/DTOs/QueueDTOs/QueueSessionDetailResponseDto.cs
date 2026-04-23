@@ -20,7 +20,6 @@ public class QueueSessionDetailResponseDto
     public TimeSpan Duration { get; set; } // Можливо поставити int але під питанням
     public int AverageMinutesPerStudent { get; set; }
     
-    public int EntriesCount { get; set; }
     public int GuaranteedSlots { get; set; }// Може і фронт розраховувати
     
     public QueueStatus QueueStatus { get; set; } 

@@ -5,6 +5,7 @@ using DTOs.Validators;
 using FluentValidation;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Hubs.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -83,7 +84,8 @@ builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IICalbuilder, ICalBuilder>();
-
+builder.Services.AddSignalR();
+    
 builder.Services.AddControllers();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
@@ -109,6 +111,7 @@ using (var scope = app.Services.CreateScope())
 app.UseHangfireDashboard("/hangfire");
 app.UseMiddleware<ExceptionMiddleware>();
 
+app.MapHub<QueueHub>("/hubs/queues");
 app.UseAuthentication();
 app.UseAuthorization();
 
