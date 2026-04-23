@@ -1,8 +1,9 @@
 using Hubs.Clients;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Hubs.Hubs;
-
+[Authorize]
 public class QueueHub : Hub<IQueueClient>
 {
     public async Task JoinSessionGroup(Guid sessionId) =>
