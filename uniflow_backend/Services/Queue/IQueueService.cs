@@ -6,7 +6,7 @@ namespace Services.Queue;
 public interface IQueueService
 {
     // Гетери
-    Task<QueueSessionDetailResponseDto> GetSessionByIdAsync( Guid userId, Guid sessionId);
+    Task<QueueSessionDetailResponseDto> GetSessionByIdAsync( Guid sessionId);
     Task<QueueStateResponseDto> GetSessionEntriesAsync(Guid userId, Guid sessionId);
     Task<IEnumerable<MyQueueCardResponseDto>> GetUserSession(Guid userId);
     Task<PaginationResult<QueueCardResponseDto>> GetAllSessions(Guid userId, int page, int pageSize);

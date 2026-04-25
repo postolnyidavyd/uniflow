@@ -5,6 +5,7 @@ using DTOs.Validators;
 using FluentValidation;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Hubs.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,23 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            
+            var path = context.HttpContext.Request.Path;
+
+            if (!string.IsNullOrEmpty(accessToken) &&
+                path.StartsWithSegments("/hubs/queue"))
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
+        }
+    };
 });
 builder.Services.AddAuthorization();
 builder.Services.AddHangfire(config =>
@@ -66,6 +84,14 @@ builder.Services.AddHangfire(config =>
     })
 );
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policyBuilder =>
+        policyBuilder.WithOrigins("http://localhost:3000", "http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
 builder.Services.AddHangfireServer();
 
 builder.Services.AddOpenApi();
@@ -83,6 +109,7 @@ builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IICalbuilder, ICalBuilder>();
+builder.Services.AddSignalR();
 
 builder.Services.AddControllers();
 
@@ -109,6 +136,10 @@ using (var scope = app.Services.CreateScope())
 app.UseHangfireDashboard("/hangfire");
 app.UseMiddleware<ExceptionMiddleware>();
 
+app.MapHub<QueueHub>("/hubs/queue");
+
+app.UseCors("AllowFrontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -118,4 +149,3 @@ app.UseHttpsRedirection();
 
 
 app.Run();
-

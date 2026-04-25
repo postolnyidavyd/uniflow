@@ -45,8 +45,7 @@ public class QueueController : RequireAuthController
     [HttpGet("{sessionId:guid}")]
     public async Task<IActionResult> GetSessionById([FromRoute] Guid sessionId)
     {
-        var userId = GetUserId();
-        return Ok(await _queueService.GetSessionByIdAsync(userId, sessionId));
+        return Ok(await _queueService.GetSessionByIdAsync(sessionId));
     }
 
     [HttpGet("{sessionId:guid}/entries")]
