@@ -67,7 +67,7 @@ builder.Services.AddAuthentication(options =>
             var path = context.HttpContext.Request.Path;
 
             if (!string.IsNullOrEmpty(accessToken) &&
-                path.StartsWithSegments("/hubs/queue")) // 👈 Тут має бути шлях твого хабу
+                path.StartsWithSegments("/hubs/queue"))
             {
                 context.Token = accessToken;
             }
@@ -84,6 +84,14 @@ builder.Services.AddHangfire(config =>
     })
 );
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policyBuilder =>
+        policyBuilder.WithOrigins("http://localhost:3000", "http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
 builder.Services.AddHangfireServer();
 
 builder.Services.AddOpenApi();
@@ -128,7 +136,10 @@ using (var scope = app.Services.CreateScope())
 app.UseHangfireDashboard("/hangfire");
 app.UseMiddleware<ExceptionMiddleware>();
 
-app.MapHub<QueueHub>("/hubs/queues");
+app.MapHub<QueueHub>("/hubs/queue");
+
+app.UseCors("AllowFrontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
 

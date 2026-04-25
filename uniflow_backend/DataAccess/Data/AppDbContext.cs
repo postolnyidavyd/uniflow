@@ -24,6 +24,8 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     
     public DbSet<UserCalendarSettings> UserCalendarSettings { get; set; }
 
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

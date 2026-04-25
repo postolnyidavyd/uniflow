@@ -571,7 +571,6 @@ public class QueueService : IQueueService
     
     private async Task BroadcastSessionDetailAsync(Guid sessionId){
         var details = await GetSessionByIdAsync(sessionId);
-        //Компілятор каже що тут завжди true, бо наш метод не повертає nullable
         if (details != null)
             await _hubContext.Clients.Group(sessionId.ToString()).SessionDetailUpdated(details);
     }
