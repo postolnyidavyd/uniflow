@@ -42,5 +42,7 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
         builder.ApplyConfiguration(new QueueEntryConfiguration());
         
         builder.ApplyConfiguration(new UserCalendarSettingConfiguration());
+        
+        builder.ApplyConfiguration(new RefreshTokenConfiguration());
     }
 }
