@@ -108,6 +108,14 @@ public class WalletService : IWalletService
         await _appDbContext.SaveChangesAsync();
     }
 
+    public async Task WeeklyTokenChargeAsync()
+    {
+        var userIds = await _appDbContext.StudentWallets
+            .Select(w => w.UserId)
+            .ToListAsync();
+        await ChargeTokensBulkAsync(userIds, 3, "Щотижневе нарахування");
+    }
+
     // public async Task RecalculateBalance(Guid userId)
     // {
     //     var wallet = await _appDbContext.StudentWallets.FirstOrDefaultAsync(sw => sw.UserId == userId);

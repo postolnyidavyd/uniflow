@@ -134,6 +134,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseHangfireDashboard("/hangfire");
+RecurringJob.AddOrUpdate<IWalletService>("weekly-token-charge", service => service.WeeklyTokenChargeAsync(), Cron.Weekly(DayOfWeek.Sunday, 9));
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapHub<QueueHub>("/hubs/queue");
