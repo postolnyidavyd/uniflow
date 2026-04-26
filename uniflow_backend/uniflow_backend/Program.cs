@@ -15,6 +15,7 @@ using Services.Auth;
 using Services.Calendar;
 using Services.Event;
 using Services.ICalBuilder;
+using Services.Markdown;
 using Services.Photo;
 using Services.Queue;
 using Services.Settings;
@@ -109,6 +110,7 @@ builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IICalbuilder, ICalBuilder>();
+builder.Services.AddScoped<IMarkdownParser, MarkdownParser>();
 builder.Services.AddSignalR();
 
 builder.Services.AddControllers();
@@ -134,6 +136,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseHangfireDashboard("/hangfire");
+RecurringJob.AddOrUpdate<IWalletService>("weekly-token-charge", service => service.WeeklyTokenChargeAsync(), Cron.Weekly(DayOfWeek.Sunday, 9));
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapHub<QueueHub>("/hubs/queue");
