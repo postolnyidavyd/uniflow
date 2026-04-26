@@ -15,6 +15,7 @@ using Services.Auth;
 using Services.Calendar;
 using Services.Event;
 using Services.ICalBuilder;
+using Services.Markdown;
 using Services.Photo;
 using Services.Queue;
 using Services.Settings;
@@ -109,6 +110,7 @@ builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IICalbuilder, ICalBuilder>();
+builder.Services.AddScoped<IMarkdownParser, MarkdownParser>();
 builder.Services.AddSignalR();
 
 builder.Services.AddControllers();
