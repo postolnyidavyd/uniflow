@@ -3,6 +3,7 @@ using DTOs.SubjectDTOs;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using Microsoft.AspNetCore.Http;
+using Services.Markdown;
 using Services.Photo;
 
 namespace Services.Subject;
@@ -11,11 +12,13 @@ public class SubjectService : ISubjectService
 {
     private readonly AppDbContext _appDbContext;
     private readonly IPhotoService _photoService;
+    private readonly IMarkdownParser _markdownParser;
 
-    public SubjectService(AppDbContext appDbContext, IPhotoService photoService)
+    public SubjectService(AppDbContext appDbContext, IPhotoService photoService,IMarkdownParser markdownParser)
     {
         _appDbContext = appDbContext;
         _photoService = photoService;
+        _markdownParser = markdownParser;
     }
 
     public async Task<IEnumerable<SubjectSummaryResponseDto>> GetAllSummariesAsync()
@@ -55,7 +58,9 @@ public class SubjectService : ISubjectService
                     Name = subject.Name,
                     Lecturer = subject.Lecturer,
                     Id = subject.Id,
-                    MarkdownContent = subject.MarkdownContent
+                    RenderedContent = subject.MarkdownContent != null 
+                        ? _markdownParser.Parse(subject.MarkdownContent) 
+                        : null
                 }).FirstOrDefaultAsync();
 
         if (subject == null)
@@ -140,6 +145,14 @@ public class SubjectService : ISubjectService
         _appDbContext.Subjects.Remove(subject);
 
         await _appDbContext.SaveChangesAsync();
+    }
+
+    public async Task<string?> GetMarkdownContentAsync(Guid subjectId)
+    {
+        return await _appDbContext.Subjects
+            .Where(s => s.Id == subjectId)
+            .Select(s => s.MarkdownContent)
+            .FirstOrDefaultAsync();
     }
 
     private async Task<string?> UploadPhotoAsync(IFormFile? file)

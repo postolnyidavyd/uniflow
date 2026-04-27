@@ -12,4 +12,5 @@ public interface ISubjectService
     Task UpdateMarkdownContentAsync(Guid subjectId, UpdateMarkdownDto dto);
 
     Task DeleteSubjectAsync(Guid subjectId);
+    Task<string?> GetMarkdownContentAsync(Guid subjectId);
 }
