@@ -44,7 +44,14 @@ public class SubjectController: RequireAuthController
         await _subjectService.UpdateSubjectAsync(subjectId, dto);
         return Ok();
     }
-
+    
+    [HttpGet("{subjectId}/markdown")]
+    [Authorize(Roles = Roles.Headman)]
+    public async Task<IActionResult> GetMarkdownContent([FromRoute] Guid subjectId)
+    {
+        return Ok(await _subjectService.GetMarkdownContentAsync(subjectId));
+    }
+    
     [HttpPatch("{subjectId}/markdown")]
     [Authorize(Roles = Roles.Headman)]
     public async Task<IActionResult> UpdateMarkdownContent([FromRoute] Guid subjectId, [FromBody] UpdateMarkdownDto dto)

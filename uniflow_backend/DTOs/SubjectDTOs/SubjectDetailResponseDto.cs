@@ -9,5 +9,5 @@ public class SubjectDetailResponseDto
     public required string Name { get; set; }
 
     public required string Lecturer { get; set; }
-    public string? MarkdownContent { get; set; }
+    public string? RenderedContent { get; set; }
 }
