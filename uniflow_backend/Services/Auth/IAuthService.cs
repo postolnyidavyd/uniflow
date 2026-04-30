@@ -9,4 +9,6 @@ public interface IAuthService
     
     Task<(AuthResponseDto authResponse, string newRefreshToken)> RefreshTokensAsync(string incomingRefreshToken, string ipAddress, string userAgent);
     Task RevokeTokenAsync(string refreshToken);
+    
+    Task<UserProfileDto> GetMeAsync(Guid userId);
 }

@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using DTOs.AuthDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Auth;
 
@@ -68,6 +70,15 @@ public class AuthController : ControllerBase
         
         return Ok(new { message = "Успішний вихід" });
     }
+    
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<IActionResult> GetMe()
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        return Ok(await _authService.GetMeAsync(userId));
+    }
+    
     private void SetTokenCookie(string token)
     {
         var cookieOptions = new CookieOptions
