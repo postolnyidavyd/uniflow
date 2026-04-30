@@ -145,6 +145,23 @@ public class AuthService : IAuthService
         };
     }
     
+    public async Task<UserProfileDto> GetMeAsync(Guid userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString())
+            ?? throw new KeyNotFoundException("Користувача не знайдено");
+    
+        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault() ?? Roles.Student;
+    
+        return new UserProfileDto
+        {
+            Id = user.Id,
+            Email = user.Email!,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Group = user.Group,
+            Role = role
+        };
+    }
     
     private async Task<string> CreateSessionAsync(Guid userId, string ipAddress, string userAgent)
     {
@@ -171,4 +188,7 @@ public class AuthService : IAuthService
 
         return token;
     }
+    
+    
+    
 }
