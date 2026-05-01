@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
-import Close_MD from '../../assets/Close_MD.svg';
+import Close_MD from '../../assets/Close_MD.svg?react';
 
-const Modal = ({ isOpen, onClose, title, children, width = '34rem' }) => {
+const Modal = ({ isOpen, onClose, title, children, width }) => {
   const dialogRef = useRef(null);
   const isMousedownInside = useRef(false);
 
@@ -52,7 +52,7 @@ const Modal = ({ isOpen, onClose, title, children, width = '34rem' }) => {
           <ModalTitle>{title}</ModalTitle>
           {onClose && (
             <CloseButton type="button" onClick={onClose}>
-              <img src={Close_MD} alt="Закрити" />
+              <Close_MD/>
             </CloseButton>
           )}
         </ModalHeader>
@@ -64,7 +64,8 @@ const Modal = ({ isOpen, onClose, title, children, width = '34rem' }) => {
 };
 
 const StyledDialog = styled.dialog`
-  width: ${({ $width }) => $width};
+   width: ${({ $width }) => $width || 'max-content'};
+    min-width: 34.375rem;   
   border: 1.901px solid var(--base-bright-grey);
 
   border-radius: 1.25rem;
@@ -73,7 +74,7 @@ const StyledDialog = styled.dialog`
   margin: auto;
 
   
-  max-height: 90vh;
+  //max-height: 90vh;
   overflow-y: auto;
 
   &::backdrop {
@@ -87,14 +88,13 @@ const ModalHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 1.5rem 0.5rem 1.5rem; 
-  /* Без border-bottom */
 `;
 
 const ModalTitle = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* Відступ між текстом і бейджами */
-  font-size: 1.25rem; /* Або var(--font-desktop-headings-h5) */
+  gap: 0.5rem; 
+  font-size: 1.25rem; 
   font-weight: 600;
   color: var(--base-black, #000000);
 `;
@@ -108,12 +108,13 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   border-radius: 0.5rem;
-  transition: background-color 160ms ease;
+  transition: all 180ms ease;
 
   &:hover { 
     background-color: var(--grey-20, #f5f5f5); 
+    color: var(--base-secondary-text);
   }
-
+  
   img { 
     width: 1.5rem; 
     height: 1.5rem; 
@@ -122,6 +123,9 @@ const CloseButton = styled.button`
 
 const ModalBody = styled.div`
   padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 `;
 
 export default Modal;
