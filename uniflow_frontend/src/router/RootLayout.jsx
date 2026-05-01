@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux';
 import {
   Navigate,
   Outlet,
@@ -6,21 +5,25 @@ import {
   useLocation,
 } from 'react-router-dom';
 import Sidebar from '../components/Sidebar.jsx';
+import { useGetMeQuery } from '../store/api/authApi.js';
+import Spinner from '../components/Spinner.jsx';
 
 function RootLayout() {
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const location = useLocation();
+    const location = useLocation();
+    const { isLoading, isError } = useGetMeQuery();
 
-  if (!isAuthenticated)
-    return <Navigate to="/landing" state={{ from: location }} replace />;
+    if (isLoading) return <Spinner fullscreen />;
 
-  return (
-    <>
-      <Sidebar />
-      <ScrollRestoration />
-      {/*<ModalRoot/>*/}
-      <Outlet />
-    </>
-  );
+    if (isError)
+        return <Navigate to="/landing" state={{ from: location }} replace />;
+
+    return (
+        <>
+            <Sidebar />
+            <ScrollRestoration />
+            <Outlet />
+        </>
+    );
 }
+
 export default RootLayout;
