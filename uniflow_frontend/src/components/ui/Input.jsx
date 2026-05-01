@@ -2,14 +2,17 @@ import styled from 'styled-components';
 import { forwardRef } from 'react';
 
 const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-  width: 100%;
-  margin-top: 1.25rem;
-  position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    width: 100%;
+    padding-top: 1.25rem;
 `;
 
+const InputContainer = styled.div`
+  position: relative;
+  width: 100%;
+`;
 const StyledInput = styled.input`
   width: 100%;
   padding: 0.25rem 0 0.5rem 0;
@@ -17,7 +20,8 @@ const StyledInput = styled.input`
   color: var(--base-black, #000);
   background-color: transparent;
   border: none;
-  border-bottom: 1.5px solid var(--base-black, #000);
+  /* Перевіряємо наявність помилки для базового стану */
+  border-bottom: 0.125rem solid ${({ $error }) => $error ? 'var(--brick-red-100, #E42939)' : 'var(--base-black, #000)'};
   border-radius: 0;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -27,8 +31,9 @@ const StyledInput = styled.input`
   }
 
   &:focus {
-    border-bottom-color: var(--base-black);
-    box-shadow: 0 1px 0 0 var(--base-black);
+    /* Зберігаємо червоний колір та тінь при фокусі, якщо є помилка */
+    border-bottom-color: ${({ $error }) => $error ? 'var(--brick-red-100, #E42939)' : 'var(--base-black, #000)'};
+    box-shadow: 0 1px 0 0 ${({ $error }) => $error ? 'var(--brick-red-100, #E42939)' : 'var(--base-black, #000)'};
   }
 
   &:disabled {
@@ -66,8 +71,10 @@ const Input = forwardRef(({ label, id, error, ...props }, ref) => {
   const inputId = id || `input-${Math.random().toString(36).substring(2, 9)}`;
   return (
     <Wrapper>
-      <StyledInput id={inputId} ref={ref} placeholder=" " $error={!!error} {...props} />
-      <StyledLabel htmlFor={inputId}>{label}</StyledLabel>
+      <InputContainer>
+        <StyledInput id={inputId} ref={ref} placeholder=" " $error={!!error} {...props} />
+        <StyledLabel htmlFor={inputId}>{label}</StyledLabel>
+      </InputContainer>
       {error && <ErrorText>{error}</ErrorText>}
     </Wrapper>
   );

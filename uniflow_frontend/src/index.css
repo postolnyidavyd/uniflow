@@ -117,3 +117,30 @@
     margin: 0;
     padding: 0;
 }
+[data-sonner-toaster] {
+    --normal-bg: var(--base-white);
+    --normal-border: var(--grey-40);
+    --normal-text: var(--base-black);
+
+    --success-bg: var(--malachite-20);
+    --success-border: var(--malachite-100);
+    --success-text: var(--malachite-100);
+
+    --error-bg: var(--brick-red-20);
+    --error-border: var(--brick-red-100);
+    --error-text: var(--brick-red-100);
+
+    --warning-bg: var(--pumpkin-20);
+    --warning-border: var(--pumpkin-100);
+    --warning-text: var(--pumpkin-100);
+
+    --info-bg: var(--radiance-20);
+    --info-border: var(--radiance-100);
+    --info-text: var(--radiance-100);
+}
+
+[data-sonner-toast] {
+    border-radius: 12px !important;
+    font-family: 'e-Ukraine', sans-serif !important;
+    box-shadow: var(--shadow) !important;
+}
