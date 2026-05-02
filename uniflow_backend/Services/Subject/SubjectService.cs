@@ -14,7 +14,7 @@ public class SubjectService : ISubjectService
     private readonly IPhotoService _photoService;
     private readonly IMarkdownParser _markdownParser;
 
-    public SubjectService(AppDbContext appDbContext, IPhotoService photoService,IMarkdownParser markdownParser)
+    public SubjectService(AppDbContext appDbContext, IPhotoService photoService, IMarkdownParser markdownParser)
     {
         _appDbContext = appDbContext;
         _photoService = photoService;
@@ -52,21 +52,18 @@ public class SubjectService : ISubjectService
     {
         var subject = await _appDbContext.Subjects
             .Where(s => s.Id == subjectId)
-            .Select(subject =>
-                new SubjectDetailResponseDto()
-                {
-                    Name = subject.Name,
-                    Lecturer = subject.Lecturer,
-                    Id = subject.Id,
-                    RenderedContent = subject.MarkdownContent != null 
-                        ? _markdownParser.Parse(subject.MarkdownContent) 
-                        : null
-                }).FirstOrDefaultAsync();
+            .Select(s => new { s.Name, s.Lecturer, s.Id, s.MarkdownContent })
+            .FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Предмет не знайдено");
 
-        if (subject == null)
-            throw new KeyNotFoundException("Предмет не знайдено");
-
-        return subject;
+        return new SubjectDetailResponseDto
+        {
+            Name = subject.Name,
+            Lecturer = subject.Lecturer,
+            Id = subject.Id,
+            RenderedContent = subject.MarkdownContent != null
+                ? _markdownParser.Parse(subject.MarkdownContent)
+                : null
+        };
     }
 
     public async Task<Guid> CreateSubjectAsync(Guid userId, CreateSubjectDto dto)

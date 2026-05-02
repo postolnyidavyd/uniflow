@@ -22,7 +22,7 @@ public class CodeBlockHandler : BaseBlockHandler
             var language = match.Groups[1].Value;
             var classAttr = string.IsNullOrEmpty(language) ? "" : $" class=\"language-{language}\"";
             
-            return $"<pre><code {classAttr}\">{textContent}</code></pre>";
+            return $"<pre><code {classAttr}>{textContent}</code></pre>";
         });
     }
 }

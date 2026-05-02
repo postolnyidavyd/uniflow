@@ -1,4 +1,6 @@
+using System;
 using System.Text;
+using System.Threading.Tasks;
 using DataAccess.Data;
 using Domain.Models;
 using DTOs.Validators;
@@ -7,8 +9,10 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Hubs.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Services.Auth;
@@ -25,6 +29,8 @@ using Services.Wallet;
 using Services.WeightStrategyFactory;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using uniflow_backend.Middleware;
+using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +91,12 @@ builder.Services.AddHangfire(config =>
     })
 );
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policyBuilder =>
@@ -135,20 +147,19 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseHttpsRedirection();         
+app.UseCors("AllowFrontend");      
+app.UseMiddleware<ExceptionMiddleware>(); 
 app.UseHangfireDashboard("/hangfire");
-RecurringJob.AddOrUpdate<IWalletService>("weekly-token-charge", service => service.WeeklyTokenChargeAsync(), Cron.Weekly(DayOfWeek.Sunday, 9));
-app.UseMiddleware<ExceptionMiddleware>();
-
+app.UseAuthentication();           
+app.UseAuthorization();            
 app.MapHub<QueueHub>("/hubs/queue");
-
-app.UseCors("AllowFrontend");
-
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.MapControllers();
-// Configure the HTTP request pipeline.
-app.UseHttpsRedirection();
 
+RecurringJob.AddOrUpdate<IWalletService>(
+    "weekly-token-charge",
+    service => service.WeeklyTokenChargeAsync(),
+    Cron.Weekly(DayOfWeek.Sunday, 9)
+);
 
 app.Run();
