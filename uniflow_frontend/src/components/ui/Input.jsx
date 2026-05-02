@@ -16,7 +16,7 @@ const InputContainer = styled.div`
 const StyledInput = styled.input`
   width: 100%;
   padding: 0.25rem 0 0.5rem 0;
-  font-size: var(--desktop-base-body);
+  font-style: var(--desktop-base-body);
   color: var(--base-black, #000);
   background-color: transparent;
   border: none;
@@ -48,7 +48,7 @@ const StyledLabel = styled.label`
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  font-size: var(--desktop-base-body);
+  font-style: var(--desktop-base-body);
   color: var(--grey-100, #959595);
   pointer-events: none;
   transition: all 0.2s ease-out;
@@ -57,7 +57,7 @@ const StyledLabel = styled.label`
   ${StyledInput}:not(:placeholder-shown) ~ & {
     top: -4px;
     transform: translateY(-100%);
-    font-size: var(--desktop-base-tiny);
+    font-style: var(--desktop-base-tiny);
     color: var(--grey-100, #959595);
   }
 `;

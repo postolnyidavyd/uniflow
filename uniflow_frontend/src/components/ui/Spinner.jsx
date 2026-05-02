@@ -47,7 +47,7 @@ const FullWrapper = styled.div`
 `;
 
 const LoadingText = styled.p`
-  font-size: var(--desktop-headings-h8);
+  font-style: var(--desktop-headings-h8);
   color: var(--base-secondary-text);
   margin: 0;
 `;

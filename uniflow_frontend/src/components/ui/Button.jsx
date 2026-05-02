@@ -117,15 +117,15 @@ const variants = {
 const sizes = {
   sm: css`
     padding: 0.375rem 0.75rem;
-    font-size: var(--desktop-headings-h8);
+    font-style: var(--desktop-headings-h8);
   `,
   md: css`
     padding: 0.625rem 1.25rem;
-    font-size: var(--desktop-headings-h7);
+    font-style: var(--desktop-headings-h7);
   `,
   lg: css`
     padding: 0.875rem 1.75rem;
-    font-size: var(--desktop-headings-h6);
+    font-style: var(--desktop-headings-h6);
   `,
 };
 

@@ -36,7 +36,7 @@ const Wrapper = styled.div`
   gap: 0.75rem;
 `
 const Label = styled.span`
-  font-size: var(--desktop-headings-h6);
+  font-style: var(--desktop-headings-h6);
   color: var(--base-black, #000);
 `
 // Використання

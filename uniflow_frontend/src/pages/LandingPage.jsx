@@ -1,7 +1,7 @@
-import RegisterModal from '../components/RegisterModal.jsx';
+import RegisterModal from '../components/modals/RegisterModal.jsx';
 import { useState } from 'react';
 import Button from '../components/ui/Button.jsx';
-import LoginModal from '../components/LoginModal.jsx';
+import LoginModal from '../components/modals/LoginModal.jsx';
 
 function LandingPage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
