@@ -1,6 +1,7 @@
 :root {
     /* Color styles */
-    --aaccent-color: #64806D;
+    --accent-color: #64806D;
+    --accent-color-hover: rgba(255, 255, 255, 0.10);
     --base-white: rgba(255, 255, 255, 1);
     --base-black: rgba(0, 0, 0, 1);
     --base-bright-grey: rgba(231, 238, 243, 1);

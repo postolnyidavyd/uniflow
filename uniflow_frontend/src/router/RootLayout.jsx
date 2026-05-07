@@ -7,28 +7,31 @@ import {
 import Sidebar from '../components/Sidebar.jsx';
 import { useGetMeQuery } from '../store/api/authApi.js';
 import Spinner from '../components/ui/Spinner.jsx';
-import styled from "styled-components";
+import styled from 'styled-components';
 
 function RootLayout() {
-    const location = useLocation();
-    const { isLoading, isError } = useGetMeQuery();
+  const location = useLocation();
+  const { isLoading, isError } = useGetMeQuery();
 
-    if (isLoading) return <Spinner fullscreen />;
+  if (isLoading) return <Spinner fullscreen />;
 
-    if (isError)
-        return <Navigate to="/landing" state={{ from: location }} replace />;
+  if (isError)
+    return <Navigate to="/landing" state={{ from: location }} replace />;
 
-    return (
-        <LayoutContainer>
-            <Sidebar />
-                <ScrollRestoration />
-                <Outlet />
-        </LayoutContainer>
-    );
+  return (
+    <LayoutContainer>
+      <Sidebar />
+      <main>
+        <ScrollRestoration />
+        <Outlet />
+      </main>
+    </LayoutContainer>
+  );
 }
 const LayoutContainer = styled.div`
-  display: flex;
-  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 258px 1fr;
+  min-height: 100dvh;
 `;
 // const PageWrapper = styled.div`
 //     flex: 1;

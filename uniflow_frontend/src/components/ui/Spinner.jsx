@@ -13,13 +13,13 @@ const sizes = {
 };
 
 const Ring = styled.div`
-  width: ${({ $size }) => sizes[$size].ring};
-  height: ${({ $size }) => sizes[$size].ring};
-  border-radius: 50%;
-  border: ${({ $size }) => sizes[$size].border} solid rgba(100, 128, 109, 0.2);
-  border-top-color: var(--aaccent-color);
-  animation: ${spin} 0.8s linear infinite;
-  flex-shrink: 0;
+    width: ${({$size}) => sizes[$size].ring};
+    height: ${({$size}) => sizes[$size].ring};
+    border-radius: 50%;
+    border: ${({$size}) => sizes[$size].border} solid rgba(100, 128, 109, 0.2);
+    border-top-color: var(--accent-color);
+    animation: ${spin} 0.8s linear infinite;
+    flex-shrink: 0;
 `;
 
 const DotsWrapper = styled.div`
@@ -29,12 +29,12 @@ const DotsWrapper = styled.div`
 `;
 
 const Dot = styled.span`
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--aaccent-color);
-  animation: ${pulse} 1.2s ease-in-out infinite;
-  animation-delay: ${({ $i }) => $i * 0.2}s;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    animation: ${pulse} 1.2s ease-in-out infinite;
+    animation-delay: ${({$i}) => $i * 0.2}s;
 `;
 
 const FullWrapper = styled.div`
