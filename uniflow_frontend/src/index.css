@@ -1,6 +1,7 @@
 :root {
     /* Color styles */
-    --aaccent-color: #64806D;
+    --accent-color: #64806D;
+    --accent-color-hover: rgba(255, 255, 255, 0.10);
     --base-white: rgba(255, 255, 255, 1);
     --base-black: rgba(0, 0, 0, 1);
     --base-bright-grey: rgba(231, 238, 243, 1);
@@ -117,6 +118,13 @@
     margin: 0;
     padding: 0;
 }
+
+body {
+    font-family: 'e-Ukraine', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 [data-sonner-toaster] {
     --normal-bg: var(--base-white);
     --normal-border: var(--grey-40);

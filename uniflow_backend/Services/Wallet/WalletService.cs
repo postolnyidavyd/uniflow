@@ -86,26 +86,36 @@ public class WalletService : IWalletService
 
     public async Task ChargeTokensBulkAsync(IEnumerable<Guid> userIds, int amount, string? reason)
     {
-        await _appDbContext.StudentWallets
-            .Where(w => userIds.Contains(w.UserId))
-            .ExecuteUpdateAsync(s => s.SetProperty(w => w.Balance, w => w.Balance + amount));
-
-
-        var userWallets = await _appDbContext.StudentWallets
-            .Where(w => userIds.Contains(w.UserId))
-            .Select(w => new { w.UserId, WalletId = w.Id })
-            .ToListAsync();
-
-        var transactionsRecords = userWallets.Select(w => new TokenTransaction()
+        await using var transaction = await _appDbContext.Database.BeginTransactionAsync();
+        try
         {
-            Amount = amount,
-            Description = reason,
-            StudentWalletId = w.WalletId,
-        });
+            await _appDbContext.StudentWallets
+                .Where(w => userIds.Contains(w.UserId))
+                .ExecuteUpdateAsync(s => s.SetProperty(w => w.Balance, w => w.Balance + amount));
 
 
-        await _appDbContext.TokenTransactions.AddRangeAsync(transactionsRecords);
-        await _appDbContext.SaveChangesAsync();
+            var userWallets = await _appDbContext.StudentWallets
+                .Where(w => userIds.Contains(w.UserId))
+                .Select(w => new { w.UserId, WalletId = w.Id })
+                .ToListAsync();
+
+            var transactionsRecords = userWallets.Select(w => new TokenTransaction()
+            {
+                Amount = amount,
+                Description = reason,
+                StudentWalletId = w.WalletId,
+            });
+
+
+            await _appDbContext.TokenTransactions.AddRangeAsync(transactionsRecords);
+            await _appDbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task WeeklyTokenChargeAsync()

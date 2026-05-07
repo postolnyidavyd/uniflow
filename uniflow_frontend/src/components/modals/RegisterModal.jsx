@@ -1,15 +1,15 @@
 import styled from 'styled-components';
-import Input from './ui/Input.jsx';
-import Modal from './ui/Modal.jsx';
-import Button from './ui/Button.jsx';
-import { useRegisterMutation } from '../store/api/authApi.js';
+import Input from '../ui/Input.jsx';
+import Modal from '../ui/Modal.jsx';
+import Button from '../ui/Button.jsx';
+import { useRegisterMutation } from '../../store/api/authApi.js';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   matchHelper,
   required,
   validate,
   validEmail,
-} from '../utils/validation.js';
+} from '../../utils/validation.js';
 import { useActionState } from 'react';
 
 const RegisterModal = ({ isOpen, onClose }) => {
@@ -148,7 +148,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
   );
 };
 const HeadingH4 = styled.h4`
-  font-size: var(--desktop-headings-h4);
+  font-style: var(--desktop-headings-h4);
 `;
 
 const FieldGroup = styled.div`

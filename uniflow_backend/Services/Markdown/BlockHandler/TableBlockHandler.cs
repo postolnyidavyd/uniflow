@@ -42,7 +42,7 @@ public class TableBlockHandler : BaseBlockHandler
                 for (int j = 1; j < linesContent.Length - 1; j++)
                 {
                     var parsedContent = InlineParser.Parse(linesContent[j].Trim());
-                    htmlContentBuilder.AppendLine($"<td>{linesContent[j]}</td>");
+                    htmlContentBuilder.AppendLine($"<td>{parsedContent}</td>");
                 }
                 
                 htmlContentBuilder.AppendLine("</tr>");

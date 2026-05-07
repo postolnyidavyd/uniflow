@@ -1,10 +1,10 @@
 import styled from 'styled-components';
-import Input from './ui/Input.jsx';
-import Modal from './ui/Modal.jsx';
-import Button from './ui/Button.jsx';
-import { useLoginMutation } from '../store/api/authApi.js';
+import Input from '../ui/Input.jsx';
+import Modal from '../ui/Modal.jsx';
+import Button from '../ui/Button.jsx';
+import { useLoginMutation } from '../../store/api/authApi.js';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { required, validate, validEmail } from '../utils/validation.js';
+import { required, validate, validEmail } from '../../utils/validation.js';
 import { useActionState } from 'react';
 
 const LoginModal = ({ isOpen, onClose }) => {
@@ -76,7 +76,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         />
         <FieldGroup>
           <Button type="submit" disabled={isLoading}>
-            {!isLoading ? 'Створити акаунт' : 'Зачекайте...'}
+            {!isLoading ? 'Увійти' : 'Зачекайте...'}
           </Button>
           {errors?.server && <ErrorText>{errors?.server}</ErrorText>}
         </FieldGroup>
@@ -85,7 +85,7 @@ const LoginModal = ({ isOpen, onClose }) => {
   );
 };
 const HeadingH4 = styled.h4`
-  font-size: var(--desktop-headings-h4);
+  font-style: var(--desktop-headings-h4);
 `;
 
 const FieldGroup = styled.div`
