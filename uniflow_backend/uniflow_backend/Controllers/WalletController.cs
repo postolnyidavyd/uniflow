@@ -4,7 +4,7 @@ using Services.Wallet;
 namespace uniflow_backend.Controllers;
 
 [ApiController]
-[Microsoft.AspNetCore.Components.Route("api/wallet")]
+[Route("api/wallet")]
 public class WalletController : RequireAuthController
 {
     private readonly IWalletService _walletService;
