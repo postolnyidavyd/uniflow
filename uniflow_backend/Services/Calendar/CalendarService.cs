@@ -28,15 +28,11 @@ public class CalendarService : ICalendarService
 
     public async Task<IEnumerable<CalendarItemDto>> GetMonthlyCalendarAsync(Guid userId, int year, int month)
     {
-        var eventsTask = _eventService.GetEventsByMonthAsync(userId, year, month);
-        var queuesTask = _queueService.GetSessionsByMonthAsync(userId, year, month);
+        var events = (await _eventService.GetEventsByMonthAsync(userId, year, month)).ProjectToCalendarItem();
+        var queues = (await _queueService.GetSessionsByMonthAsync(userId, year, month)).ProjectToCalendarItem();
 
-        await Task.WhenAll(eventsTask, queuesTask);
 
-        var eventsAndDeadlines = eventsTask.Result.ProjectToCalendarItem();
-        var queues = queuesTask.Result.ProjectToCalendarItem();
-
-        return eventsAndDeadlines
+        return events
             .Concat(queues)
             .OrderBy(c => c.StartTime);
     }
