@@ -12,8 +12,9 @@ import {
 } from '../store/selectors/authSelector.js';
 import { useSelector } from 'react-redux';
 import TokenBalanceBadge from './TokenBalanceBadge.jsx';
+import {useGetBalanceQuery} from "../store/api/walletApi.js";
 function Sidebar() {
-  const balance = 3; // TODO: використати api як з'явиться ендпоінт на беку
+  const {data:balance} = useGetBalanceQuery();
   const firstName = useSelector(selectUserFirstName);
   const lastName = useSelector(selectUserLastName);
   const initials = `${firstName?.[0] ?? ''}${lastName?.[0] ?? ''}`;

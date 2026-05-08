@@ -1,4 +1,4 @@
-import {MonthNames} from "../../../utils/monthNames.jsx";
+import {shortMonthNames} from "../../../utils/monthNames.js";
 import {
   DateText,
   eventColors,
@@ -15,7 +15,7 @@ const UpcomingEventBlock = ({ focus = false, date, shortTitle, subjectName, even
     const d = date instanceof Date ? date : new Date(date);
 
     const day = String(d.getDate()).padStart(2, '0');
-    const month = MonthNames[d.getMonth()];
+    const month = shortMonthNames[d.getMonth()];
     const time = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 
     const color = eventColors[eventType] ?? eventColors.Deadline;

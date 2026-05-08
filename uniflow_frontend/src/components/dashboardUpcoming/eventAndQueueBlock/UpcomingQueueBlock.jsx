@@ -1,4 +1,4 @@
-import { MonthNames } from '../../../utils/monthNames.jsx';
+import { shortMonthNames } from '../../../utils/monthNames.js';
 import {
   DateText,
   eventColors,
@@ -24,8 +24,8 @@ const UpcomingQueueBlock = ({
     queueStartTime instanceof Date ? queueStartTime : new Date(queueStartTime);
 
   const day = String(d.getDate()).padStart(2, '0');
-  const month = MonthNames[d.getMonth()].toLowerCase();
-  
+  const month = shortMonthNames[d.getMonth()].toLowerCase();
+
   const color = eventColors.Queue;
   const additionalInfo = userPosition
     ? `Ваша позиція: ${userPosition}`
@@ -33,10 +33,10 @@ const UpcomingQueueBlock = ({
   return (
     <QueueWrapper $color={color}>
       <LeftSide>
-        <Time $color={color}>
+        <QueueTime $color={color}>
           <DateText>{day}</DateText>
           <MonthText>{month}</MonthText>
-        </Time>
+        </QueueTime>
         <Info>
           <Title>
             {subjectName} - {shortTitle}
@@ -59,4 +59,6 @@ const LeftSide = styled.div`
   gap: 0.5rem;
   align-self: stretch;
 `;
+const QueueTime = styled(Time)`
+color: var(--base-black)`
 export default UpcomingQueueBlock;

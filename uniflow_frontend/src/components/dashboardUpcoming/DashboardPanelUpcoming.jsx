@@ -1,6 +1,6 @@
 // orientation: 'horizontal' | 'vertical'
 import {
-  useGetUpcomingBySubjectQuery,
+    useGetUpcomingBySubjectQuery,
   useGetUpcomingQuery,
 } from '../../store/api/calendarApi.js';
 import styled from 'styled-components';
@@ -13,7 +13,6 @@ const DashboardPanelUpcoming = ({ orientation = 'horizontal', subjectId }) => {
   const subjectQuery = useGetUpcomingBySubjectQuery(subjectId, {
     skip: !subjectId,
   });
-
   const { data, isLoading, error } = subjectId ? subjectQuery : globalQuery;
   return (
     <PanelContainer $orientation={orientation}>
