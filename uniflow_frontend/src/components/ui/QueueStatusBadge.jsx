@@ -45,5 +45,4 @@ const Badge = styled.div`
     colorStatusFormating[$status] || colorStatusFormating.Planned};
   ${({ $size }) => badgeSizes[$size] || badgeSizes.md};
 `;
-
 export default QueueStatusBadge;

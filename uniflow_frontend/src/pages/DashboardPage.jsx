@@ -1,10 +1,12 @@
 import styled from 'styled-components';
 import DashboardPanelUpcoming from '../components/dashboardUpcoming/DashboardPanelUpcoming.jsx';
+import CalendarSection from '../components/CalendarSection/CalendarSection.jsx';
 
 function DashboardPage() {
   return (
     <PageWrapper>
-      DashboardPage <DashboardPanelUpcoming />
+      <CalendarSection />
+      <DashboardPanelUpcoming />
     </PageWrapper>
   );
 }
