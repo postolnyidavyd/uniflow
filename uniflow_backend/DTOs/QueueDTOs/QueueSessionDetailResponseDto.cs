@@ -30,5 +30,6 @@ public class QueueSessionDetailResponseDto
     // public Guid SubjectId { get; set; }
     public string SubjectName { get; set; }
     
-    
+    public bool IsSubscribed { get; set; }
+
 }

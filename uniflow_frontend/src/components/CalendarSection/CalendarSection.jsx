@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { CalendarHeader } from './CalendarHeader.jsx';
 import CalendarGrid from './CalendarGrid.jsx';
 import { openCalendarDayPanel } from '../../store/uiSlice.js';
-import DayDetailDrawer from './DayDetailDrawer.jsx';
 
 const addMonth = (date) => new Date(date.getFullYear(), date.getMonth() + 1, 1);
 const subMonth = (date) => new Date(date.getFullYear(), date.getMonth() - 1, 1);
@@ -40,7 +39,7 @@ const CalendarSection = () => {
         month={month}
         onDayClick={handleDayCellClick}
       />
-      <DayDetailDrawer />
+
     </SectionWrapper>
   );
 };

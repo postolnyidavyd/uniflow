@@ -22,7 +22,8 @@ public class QueueService : IQueueService
     private readonly IHubContext<QueueHub, IQueueClient> _hubContext;
 
     public QueueService(AppDbContext appDbContext, IWalletService walletService,
-        IBackgroundJobClient backgroundJobClient, IWeightStrategyFactory weightStrategyFactory, IHubContext<QueueHub,IQueueClient> hubContext)
+        IBackgroundJobClient backgroundJobClient, IWeightStrategyFactory weightStrategyFactory,
+        IHubContext<QueueHub, IQueueClient> hubContext)
     {
         _appDbContext = appDbContext;
         _walletService = walletService;
@@ -31,10 +32,10 @@ public class QueueService : IQueueService
         _hubContext = hubContext;
     }
 
-    public async Task<QueueSessionDetailResponseDto> GetSessionByIdAsync(Guid sessionId)
+    public async Task<QueueSessionDetailResponseDto> GetSessionByIdAsync(Guid userId, Guid sessionId)
     {
         return await _appDbContext.QueueSessions
-                   .ProjectToSessionDetailDto()
+                   .ProjectToSessionDetailDto(userId)
                    .FirstOrDefaultAsync(q => q.Id == sessionId)
                ?? throw new KeyNotFoundException("Чергу не знайдено");
     }
@@ -49,7 +50,6 @@ public class QueueService : IQueueService
             UserEntry = entries.FirstOrDefault(e => e.UserId == userId)
         };
     }
-
 
 
     public async Task<IEnumerable<MyQueueCardResponseDto>> GetUserSession(Guid userId)
@@ -252,7 +252,7 @@ public class QueueService : IQueueService
             string reason = $"Компенсація за скасовану чергу '{sessionValues.Title}' ({sessionValues.SubjectName})";
             await _walletService.ChargeTokensBulkAsync(usersToRefund, 1, reason);
         }
-        
+
         await BroadcastSessionDetailAsync(sessionId);
     }
 
@@ -263,7 +263,7 @@ public class QueueService : IQueueService
             .Where(q => q.QueueStatus != QueueStatus.Cancelled)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.QueueStatus, QueueStatus.Registration));
-        
+
         await BroadcastSessionDetailAsync(sessionId);
     }
 
@@ -274,7 +274,7 @@ public class QueueService : IQueueService
             .Where(q => q.QueueStatus != QueueStatus.Cancelled)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.QueueStatus, QueueStatus.Active));
-        
+
         //Спочатку оновлюємо деталі черги потім переводим студента
         await BroadcastSessionDetailAsync(sessionId);
         //Переводимо першого студента в активний стан, щоб почати цикл 
@@ -557,6 +557,7 @@ public class QueueService : IQueueService
                 .ExecuteUpdateAsync(s => s.SetProperty(e => e.EntryStatus, QueueEntryStatus.InProgress));
         }
     }
+
     private async Task<List<QueueEntryDto>> GetQueueEntryDtosAsync(Guid sessionId)
     {
         var entries = await _appDbContext.QueueEntries.Where(qn =>
@@ -568,17 +569,18 @@ public class QueueService : IQueueService
             .ToListAsync();
         return entries;
     }
-    
-    private async Task BroadcastSessionDetailAsync(Guid sessionId){
-        var details = await GetSessionByIdAsync(sessionId);
+
+    private async Task BroadcastSessionDetailAsync(Guid sessionId)
+    {
+        var details = await GetSessionByIdAsync(Guid.Empty, sessionId);
         if (details != null)
             await _hubContext.Clients.Group(sessionId.ToString()).SessionDetailUpdated(details);
     }
-    
+
     private async Task BroadcastQueueEntriesAsync(Guid sessionId)
     {
-        var entries = await  GetQueueEntryDtosAsync(sessionId);
-        
+        var entries = await GetQueueEntryDtosAsync(sessionId);
+
         await _hubContext.Clients.Group(sessionId.ToString()).QueueEntriesUpdated(entries);
     }
 }

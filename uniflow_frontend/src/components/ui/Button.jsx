@@ -47,7 +47,7 @@ const variants = {
     }
 
     &:hover:not(:disabled) {
-      transform: translateY(-2px);
+      //transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
       &::after {
@@ -87,7 +87,7 @@ const variants = {
         0.03
       ); 
       box-shadow: inset 0 0 0 1.5px transparent; 
-      transform: translateY(-1px);
+      //transform: translateY(-1px);
 
       &::after {
         opacity: 1; 
@@ -108,7 +108,7 @@ const variants = {
     color: white;
     &:hover:not(:disabled) {
       opacity: 0.9;
-      transform: translateY(-1px);
+      //transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(204, 46, 79, 0.3); 
     }
   `,
@@ -117,15 +117,20 @@ const variants = {
 const sizes = {
   sm: css`
     padding: 0.375rem 0.75rem;
-    font-style: var(--desktop-headings-h8);
+    font-size: var(--desktop-headings-h8);
   `,
   md: css`
     padding: 0.625rem 1.25rem;
-    font-style: var(--desktop-headings-h7);
+    
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.5rem; /* 150% */
+    letter-spacing: -0.02rem;
   `,
   lg: css`
     padding: 0.875rem 1.75rem;
-    font-style: var(--desktop-headings-h6);
+    font-size: var(--desktop-headings-h6);
   `,
 };
 
