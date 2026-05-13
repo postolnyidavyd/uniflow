@@ -8,30 +8,38 @@ const currentItem = [
   {
     id: '1',
     calendarItemType: 'Event',
-    subjectName: 'Математика',
-    shortTitle: 'Алг',
+    subjectShortName: 'Математика',
+    itemShortTitle: 'Алг',
     isSubscribed: true,
+    startTime: '2026-05-09T10:00:00.000Z',
+    location: 'Ауд. 101',
   },
   {
     id: '2',
     calendarItemType: 'Queue',
-    subjectName: 'КН',
-    shortTitle: 'Проєкт',
+    subjectShortName: 'КН',
+    itemShortTitle: 'Проєкт',
     isSubscribed: true,
+    startTime: '2026-05-09T13:30:00.000Z',
+    meetUrl: 'https://meet.example.com/kn-project',
   },
   {
     id: '3',
     calendarItemType: 'Deadline',
-    subjectName: 'Фізика',
-    shortTitle: 'Модуль',
+    subjectShortName: 'Фізика',
+    itemShortTitle: 'Модуль',
     isSubscribed: true,
+    startTime: '2026-05-10T23:59:00.000Z',
+    location: 'Онлайн',
+    meetUrl: 'https://meet.example.com/physics-module',
   },
   {
     id: '4',
     calendarItemType: 'Deadline',
-    subjectName: 'Історія',
-    shortTitle: 'Есе',
+    subjectShortName: 'Історія',
+    itemShortTitle: 'Есе',
     isSubscribed: true,
+    startTime: '2026-05-11T17:00:00.000Z',
   },
 ];
 
@@ -41,18 +49,11 @@ const CalendarDayCell = ({ date, isCurrentMonth, items, isToday, onClick }) => {
     onClick(date, items);
   };
 
-  // Беремо твій масив
-  const eventsToRender = currentItem || [];
-  const totalEvents = eventsToRender.length;
+  const totalEvents = items.length;
 
-  // ✨ Розумний ліміт: якщо подій 3 або менше - показуємо всі.
-  // Якщо 4 і більше - показуємо лише 2, щоб залишити місце для напису "Ще X"
   const maxVisible = totalEvents <= 3 ? totalEvents : 2;
 
-  // Відрізаємо потрібну кількість
-  const visibleEvents = eventsToRender.slice(0, maxVisible);
-
-  // Рахуємо, скільки залишилося
+  const visibleEvents = items.slice(0, maxVisible);
   const hiddenEventsCount = totalEvents - maxVisible;
 
   return (
@@ -61,7 +62,9 @@ const CalendarDayCell = ({ date, isCurrentMonth, items, isToday, onClick }) => {
       $isCurrentMonth={isCurrentMonth}
       $isToday={isToday}
     >
-      <DateBadge $isToday={isToday}>{+date.slice(-2)}</DateBadge>
+      <DateBadge $isToday={isToday} $isCurrentMonth={isCurrentMonth}>
+        {+date.slice(-2)}
+      </DateBadge>
 
       {isCurrentMonth && (
         <>
@@ -74,7 +77,7 @@ const CalendarDayCell = ({ date, isCurrentMonth, items, isToday, onClick }) => {
               $color={calendarItemFormattingColor[item.calendarItemType]}
             >
               <span>
-                {item.subjectName} - {item.shortTitle}
+                {item.subjectShortName} - {item.itemShortTitle}
               </span>
               {item.isSubscribed && (
                 <SubscribedDot
@@ -92,7 +95,6 @@ const CalendarDayCell = ({ date, isCurrentMonth, items, isToday, onClick }) => {
     </DayCell>
   );
 };
-
 
 const SubscribedDot = styled.div`
   width: 0.5rem;
@@ -114,7 +116,7 @@ const EventContainer = styled.div`
     $backgroundColor || calendarItemFormattingBackgroundColor.Deadline};
   border-left: 0.125rem solid
     ${({ $color }) => $color || calendarItemFormattingColor.Deadline};
-  
+
   span {
     white-space: nowrap;
     overflow: hidden;
@@ -123,28 +125,31 @@ const EventContainer = styled.div`
 `;
 
 const DateBadge = styled.p`
-  color: ${({ $isToday }) =>
-    $isToday ? 'var(--accent-color)' : 'var(--base-black)'};
+  color: ${({ $isToday, $isCurrentMonth }) =>
+    $isToday
+      ? 'var(--accent-color)'
+      : $isCurrentMonth
+        ? 'var(--base-black)'
+        : 'var(--grey-100)'};
   font-size: var(--desktop-headings-h9);
   font-weight: 500;
   line-height: 1.2;
 `;
 
-
 const MoreEventsBadge = styled.div`
   align-self: stretch;
-  
+
   background-color: var(--base-very-bright-grey, #f1f5f9);
   color: var(--grey-100, #6b7280);
 
   font-size: 0.75rem;
   font-weight: 500;
-  
+
   padding: 0.125rem 0.375rem;
-  margin-top: 0.125rem; 
-  
+  margin-top: 0.125rem;
+
   border-radius: 0.25rem;
-  
+
   user-select: none;
 `;
 
@@ -160,24 +165,26 @@ const DayCell = styled.div`
   border: ${({ $isCurrentMonth }) =>
     $isCurrentMonth
       ? '1.901px solid var(--base-bright-grey, #e7eef3)'
-      : '1.901px solid var(--gray-100)'};
-  
+      : '1.901px solid var(--base-very-bright-grey)'};
+
   outline: ${({ $isToday }) =>
     $isToday ? '2px solid var(--accent-color)' : '2px solid transparent'};
-  
-  transition: outline 0.2s ease, background-color 0.2s ease;
+
+  transition:
+    outline 0.2s ease,
+    background-color 0.2s ease;
 
   padding: 0.5rem;
   overflow: hidden;
-  cursor: pointer;
-  
+  cursor: ${({ $isCurrentMonth }) => ($isCurrentMonth ? 'pointer' : 'default')};
+
   &:hover {
     outline: ${({ $isToday }) =>
       $isToday
         ? '2px solid var(--accent-color)'
         : '2px solid var(--grey-40, #cbd5e1)'};
-    
-    background-color:#f8fafc;
+
+    background-color: #f8fafc;
   }
 `;
 

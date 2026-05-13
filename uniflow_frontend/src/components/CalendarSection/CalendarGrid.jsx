@@ -15,7 +15,7 @@ const getTodayISO = () => {
 const CalendarGrid = ({ calendarItems = [], year, month, onDayClick }) => {
   const calendarItemsMap = useMemo(() => {
     return calendarItems.reduce((acc, event) => {
-      const dateKey = event.date.substring(0, 10);
+      const dateKey = event.startTime.substring(0, 10);
       if (!acc[dateKey]) acc[dateKey] = [];
       acc[dateKey].push(event);
       return acc;
@@ -29,7 +29,7 @@ const CalendarGrid = ({ calendarItems = [], year, month, onDayClick }) => {
   const rowsCount = calendarCells.length / 7;
 
   const today = getTodayISO();
-  console.log(today);
+
   return (
     <GridWrapper>
       <Grid $rows={rowsCount}>
