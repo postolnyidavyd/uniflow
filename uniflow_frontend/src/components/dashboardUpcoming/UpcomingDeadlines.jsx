@@ -14,6 +14,7 @@ const UpcomingDeadlines = ({ deadlines = [] }) => {
         deadlines.map((deadline, index) => (
           <UpcomingEventBlock
             key={deadline.id}
+            id={deadline.id}
             focus={index === 0}
             date={deadline.date}
             shortTitle={deadline.shortTitle}

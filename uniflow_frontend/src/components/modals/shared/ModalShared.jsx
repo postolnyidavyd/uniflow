@@ -4,34 +4,34 @@ import CalendarIcon from '../../../assets/Calendar.svg?react';
 import { useGetCalendarSettingsQuery } from '../../../store/api/subscriptionApi.js';
 
 export const AddToCalendarButton = ({
-                                        type,
-                                        isSubscribed,
-                                        onToggle,
-                                        isUserInQueue = false,
-                                    }) => {
-    const { data: settings } = useGetCalendarSettingsQuery();
+  type,
+  isSubscribed,
+  onToggle,
+  isUserInQueue = false,
+}) => {
+  const { data: settings } = useGetCalendarSettingsQuery();
 
-    const isAutoEvent = type === 'event' && settings?.autoAddEvents;
-    const isAutoQueue = type === 'queue' && settings?.autoAddQueues && isUserInQueue;
-    const isAuto = isAutoEvent || isAutoQueue;
+  const isAutoEvent = type === 'event' && settings?.autoAddEvents;
+  const isAutoQueue =
+    type === 'queue' && settings?.autoAddQueues && isUserInQueue;
+  const isAuto = isAutoEvent || isAutoQueue;
 
-    if (isAuto) {
-        return (
-            <AutoAddLabel>
-                <CalendarIcon width={18} height={18} />
-                Додається автоматично
-            </AutoAddLabel>
-        );
-    }
-
+  if (isAuto) {
     return (
-        <Button variant="secondary" fullWidth onClick={onToggle}>
-            <CalendarIcon width={24} height={24} />
-            {isSubscribed ? 'Видалити з календаря' : 'Додати в календар'}
-        </Button>
+      <AutoAddLabel>
+        <CalendarIcon width={18} height={18} />
+        Додається автоматично
+      </AutoAddLabel>
     );
-};
+  }
 
+  return (
+    <Button variant="secondary" fullWidth onClick={onToggle}>
+      <CalendarIcon width={24} height={24} />
+      {isSubscribed ? 'Видалити з календаря' : 'Додати в календар'}
+    </Button>
+  );
+};
 
 export const ModalTitleWrapper = styled.div`
   display: flex;
@@ -142,7 +142,7 @@ export const ModalCountdown = styled.div`
 `;
 
 export const CountdownSeparator = styled.span`
-  color: var(--base-bright-grey, #e7eef3);
+  color: var(--base-secondary-text, #e7eef3);
 `;
 
 const AutoAddLabel = styled.div`

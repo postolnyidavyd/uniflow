@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import Input from '../ui/Input.jsx';
+import Input from '../ui/inputs/Input.jsx';
 import Modal from '../ui/Modal.jsx';
 import Button from '../ui/Button.jsx';
 import { useRegisterMutation } from '../../store/api/authApi.js';
@@ -69,7 +69,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={<HeadingH4>Створити акаунт</HeadingH4>}
+      title="Створити акаунт"
     >
       <form action={formAction} style={{ display: 'contents' }}>
         <NameInputsContainer>
@@ -147,9 +147,6 @@ const RegisterModal = ({ isOpen, onClose }) => {
     </Modal>
   );
 };
-const HeadingH4 = styled.h4`
-  font-style: var(--desktop-headings-h4);
-`;
 
 const FieldGroup = styled.div`
   display: flex;

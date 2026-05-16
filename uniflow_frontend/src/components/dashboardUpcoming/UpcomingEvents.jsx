@@ -14,6 +14,7 @@ const UpcomingEvents = ({ events = [] }) => {
                 events.map((event) => (
                     <UpcomingEventBlock
                         key={event.id}
+                        id={event.id}
                         date={event.date}
                         shortTitle={event.shortTitle}
                         subjectName={event.subjectName}

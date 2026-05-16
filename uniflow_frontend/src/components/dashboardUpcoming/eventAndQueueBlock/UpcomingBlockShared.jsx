@@ -1,9 +1,9 @@
 import styled, { css } from 'styled-components';
 
 export const eventColors = {
-    Deadline: 'var(--brick-red-100)',
-    Event: 'var(--radiance-100)',
-    Queue: 'var(--gorse-100)',
+  Deadline: 'var(--brick-red-100)',
+  Event: 'var(--radiance-100)',
+  Queue: 'var(--gorse-100)',
 };
 export const Wrapper = styled.div`
   border-radius: 0.5rem;
@@ -13,16 +13,30 @@ export const Wrapper = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-size: var(--desktop-headings-h8);
+  cursor: pointer;
+  transition: all 0.2s ease;
 
-  ${({ $focus, $color }) => $focus ? css`
-    border: 2px solid ${$color};
-    background: ${$color};
-    color: var(--base-white);
-  ` : css`
-    border: 1.901px solid var(--base-bright-grey);
-    background: transparent;
-    color: var(--base-black);
-  `}
+  ${({ $focus, $color }) =>
+    $focus
+      ? css`
+          border: 2px solid ${$color};
+          background: ${$color};
+          color: var(--base-white);
+
+          &:hover {
+            filter: brightness(0.9);
+          }
+        `
+      : css`
+          border: 1.901px solid var(--base-bright-grey);
+          background: transparent;
+          color: var(--base-black);
+
+          &:hover {
+            border-color: ${$color};
+            background: color-mix(in srgb, ${$color} 8%, transparent);
+          }
+        `}
 `;
 
 export const Time = styled.div`
@@ -32,8 +46,9 @@ export const Time = styled.div`
   justify-content: center;
   align-items: center;
   border-radius: 0.625rem;
-  background-color: ${({ $focus, $color }) => $focus ? 'var(--base-white)' : $color};
-  color: ${({ $focus, $color }) => $focus ? $color : 'var(--base-white)'};
+  background-color: ${({ $focus, $color }) =>
+    $focus ? 'var(--base-white)' : $color};
+  color: ${({ $focus, $color }) => ($focus ? $color : 'var(--base-white)')};
 `;
 
 export const DateText = styled.p`
@@ -64,5 +79,5 @@ export const AdditionalInfoText = styled.p`
   font-size: var(--desktop-base-small);
   font-weight: 300;
   color: inherit;
-  opacity: ${({ $focus }) => $focus ? 0.85 : 1};
+  opacity: ${({ $focus }) => ($focus ? 0.85 : 1)};
 `;

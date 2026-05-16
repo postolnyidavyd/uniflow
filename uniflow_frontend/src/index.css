@@ -153,3 +153,12 @@ body {
     font-family: 'e-Ukraine', sans-serif !important;
     box-shadow: var(--shadow) !important;
 }
+
+
+input, textarea, select {
+    font-family: inherit;
+    outline: none;
+}
+button{
+    font-family: inherit;
+}

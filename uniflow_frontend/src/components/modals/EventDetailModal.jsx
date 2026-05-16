@@ -29,6 +29,7 @@ import CalendarIcon from '../../assets/Calendar.svg?react';
 import PaperclipIcon from '../../assets/Paperclip_Attechment_Tilt.svg?react';
 import LocationIcon from '../../assets/Map_Pin.svg?react';
 import ExternalLinkIcon from '../../assets/External_Link.svg?react';
+import FileIcon from '../../assets/File_Document.svg?react';
 import { formatDateModal } from '../../utils/ISODateParser.js';
 
 const EventDetailModal = () => {
@@ -41,7 +42,7 @@ const EventDetailModal = () => {
 
   const [toggleSubscription] = useToggleEventSubscriptionMutation();
 
-  const isDeadline = event?.eventType === 'DeadlineEvent';
+  const isDeadline = event?.eventType === 'Deadline';
   const timeLeft = useCountdown(isDeadline ? event?.date : null);
 
   const handleClose = () => dispatch(closeEventDetailModal());
@@ -91,18 +92,6 @@ const EventDetailModal = () => {
               <ModalDateText>{formatDateModal(event.date)}</ModalDateText>
             </ModalDateRow>
 
-            {event.description && (
-              <ModalLinkBox>
-                <ModalLinkLeft>
-                  <PaperclipIcon width={22} height={22} />
-                  <ModalLinkContent>
-                    <ModalLinkLabel>Деталі</ModalLinkLabel>
-                    <SecondaryText>{event.description}</SecondaryText>
-                  </ModalLinkContent>
-                </ModalLinkLeft>
-              </ModalLinkBox>
-            )}
-
             {event.meetUrl && (
               <ModalLinkBox>
                 <ModalLinkLeft>
@@ -140,8 +129,18 @@ const EventDetailModal = () => {
                 </ModalLinkLeft>
               </ModalLinkBox>
             )}
+            {event.description && (
+              <ModalLinkBox>
+                <ModalLinkLeft>
+                  <FileIcon width={22} height={22} />
+                  <ModalLinkContent>
+                    <ModalLinkLabel>Деталі</ModalLinkLabel>
+                    <SecondaryText>{event.description}</SecondaryText>
+                  </ModalLinkContent>
+                </ModalLinkLeft>
+              </ModalLinkBox>
+            )}
           </InfoBlock>
-
           <AddToCalendarButton
             type="event"
             isSubscribed={event.isSubscribed}

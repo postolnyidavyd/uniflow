@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createPortal } from 'react-dom';
 import {
   closeCalendarDayPanel,
+  openCreateOptionsModal,
   openEventDetailModal,
   openQueueDetailModal,
 } from '../../store/uiSlice.js';
@@ -18,9 +19,15 @@ import {
   getTimeFromISO,
 } from '../../utils/ISODateParser.js';
 import CloseLG from '../../assets/Close_LG.svg?react';
+import Button from '../ui/Button.jsx';
+import PlusIcon from '../../assets/Plus.svg?react';
+import { selectUserRole } from '../../store/selectors/authSelector.js';
+
+//TODO Змінити структуру компонента щоб карточки були окремий контейнер і скролилися між собою а кнопка не скролилася і завжди була внизу
 
 const DayDetailsDrawer = () => {
   const { isOpen, date, items } = useSelector(selectCalendarDayPanel);
+  const role = useSelector(selectUserRole);
   const dispatch = useDispatch();
 
   const formattedDate = formatDateTitle(date);
@@ -36,10 +43,19 @@ const DayDetailsDrawer = () => {
     };
   }, [isOpen]);
   const handleClose = () => dispatch(closeCalendarDayPanel());
-  const handleEventCardClick = (calendarItemType, id) =>
-    calendarItemType === 'Queue'
-      ? dispatch(openQueueDetailModal(id))
-      : dispatch(openEventDetailModal(id));
+  const handleEventCardClick = (calendarItemType, id) => {
+    handleClose();
+
+    if (calendarItemType === 'Queue') {
+      dispatch(openQueueDetailModal(id));
+    } else {
+      dispatch(openEventDetailModal(id));
+    }
+  };
+  const handleAddEventClick = () => {
+    handleClose();
+    dispatch(openCreateOptionsModal());
+  };
   if (!isOpen) return null;
 
   return createPortal(
@@ -91,6 +107,13 @@ const DayDetailsDrawer = () => {
             </EventDetailsCard>
           </EventRow>
         ))}
+        {role === 'Headman' && (
+          <ButtonContainer>
+            <Button onClick={handleAddEventClick}>
+              <PlusIcon width="1rem" height="1rem"/> Додати
+            </Button>
+          </ButtonContainer>
+        )}
       </DrawerPanel>
     </>,
     document.getElementById('modal')
@@ -202,12 +225,15 @@ const EventRow = styled.div`
   align-self: stretch;
 
   cursor: pointer;
-  
+
   border-radius: 0.5rem; /* Щоб хавер не був гострим */
   transition: background-color 180ms ease;
 
   &:hover {
-    background-color: var(--base-bright-grey, #f8fafc); /* Або твій дуже світло-сірий */
+    background-color: var(
+      --base-bright-grey,
+      #f8fafc
+    ); /* Або твій дуже світло-сірий */
   }
 `;
 
@@ -276,6 +302,16 @@ const EventUrl = styled.a`
 
   &:hover {
     color: var(--radiance-80);
+  }
+`;
+const ButtonContainer = styled.div`
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+
+  & > button {
+    width: 100%;
+    justify-content: center;
   }
 `;
 export default DayDetailsDrawer;
