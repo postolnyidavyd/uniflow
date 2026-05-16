@@ -4,7 +4,7 @@ const initialState = {
   createSubjectModal: { isOpen: false },
   editSubjectModal: { isOpen: false, subjectId: null },
 
-  createEventModal: { isOpen: false },
+  createEventModal: { isOpen: false, eventType: 'Event' },
   editEventModal: { isOpen: false, eventId: null },
   eventDetailModal: { isOpen: false, eventId: null },
 
@@ -20,6 +20,8 @@ const initialState = {
   queueDetailModal: { isOpen: false, sessionId: null },
 
   calendarDayPanel: { isOpen: false, date: null, items: null }, // date: ISO string 'YYYY-MM-DD'
+
+  createOptionsModal: {isOpen:false }
 };
 
 const uiSlice = createSlice({
@@ -41,11 +43,14 @@ const uiSlice = createSlice({
     },
 
     // Event
-    openCreateEventModal(state) {
-      state.createEventModal = { isOpen: true };
+    openCreateEventModal(state, action) {
+      state.createEventModal = {
+        isOpen: true,
+        eventType: action.payload || 'Event'
+      };
     },
     closeCreateEventModal(state) {
-      state.createEventModal = { isOpen: false };
+      state.createEventModal = { isOpen: false, eventType: 'Event' };
     },
     openEditEventModal(state, action) {
       state.editEventModal = { isOpen: true, eventId: action.payload };
@@ -109,6 +114,14 @@ const uiSlice = createSlice({
     closeCalendarDayPanel(state) {
       state.calendarDayPanel = { isOpen: false, date: null, items: [] };
     },
+
+    //Create Options
+    openCreateOptionsModal(state){
+      state.createOptionsModal = {isOpen: true};
+    },
+    closeCreateOptionsModal(state){
+      state.createOptionsModal = {isOpen: false};
+    }
   },
 });
 
@@ -135,6 +148,8 @@ export const {
   closeQueueDetailModal,
   openCalendarDayPanel,
   closeCalendarDayPanel,
+  openCreateOptionsModal,
+  closeCreateOptionsModal
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

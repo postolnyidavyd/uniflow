@@ -52,7 +52,7 @@ const Modal = ({ isOpen, onClose, title, children, width }) => {
           <ModalTitle>{title}</ModalTitle>
           {onClose && (
             <CloseButton type="button" onClick={onClose}>
-              <Close_MD/>
+              <Close_MD />
             </CloseButton>
           )}
         </ModalHeader>
@@ -64,17 +64,13 @@ const Modal = ({ isOpen, onClose, title, children, width }) => {
 };
 
 const StyledDialog = styled.dialog`
-   width: ${({ $width }) => $width || 'max-content'};
-    min-width: 34.375rem;   
+  width: ${({ $width }) => $width || 'max-content'};
+  min-width: 34.375rem;
   border: 1.901px solid var(--base-bright-grey);
-
   border-radius: 1.25rem;
-  background: var(--base-white );
+  background: var(--base-white);
   padding: 0;
   margin: auto;
-
-  
-  //max-height: 90vh;
   overflow-y: auto;
 
   &::backdrop {
@@ -87,16 +83,15 @@ const ModalHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem 1.5rem 0.5rem 1.5rem; 
+  padding: 1.5rem 1.5rem 0 1.5rem;
+  margin-bottom: 2rem;
 `;
 
 const ModalTitle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem; 
-  font-size: 1.25rem; 
-  font-weight: 600;
-  color: var(--base-black, #000000);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.75rem;
+  color: var(--base-black);
 `;
 
 const CloseButton = styled.button`
@@ -104,25 +99,15 @@ const CloseButton = styled.button`
   border: none;
   cursor: pointer;
   padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: 0.5rem;
-  transition: all 180ms ease;
 
-  &:hover { 
-    background-color: var(--grey-20, #f5f5f5); 
-    color: var(--base-secondary-text);
-  }
-  
-  img { 
-    width: 1.5rem; 
-    height: 1.5rem; 
+  &:hover {
+    background-color: var(--grey-20);
   }
 `;
 
 const ModalBody = styled.div`
-  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+  padding: 0 1.5rem 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;

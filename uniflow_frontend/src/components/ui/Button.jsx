@@ -8,7 +8,6 @@ const granimateRadial = keyframes`
   100% { background-position: 10% 10%; }
 `;
 
-
 const magicGradient = css`
   background-color: var(--base-white, #ffffff);
   background-image:
@@ -25,7 +24,6 @@ const variants = {
     background-color: transparent;
     color: var(--base-white);
 
-    
     &::before {
       content: '';
       position: absolute;
@@ -34,11 +32,11 @@ const variants = {
       border-radius: inherit;
       z-index: -2;
     }
-    
+
     &::after {
       content: '';
       position: absolute;
-      inset: -1.5px; 
+      inset: -1.5px;
       border-radius: inherit;
       ${magicGradient};
       opacity: 0;
@@ -59,7 +57,7 @@ const variants = {
   secondary: css`
     background-color: transparent;
     color: var(--base-black);
-    
+
     box-shadow: inset 0 0 0 1.5px var(--base-black);
     transition: all 0.3s ease;
 
@@ -70,7 +68,9 @@ const variants = {
       border-radius: inherit;
       padding: 1.5px;
       ${magicGradient};
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
       mask-composite: exclude;
       pointer-events: none;
@@ -80,17 +80,12 @@ const variants = {
     }
 
     &:hover:not(:disabled) {
-      background-color: rgba(
-        0,
-        0,
-        0,
-        0.03
-      ); 
-      box-shadow: inset 0 0 0 1.5px transparent; 
+      background-color: rgba(0, 0, 0, 0.03);
+      box-shadow: inset 0 0 0 1.5px transparent;
       //transform: translateY(-1px);
 
       &::after {
-        opacity: 1; 
+        opacity: 1;
       }
     }
   `,
@@ -109,7 +104,7 @@ const variants = {
     &:hover:not(:disabled) {
       opacity: 0.9;
       //transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(204, 46, 79, 0.3); 
+      box-shadow: 0 4px 12px rgba(204, 46, 79, 0.3);
     }
   `,
 };
@@ -117,16 +112,19 @@ const variants = {
 const sizes = {
   sm: css`
     padding: 0.375rem 0.75rem;
-    font-size: var(--desktop-headings-h8);
+    font-size: 0.75rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1rem; /* 133.333% */
+    letter-spacing: -0.015rem;
   `,
   md: css`
     padding: 0.625rem 1.25rem;
-    
+
     font-size: 1rem;
     font-style: normal;
-    font-weight: 400;
+    font-weight: 300;
     line-height: 1.5rem; /* 150% */
-    letter-spacing: -0.02rem;
   `,
   lg: css`
     padding: 0.875rem 1.75rem;
@@ -135,7 +133,7 @@ const sizes = {
 };
 
 const StyledButton = styled.button`
-  position: relative; 
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -143,7 +141,6 @@ const StyledButton = styled.button`
   border: 1.5px solid transparent;
   border-radius: 2.5rem;
 
-  font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
   z-index: 1;
@@ -153,13 +150,11 @@ const StyledButton = styled.button`
     box-shadow 0.2s ease,
     background-color 0.2s ease;
 
-  
   &:active:not(:disabled) {
-    transform: scale(0.96) !important; 
+    transform: scale(0.96) !important;
     box-shadow: none !important;
   }
 
-  
   &:focus-visible {
     outline: 2px solid var(--radiance-100, #007eff);
     outline-offset: 2px;
