@@ -51,7 +51,7 @@ public static class QueueMapping
         QueueStartTime = qs.QueueStartTime,
         Location = qs.Location,
         MeetUrl = qs.MeetUrl,
-        
+
         CurrentStudentName = qs.QueueEntries
             .Where(e => e.EntryStatus == QueueEntryStatus.InProgress)
             .Select(e => e.User!.LastName + " " + e.User!.FirstName.Substring(0, 1) + ".")
@@ -116,7 +116,7 @@ public static class QueueMapping
     #region Detailed Session
 
     private static Expression<Func<Domain.Models.QueueSession, QueueSessionDetailResponseDto>>
-        SessionDetailDtoExpression => q => new QueueSessionDetailResponseDto()
+        SessionDetailDtoExpression(Guid userId) => q => new QueueSessionDetailResponseDto()
     {
         Id = q.Id,
         Title = q.Title,
@@ -131,12 +131,13 @@ public static class QueueMapping
         QueueStatus = q.QueueStatus,
         IsAllowedToSubmitMoreThanOne = q.IsAllowedToSubmitMoreThanOne,
         SubmissionMode = q.SubmissionMode,
-        SubjectName = q.Subject!.Name
+        SubjectName = q.Subject!.Name,
+        IsSubscribed = q.Subscribers.Any(u => u.Id == userId)
     };
 
     public static IQueryable<QueueSessionDetailResponseDto> ProjectToSessionDetailDto(
-        this IQueryable<QueueSession> query) =>
-        query.Select(SessionDetailDtoExpression);
+        this IQueryable<QueueSession> query, Guid userId) =>
+        query.Select(SessionDetailDtoExpression(userId));
 
     #endregion
 
@@ -189,8 +190,8 @@ public static class QueueMapping
         query.Select(EntryDtoExpression);
 
     #endregion
-    
-    
+
+
     #region QueueShort (На видалення після рефакторингу)
 
     private static Expression<Func<Domain.Models.QueueSession, QueueSessionShortResponseDto>>

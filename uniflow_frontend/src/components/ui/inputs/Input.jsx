@@ -16,10 +16,17 @@ const InputContainer = styled.div`
 const StyledInput = styled.input`
   width: 100%;
   padding: 0.25rem 0 0.5rem 0;
-  font-style: var(--desktop-base-body);
+  
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 1.5rem; /* 150% */
+  letter-spacing: -0.02rem;
+  
   color: var(--base-black, #000);
   background-color: transparent;
   border: none;
+  
   /* Перевіряємо наявність помилки для базового стану */
   border-bottom: 0.125rem solid ${({ $error }) => $error ? 'var(--brick-red-100, #E42939)' : 'var(--base-black, #000)'};
   border-radius: 0;
@@ -48,7 +55,13 @@ const StyledLabel = styled.label`
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  font-style: var(--desktop-base-body);
+  
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 1.5rem; /* 150% */
+  letter-spacing: -0.02rem;
+  
   color: var(--grey-100, #959595);
   pointer-events: none;
   transition: all 0.2s ease-out;
@@ -57,7 +70,12 @@ const StyledLabel = styled.label`
   ${StyledInput}:not(:placeholder-shown) ~ & {
     top: -4px;
     transform: translateY(-100%);
-    font-style: var(--desktop-base-tiny);
+    
+    font-size: 0.75rem;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 1rem; /* 133.333% */
+    
     color: var(--grey-100, #959595);
   }
 `;

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import Input from '../ui/Input.jsx';
+import Input from '../ui/inputs/Input.jsx';
 import Modal from '../ui/Modal.jsx';
 import Button from '../ui/Button.jsx';
 import { useLoginMutation } from '../../store/api/authApi.js';
@@ -49,11 +49,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     errors: null,
   });
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={<HeadingH4>З поверненням!</HeadingH4>}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title="З поверненням!">
       <form action={formAction} style={{ display: 'contents' }}>
         <Input
           label="Електронна пошта"

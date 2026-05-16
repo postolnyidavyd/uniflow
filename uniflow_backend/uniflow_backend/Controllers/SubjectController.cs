@@ -22,6 +22,12 @@ public class SubjectController: RequireAuthController
     {
         return Ok(await _subjectService.GetAllSummariesAsync());
     }
+
+    [HttpGet("short")]
+    public async Task<IActionResult> GetSubjectsShort()
+    {
+        return Ok(await _subjectService.GetAllShortAsync());
+    }
     
     [HttpGet("{subjectId}")] 
     public async Task<IActionResult> GetSubjectById([FromRoute]Guid subjectId)

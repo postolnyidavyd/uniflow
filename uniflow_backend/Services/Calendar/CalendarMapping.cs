@@ -16,7 +16,7 @@ public static class CalendarMapping
         Location = e.Location,
         MeetUrl = e.MeetUrl,
         IsSubscribed = e.IsSubscribed,
-        CalendarItemType = e.EventType == EventType.GeneralEvent ? CalendarItemType.Event : CalendarItemType.Deadline
+        CalendarItemType = e.EventType == EventType.Event ? CalendarItemType.Event : CalendarItemType.Deadline
     };
 
     public static IEnumerable<CalendarItemDto> ProjectToCalendarItem(this IEnumerable<EventSummaryResponseDto> query) =>

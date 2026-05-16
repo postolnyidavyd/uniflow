@@ -15,7 +15,7 @@ public static class ICalMapping
         EndTime = e.Date.AddMinutes(80),
         Location = e.Location,
         Url = e.MeetUrl,
-        ItemType = e.EventType == EventType.GeneralEvent ? ICalItemType.Event : ICalItemType.Deadline,
+        ItemType = e.EventType == EventType.Event ? ICalItemType.Event : ICalItemType.Deadline,
         
         Description = $"{e.Subject!.Name} — {e.Title}\n\n" +
                       $"📍 Локація/Посилання: {e.MeetUrl ?? e.Location ?? "Не вказано"}\n" +

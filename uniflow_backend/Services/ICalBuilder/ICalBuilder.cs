@@ -3,6 +3,7 @@ using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
+using TimeZoneConverter;
 
 namespace Services.ICalBuilder;
 
@@ -97,20 +98,20 @@ public class ICalBuilder : IICalbuilder
 
         calendar.AddTimeZone(timeZoneId);
 
-        var targetZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-
+        var targetZone = TZConvert.GetTimeZoneInfo(timeZoneId);
         foreach (var calItem in items)
         {
             var localStart = TimeZoneInfo.ConvertTimeFromUtc(calItem.StartTime, targetZone);
             var localEnd = TimeZoneInfo.ConvertTimeFromUtc(calItem.EndTime, targetZone);
-
+            
+            Uri.TryCreate(calItem.Url, UriKind.Absolute, out var validatedUri);
             var calendarEvent = new CalendarEvent()
             {
                 Uid = calItem.Id.ToString(),
                 Summary = FormatTitle(calItem.ItemType, calItem.Title),
                 Description = calItem.Description,
                 Location = calItem.Location,
-                Url = string.IsNullOrWhiteSpace(calItem.Url) ? null : new Uri(calItem.Url),
+                Url = validatedUri,
 
                 Categories = new List<string>() { GetCategory(calItem.ItemType) },
 
