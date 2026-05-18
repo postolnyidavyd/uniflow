@@ -5,9 +5,15 @@ import {
 } from '../../utils/queueStatusFormating.js';
 
 const textSizes = {
-  sm: 'var(--desktop-base-small)',
-  md: 'var(--desktop-headings-h5)',
-  lg: 'var(--desktop-headings-h2)',
+  sm: 'font-size: var(--desktop-base-small);',
+  md: css`
+    font-size: 1.25rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.5rem; /* 120% */
+    letter-spacing: -0.025rem;
+  `,
+  lg: 'font-size:var(--desktop-headings-h2);',
 };
 const badgeSizes = {
   sm: css`
@@ -26,8 +32,8 @@ const badgeSizes = {
 const QueueStatusBadge = ({ status, size, ...props }) => {
   return (
     <Wrapper {...props} $size={size}>
-      {queueStatusFormating[status] || status}
       <Badge $status={status} $size={size} />
+      {queueStatusFormating[status] || status}
     </Wrapper>
   );
 };
@@ -36,7 +42,7 @@ const Wrapper = styled.div`
   gap: ${({ $size }) => ($size === 'sm' ? '0.25rem' : '0.5rem')};
   align-items: center;
   justify-content: center;
-  font-style: ${({ $size }) => textSizes[$size] || textSizes.md};
+  ${({ $size }) => textSizes[$size] || textSizes.md};
   color: var(--base-black);
 `;
 const Badge = styled.div`

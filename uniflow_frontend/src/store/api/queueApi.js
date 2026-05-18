@@ -25,7 +25,11 @@ export const queueApi = apiSlice.injectEndpoints({
 
         createQueue: builder.mutation({
             query: (body) => ({ url: '/queue', method: 'POST', body }),
-            invalidatesTags: [{ type: 'QueueList' }],
+            invalidatesTags: [
+                { type: 'QueueList' },
+                { type: 'Calendar' },
+                { type: 'CalendarUpcoming' },
+            ],
         }),
 
         updateQueue: builder.mutation({
@@ -33,6 +37,8 @@ export const queueApi = apiSlice.injectEndpoints({
             invalidatesTags: (_, __, { id }) => [
                 { type: 'Queue', id },
                 { type: 'QueueList' },
+                { type: 'Calendar' },
+                { type: 'CalendarUpcoming' },
             ],
         }),
 
@@ -41,6 +47,8 @@ export const queueApi = apiSlice.injectEndpoints({
             invalidatesTags: (_, __, id) => [
                 { type: 'Queue', id },
                 { type: 'QueueList' },
+                { type: 'Calendar' },
+                { type: 'CalendarUpcoming' },
             ],
         }),
 

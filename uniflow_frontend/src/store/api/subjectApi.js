@@ -40,6 +40,8 @@ export const subjectApi = apiSlice.injectEndpoints({
       invalidatesTags: (_, __, { id }) => [
         { type: 'Subject', id },
         { type: 'SubjectList' },
+        { type: 'Calendar' },
+        { type: 'CalendarUpcoming' },
       ],
     }),
 
@@ -53,11 +55,17 @@ export const subjectApi = apiSlice.injectEndpoints({
     }),
 
     deleteSubject: builder.mutation({
+      query: (id) => ({
+        url: `/subject/${id}`,
+        method: 'DELETE',
+      }),
       invalidatesTags: (_, __, id) => [
         { type: 'Subject', id },
         { type: 'SubjectList' },
         { type: 'EventList', id },
         { type: 'QueueList' },
+        { type: 'Calendar' },
+        { type: 'CalendarUpcoming' },
       ],
     }),
   }),

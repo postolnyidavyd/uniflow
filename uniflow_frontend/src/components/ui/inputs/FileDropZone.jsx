@@ -1,15 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import UploadIcon from '../../../assets/File_dock_add.svg?react'; // заміни на свій SVG
-
-// ─── FileDropzone ─────────────────────────────────────────────────────────────
-//
-// Props:
-//   value:    File | null     — контрольований стан файлу
-//   onChange: (File|null)=>void
-//   accept:   string          — напр. "image/*"
-//   label:    string          — лейбл зверху
-//   error:    string | null
+import UploadIcon from '../../../assets/File_dock_add.svg?react';
 
 const FileDropzone = ({
   value,

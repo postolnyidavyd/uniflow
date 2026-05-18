@@ -43,8 +43,10 @@ const EventModalManager = () => {
     try {
       if (isEditMode) {
         await updateEvent({ id: eventId, ...formData }).unwrap();
+        toast.success('Зміни збережено');
       } else {
         await createEvent({ type: eventType, ...formData }).unwrap();
+        toast.success('Подію створено');
       }
       handleClose();
     } catch (error) {

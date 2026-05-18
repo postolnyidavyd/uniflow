@@ -11,6 +11,7 @@ import {
   validEmail,
 } from '../../utils/validation.js';
 import { useActionState } from 'react';
+import { toast } from '../../utils/toast.js';
 
 const RegisterModal = ({ isOpen, onClose }) => {
   const location = useLocation();
@@ -50,6 +51,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
           : undefined,
       }).unwrap();
 
+      toast.success('Акаунт створено. Ласкаво просимо!');
       onClose();
       navigate(location.state?.from || '/');
     } catch (error) {

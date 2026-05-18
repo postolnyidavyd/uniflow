@@ -31,6 +31,7 @@ import LocationIcon from '../../assets/Map_Pin.svg?react';
 import ExternalLinkIcon from '../../assets/External_Link.svg?react';
 import FileIcon from '../../assets/File_Document.svg?react';
 import { formatDateModal } from '../../utils/ISODateParser.js';
+import { toast } from '../../utils/toast.js';
 
 const EventDetailModal = () => {
   const dispatch = useDispatch();
@@ -51,8 +52,11 @@ const EventDetailModal = () => {
     if (!eventId) return;
     try {
       await toggleSubscription(eventId).unwrap();
+      toast.success(
+        event.isSubscribed ? 'Видалено з календаря' : 'Додано до календаря'
+      );
     } catch {
-      // TODO: Додати toast повідомлення на всіх моментах взаємодії користувача
+      toast.error('Не вдалося оновити статус підписки');
     }
   };
 

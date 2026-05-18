@@ -13,13 +13,13 @@ import {
   validate,
 } from '../../../utils/validation.js';
 import PlusIcon from '../../../assets/Plus.svg?react';
+import { toast } from '../../../utils/toast.js';
 
 const CreateSubjectModal = () => {
   const dispatch = useDispatch();
   const { isOpen } = useSelector((state) => state.ui.createSubjectModal);
   const [createSubject, { isLoading }] = useCreateSubjectMutation();
 
-  // Файл живе в окремому useState — FormData не серіалізується в useActionState
   const [coverFile, setCoverFile] = useState(null);
 
   async function submitAction(prevState, formData) {
@@ -43,7 +43,6 @@ const CreateSubjectModal = () => {
       ],
     });
 
-    // Файл живе поза FormData, тому перевіряємо окремо
     if (!coverFile) {
       errors.coverImage = 'Оберіть обкладинку';
     }
@@ -52,7 +51,6 @@ const CreateSubjectModal = () => {
       return { values, errors };
     }
 
-    // Будуємо multipart FormData для Cloudinary upload на бекенді
     const data = new FormData();
     data.append('name', values.name);
     data.append('shortName', values.shortName);
@@ -63,6 +61,7 @@ const CreateSubjectModal = () => {
 
     try {
       await createSubject(data).unwrap();
+      toast.success(`Предмет "${values.shortName}" успішно додано`);
       setCoverFile(null);
       handleClose();
       return { values: {}, errors: null };

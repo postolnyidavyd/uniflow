@@ -26,7 +26,6 @@ export const eventApi = apiSlice.injectEndpoints({
             invalidatesTags: (_, __, { id }) => [
                 { type: 'Event', id },
                 { type: 'Calendar' },
-                // TODO Переглянути, чи треба інвалідувати цей список при оновленні події
                 { type: 'CalendarUpcoming' },
             ],
         }),
@@ -36,7 +35,6 @@ export const eventApi = apiSlice.injectEndpoints({
             invalidatesTags: (_, __, id) => [
                 { type: 'Event', id },
                 { type: 'Calendar' },
-                // TODO Переглянути, чи треба інвалідувати цей список при оновленні події
                 { type: 'CalendarUpcoming' },
             ],
         }),

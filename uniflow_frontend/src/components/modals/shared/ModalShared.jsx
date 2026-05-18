@@ -1,6 +1,6 @@
 import styled, { keyframes } from 'styled-components';
 import Button from '../../ui/Button.jsx';
-import CalendarIcon from '../../../assets/Calendar.svg?react';
+import BellIcon from '../../../assets/BellSmall.svg?react';
 import { useGetCalendarSettingsQuery } from '../../../store/api/subscriptionApi.js';
 
 export const AddToCalendarButton = ({
@@ -19,7 +19,7 @@ export const AddToCalendarButton = ({
   if (isAuto) {
     return (
       <AutoAddLabel>
-        <CalendarIcon width={18} height={18} />
+        <BellIcon width={18} height={18} />
         Додається автоматично
       </AutoAddLabel>
     );
@@ -27,7 +27,7 @@ export const AddToCalendarButton = ({
 
   return (
     <Button variant="secondary" fullWidth onClick={onToggle}>
-      <CalendarIcon width={24} height={24} />
+      <BellIcon width={24} height={24} />
       {isSubscribed ? 'Видалити з календаря' : 'Додати в календар'}
     </Button>
   );
@@ -56,13 +56,13 @@ export const ModalContent = styled.div`
 `;
 
 export const ModalBigTitle = styled.h2`
-  font-family: 'e-Ukraine', sans-serif;
-  font-size: 2.375rem;
-  font-weight: 400;
-  line-height: 40px;
   color: var(--base-black, #000000);
   text-align: center;
-  margin: 0;
+  //margin: 0;
+  font-size: 2.375rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 2.5rem; /* 105.263% */
 `;
 
 export const ModalDateRow = styled.div`

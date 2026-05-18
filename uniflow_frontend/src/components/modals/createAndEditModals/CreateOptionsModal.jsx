@@ -27,13 +27,14 @@ const CreateOptionsModal = () => {
     handleClose();
     dispatch(openCreateEventModal('Event'));
   };
-  // TODO: Додати хавер ефект для айтемів
+
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={customTitle}>
       <CreateTypeContainer>
         <TypeBlock
           $iconColor="var(--gorse-100)"
           $iconBackgroundColor="var(--gorse-40)"
+          $hoverColor="var(--gorse-100)"
           onClick={handleAddQueue}
         >
           <UserAddIcon />
@@ -45,6 +46,7 @@ const CreateOptionsModal = () => {
         <TypeBlock
           $iconColor="var(--brick-red-100)"
           $iconBackgroundColor="var(--brick-red-20)"
+          $hoverColor="var(--brick-red-100)"
           onClick={handleAddDeadline}
         >
           <ClockIcon />
@@ -56,6 +58,7 @@ const CreateOptionsModal = () => {
         <TypeBlock
           $iconColor="var(--radiance-100)"
           $iconBackgroundColor="var(--radiance-20)"
+          $hoverColor="var(--radiance-100)"
           onClick={handleAddEvent}
         >
           <UserAddIcon />
@@ -93,6 +96,17 @@ const TypeBlock = styled.div`
   border: 2px solid var(--base-bright-grey, #e7eef3);
 
   cursor: pointer;
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    border-color: ${({ $hoverColor }) => $hoverColor};
+    background-color: color-mix(
+      in srgb,
+      ${({ $hoverColor }) => $hoverColor} 5%,
+      transparent
+    );
+  }
+
   svg {
     width: 2rem;
     height: 2rem;
@@ -100,6 +114,11 @@ const TypeBlock = styled.div`
     color: ${({ $iconColor }) => $iconColor || 'var(--base-black)'};
     background-color: ${({ $iconBackgroundColor }) =>
       $iconBackgroundColor || 'var(--base-bright-grey)'};
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &:hover svg {
+    transform: scale(1.02);
   }
 `;
 const TextContainer = styled.div`
