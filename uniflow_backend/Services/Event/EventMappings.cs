@@ -5,24 +5,22 @@ namespace Services.Event;
 
 public static class EventMappings
 {
-    private static Expression<Func<Domain.Models.Event, EventShortResponseDto>> ShortDtoExpression(Guid userId) =>
-        e => new EventShortResponseDto
-        {
-            Id = e.Id,
-            ShortTitle = e.ShortTitle,
-            Date = e.Date,
-            EventType = e.EventType,
-            SubjectName = e.Subject.ShortName,
-            IsSubscribed =
-                e.Subscribers.Any(u => u.Id == userId) ||
-                e.Subject.Subscribers.Any(s => s.Id == userId) ||
-                e.Subject.Subscribers.Any(u =>
-                    u.UserCalendarSettings != null &&
-                    u.UserCalendarSettings.AutoAddAllEvents &&
-                    u.Id == userId)
-        };
+private static Expression<Func<Domain.Models.Event, EventShortResponseDto>> 
+    ShortDtoExpression(Guid userId, bool autoAdd) =>
+    e => new EventShortResponseDto
+    {
+        Id = e.Id,
+        ShortTitle = e.ShortTitle,
+        Date = e.Date,
+        EventType = e.EventType,
+        SubjectName = e.Subject.ShortName,
+        IsSubscribed = autoAdd ||
+                       e.Subscribers.Any(u => u.Id == userId) ||
+                       e.Subject.Subscribers.Any(u => u.Id == userId)
+    };
 
-    private static Expression<Func<Domain.Models.Event, EventDetailResponseDto>> DetailDtoExpression(Guid userId) =>
+    private static Expression<Func<Domain.Models.Event, EventDetailResponseDto>> 
+        DetailDtoExpression(Guid userId, bool autoAdd) =>
         e => new EventDetailResponseDto
         {
             Id = e.Id,
@@ -36,22 +34,37 @@ public static class EventMappings
             MeetUrl = e.MeetUrl,
             SubjectId = e.SubjectId,
             SubjectName = e.Subject.Name,
-            IsSubscribed =
-                e.Subscribers.Any(u => u.Id == userId) ||
-                e.Subject.Subscribers.Any(u =>
-                    u.Id == userId &&
-                    u.UserCalendarSettings != null &&
-                    u.UserCalendarSettings.AutoAddAllEvents)
+            IsSubscribed = autoAdd ||
+                           e.Subscribers.Any(u => u.Id == userId) ||
+                           e.Subject.Subscribers.Any(u => u.Id == userId)
         };
+private static Expression<Func<Domain.Models.Event, EventSummaryResponseDto>>
+    SummaryDtoExpression(Guid userId, bool autoAdd) => e => new EventSummaryResponseDto
+    {
+        Id = e.Id,
+        ShortTitle = e.ShortTitle,
+        SubjectName = e.Subject!.ShortName,
+        Date = e.Date,
+        EventType = e.EventType,
+        Location = e.Location,
+        MeetUrl = e.MeetUrl,
+        IsSubscribed = autoAdd ||
+                       e.Subscribers.Any(u => u.Id == userId) ||
+                       e.Subject!.Subscribers.Any(u => u.Id == userId)
+    };
 
     public static IQueryable<EventShortResponseDto> ProjectToShortDto(
-        this IQueryable<Domain.Models.Event> query, Guid userId) =>
-        query.Select(ShortDtoExpression(userId));
+        this IQueryable<Domain.Models.Event> query, Guid userId, bool autoAdd = false) =>
+        query.Select(ShortDtoExpression(userId, autoAdd));
 
     public static IQueryable<EventDetailResponseDto> ProjectToDetailDto(
-        this IQueryable<Domain.Models.Event> query, Guid userId) =>
-        query.Select(DetailDtoExpression(userId));
+        this IQueryable<Domain.Models.Event> query, Guid userId, bool autoAdd = false) =>
+        query.Select(DetailDtoExpression(userId, autoAdd));
 
+    public static IQueryable<EventSummaryResponseDto> ProjectToSummaryDto(
+        this IQueryable<Domain.Models.Event> query, Guid userId, bool autoAdd = false) =>
+        query.Select(SummaryDtoExpression(userId, autoAdd));
+    
     public static Domain.Models.Event ToEntity(this CreateEventDto dto, Guid userId) => new()
     {
         Title = dto.Title,
@@ -66,27 +79,5 @@ public static class EventMappings
         CreatedByUserId = userId
     };
     
-    private static Expression<Func<Domain.Models.Event, EventSummaryResponseDto>>
-        SummaryDtoExpression(Guid userId) => e => new EventSummaryResponseDto()
-    {
-        Id = e.Id,
-        ShortTitle = e.ShortTitle,
-        SubjectName = e.Subject!.ShortName, 
-        Date = e.Date,
-        EventType = e.EventType,
-        Location = e.Location,
-        MeetUrl = e.MeetUrl,
-        
-        IsSubscribed = 
-            e.Subscribers.Any(u => u.Id == userId) 
-            ||
-            e.Subject!.Subscribers.Any(u => 
-                u.Id == userId && 
-                u.UserCalendarSettings != null && 
-                u.UserCalendarSettings.AutoAddAllEvents)
-    };
 
-    public static IQueryable<EventSummaryResponseDto> ProjectToSummaryDto(
-        this IQueryable<Domain.Models.Event> query, Guid userId) =>
-        query.Select(SummaryDtoExpression(userId));
 }
