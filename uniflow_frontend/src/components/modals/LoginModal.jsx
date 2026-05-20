@@ -6,6 +6,7 @@ import { useLoginMutation } from '../../store/api/authApi.js';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { required, validate, validEmail } from '../../utils/validation.js';
 import { useActionState } from 'react';
+import { toast } from '../../utils/toast.js';
 
 const LoginModal = ({ isOpen, onClose }) => {
   const location = useLocation();
@@ -33,6 +34,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         password,
       }).unwrap();
 
+      toast.success('Вітаємо! Ви успішно увійшли');
       onClose();
       navigate(location.state?.from || '/');
     } catch (error) {
@@ -80,9 +82,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     </Modal>
   );
 };
-const HeadingH4 = styled.h4`
-  font-style: var(--desktop-headings-h4);
-`;
+
 
 const FieldGroup = styled.div`
   display: flex;

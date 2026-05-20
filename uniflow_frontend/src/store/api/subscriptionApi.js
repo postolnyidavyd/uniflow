@@ -9,12 +9,12 @@ export const subscriptionApi = apiSlice.injectEndpoints({
 
         toggleAutoAddEvents: builder.mutation({
             query: () => ({ url: '/subscriptions/settings/auto-add-events/toggle', method: 'PUT' }),
-            invalidatesTags: [{ type: 'Subscriptions' }],
+            invalidatesTags: [{ type: 'Subscriptions' }, { type: 'Calendar' }],
         }),
 
         toggleAutoAddQueues: builder.mutation({
             query: () => ({ url: '/subscriptions/settings/auto-add-queues/toggle', method: 'PUT' }),
-            invalidatesTags: [{ type: 'Subscriptions' }],
+            invalidatesTags: [{ type: 'Subscriptions' }, { type: 'Calendar' }],
         }),
 
         toggleSubjectSubscription: builder.mutation({

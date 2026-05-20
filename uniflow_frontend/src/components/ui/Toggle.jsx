@@ -40,11 +40,11 @@ const Label = styled.span`
   color: var(--base-black, #000);
 `
 // Використання
-function Toggle({ checked, label, onChange }) {
+function Toggle({ checked, label, onChange, ...props }) {
   return (
     <Wrapper>
       <ToggleWrapper>
-        <HiddenInput checked={checked} onChange={onChange} />
+        <HiddenInput checked={checked} onChange={onChange} {...props}/>
         <Track $checked={checked}>
           <Thumb $checked={checked} />
         </Track>

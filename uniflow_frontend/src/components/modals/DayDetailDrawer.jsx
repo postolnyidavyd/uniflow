@@ -23,8 +23,6 @@ import Button from '../ui/Button.jsx';
 import PlusIcon from '../../assets/Plus.svg?react';
 import { selectUserRole } from '../../store/selectors/authSelector.js';
 
-//TODO Змінити структуру компонента щоб карточки були окремий контейнер і скролилися між собою а кнопка не скролилася і завжди була внизу
-
 const DayDetailsDrawer = () => {
   const { isOpen, date, items } = useSelector(selectCalendarDayPanel);
   const role = useSelector(selectUserRole);
@@ -73,44 +71,49 @@ const DayDetailsDrawer = () => {
           </CloseButton>
         </Header>
 
-        {items.map((item) => (
-          <EventRow
-            key={item.id}
-            onClick={() => handleEventCardClick(item.calendarItemType, item.id)}
-          >
-            <TimeBlock>{getTimeFromISO(item.startTime) || 'XX:XX'}</TimeBlock>
-
-            <EventDetailsCard
-              $bgColor={
-                calendarItemFormattingBackgroundColor[item.calendarItemType]
+        <ItemsList>
+          {items.map((item) => (
+            <EventRow
+              key={item.id}
+              onClick={() =>
+                handleEventCardClick(item.calendarItemType, item.id)
               }
-              $borderColor={calendarItemFormattingColor[item.calendarItemType]}
             >
-              <EventTitle>
-                {item.subjectShortName} - {item.itemShortTitle}
-              </EventTitle>
+              <TimeBlock>{getTimeFromISO(item.startTime) || 'XX:XX'}</TimeBlock>
 
-              {item.meetUrl ? (
-                <EventUrl
-                  href={item.meetUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  {item.meetUrl}
-                </EventUrl>
-              ) : (
-                <EventLocation>{item.location}</EventLocation>
-              )}
-            </EventDetailsCard>
-          </EventRow>
-        ))}
+              <EventDetailsCard
+                $bgColor={
+                  calendarItemFormattingBackgroundColor[item.calendarItemType]
+                }
+                $borderColor={calendarItemFormattingColor[item.calendarItemType]}
+              >
+                <EventTitle>
+                  {item.subjectShortName} - {item.itemShortTitle}
+                </EventTitle>
+
+                {item.meetUrl ? (
+                  <EventUrl
+                    href={item.meetUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    {item.meetUrl}
+                  </EventUrl>
+                ) : (
+                  <EventLocation>{item.location}</EventLocation>
+                )}
+              </EventDetailsCard>
+            </EventRow>
+          ))}
+        </ItemsList>
+
         {role === 'Headman' && (
           <ButtonContainer>
             <Button onClick={handleAddEventClick}>
-              <PlusIcon width="1rem" height="1rem"/> Додати
+              <PlusIcon width="1rem" height="1rem" /> Додати
             </Button>
           </ButtonContainer>
         )}
@@ -157,7 +160,7 @@ const DrawerPanel = styled.div`
 
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
 
   animation: slideIn 0.3s ease;
 
@@ -176,6 +179,33 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   align-self: stretch;
+`;
+
+const ItemsList = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  /* Виносимо скролбар до краю панелі, зберігаючи внутрішні відступи */
+  margin: 0 -0.75rem;
+  padding: 0 0.75rem;
+
+  /* Кастомний скролбар */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--grey-40, #d5d5d5);
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--grey-60, #bfbfbf);
+  }
 `;
 
 const DateContainer = styled.div`

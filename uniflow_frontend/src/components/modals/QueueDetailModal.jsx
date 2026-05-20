@@ -1,10 +1,8 @@
-import{ useMemo } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-  closeQueueDetailModal,
-} from '../../store/uiSlice.js';
+import { closeQueueDetailModal } from '../../store/uiSlice.js';
 import {
   selectQueueDetailModalIsOpen,
   selectQueueDetailSessionId,
@@ -39,10 +37,9 @@ import CalendarIcon from '../../assets/Calendar.svg?react';
 import PeopleIcon from '../../assets/UsersSmall.svg?react';
 import ClockIcon from '../../assets/ClockSmall.svg?react';
 
-import {
-  formatDateModal,
-  formatShortTime,
-} from '../../utils/ISODateParser.js';
+import { formatDateModal, formatShortTime } from '../../utils/ISODateParser.js';
+import { toast } from '../../utils/toast.js';
+import QueueStatusBadge from '../ui/QueueStatusBadge.jsx';
 
 const PLANNED = 'Planned';
 const REGISTRATION = 'Registration';
@@ -99,21 +96,18 @@ const QueueDetailModal = () => {
     if (!sessionId) return;
     try {
       await toggleSubscription(sessionId).unwrap();
-    } catch {}
+      toast.success(
+        session.isSubscribed ? 'Видалено з календаря' : 'Додано до календаря'
+      );
+    } catch {
+      toast.error('Не вдалося оновити статус підписки');
+    }
   };
 
   const handleNavigate = () => {
     handleClose();
     navigate(`/queues/${sessionId}`);
   };
-
-  const statusLabel = session
-    ? queueStatusFormating[session.queueStatus]
-    : null;
-  const statusColor = session
-    ? colorStatusFormating[session.queueStatus]
-    : null;
-  const hasDot = isActive;
 
   const customTitle = session ? (
     <ModalTitleWrapper>
@@ -126,23 +120,23 @@ const QueueDetailModal = () => {
     <Modal isOpen={isOpen} onClose={handleClose} title={customTitle}>
       {isLoading && <SkeletonLine $height="40px" />}
       {!isLoading && !session && isOpen && (
-          <ModalContent>
-              <ModalBigTitle>Чергу не знайдено</ModalBigTitle>
-              <Button onClick={handleClose}>Закрити</Button>
-          </ModalContent>
+        <ModalContent>
+          <ModalBigTitle>Чергу не знайдено</ModalBigTitle>
+          <Button onClick={handleClose}>Закрити</Button>
+        </ModalContent>
       )}
       {!isLoading && session && (
         <ModalContent>
           <ModalBigTitle>{session.title}</ModalBigTitle>
-
-          <ModalDateRow>
-            <CalendarIcon width={22} height={22} />
-            <ModalDateText>{formatDateModal(session.queueStartTime)}</ModalDateText>
-            <StatusBadge $color={statusColor}>
-              {hasDot && <StatusDot $color={statusColor} />}
-              {statusLabel}
-            </StatusBadge>
-          </ModalDateRow>
+          <HeaderRow>
+            <ModalDateRow>
+              <CalendarIcon width={22} height={22} />
+              <ModalDateText>
+                {formatDateModal(session.queueStartTime)}
+              </ModalDateText>
+            </ModalDateRow>
+            <QueueStatusBadge status={session.queueStatus} />
+          </HeaderRow>
 
           {session.queueStatus === PLANNED && (
             <CountdownSection>
@@ -208,46 +202,28 @@ const QueueDetailModal = () => {
                 : 'Чергу завершено'}
             </ClosedText>
           )}
-
-          {isActive && (
-            <Button variant="primary" fullWidth onClick={handleNavigate}>
-              {isUserInQueue ? 'Перейти на сторінку черги' : 'Записатися'}
-            </Button>
-          )}
-
-          {session.queueStatus !== CLOSED &&
-            session.queueStatus !== CANCELLED && (
-              <AddToCalendarButton
-                type="queue"
-                isSubscribed={session.isSubscribed ?? false}
-                onToggle={handleToggleCalendar}
-                isUserInQueue={isUserInQueue}
-              />
+          <ButtonGroup>
+            {isActive && (
+              <Button variant="primary" fullWidth onClick={handleNavigate}>
+                {isUserInQueue ? 'Перейти на сторінку черги' : 'Записатися'}
+              </Button>
             )}
+
+            {session.queueStatus !== CLOSED &&
+              session.queueStatus !== CANCELLED && (
+                <AddToCalendarButton
+                  type="queue"
+                  isSubscribed={session.isSubscribed ?? false}
+                  onToggle={handleToggleCalendar}
+                  isUserInQueue={isUserInQueue}
+                />
+              )}
+          </ButtonGroup>
         </ModalContent>
       )}
     </Modal>
   );
 };
-
-const StatusBadge = styled.span`
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-family: 'e-Ukraine', sans-serif;
-  font-size: 1rem;
-  font-weight: 400;
-  color: ${({ $color }) => $color};
-  margin-left: auto;
-`;
-
-const StatusDot = styled.span`
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: ${({ $color }) => $color};
-  flex-shrink: 0;
-`;
 
 const CountdownSection = styled.div`
   display: flex;
@@ -256,6 +232,12 @@ const CountdownSection = styled.div`
   gap: 0.5rem;
 `;
 
+const HeaderRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+`;
 const CountdownLabel = styled.span`
   font-family: 'e-Ukraine', sans-serif;
   font-size: 1.25rem;
@@ -304,7 +286,7 @@ const PeopleRow = styled.div`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  color: var(--base-secondary-text, #6b6b6b);
+  color: var(--base-black);
 `;
 
 const ClosedText = styled.p`
@@ -313,6 +295,13 @@ const ClosedText = styled.p`
   font-size: 1.25rem;
   color: var(--base-secondary-text, #6b6b6b);
   margin: 0;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-self: stretch;
 `;
 
 export default QueueDetailModal;
