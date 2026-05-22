@@ -22,44 +22,48 @@ public class MarkdownParser : IMarkdownParser
         return SanitizationHelper.Sanitize(string.Join("\n", result));
     }
 
-    private IEnumerable<string> SplitIntoBlocks(string markdown)
+private IEnumerable<string> SplitIntoBlocks(string markdown)
+{
+    var lines = markdown.Split('\n');
+    var blocks = new List<string>();
+    var currentBlock = new List<string>();
+    bool insideCodeBlock = false;
+
+    foreach (var line in lines)
     {
-        var lines = markdown.Split('\n');
-        var blocks = new List<string>();
-        var currentBlock = new List<string>();
-        bool insideCodeBlock = false;
+        bool isCodeFence = line.TrimStart().StartsWith("```");
 
-        foreach (var line in lines)
+        if (currentBlock.Count == 0)
         {
-            if (line.TrimStart().StartsWith("```"))
-                insideCodeBlock = !insideCodeBlock;
-
-            if (currentBlock.Count == 0)
-            {
-                currentBlock.Add(line);
-                continue;
-            }
-
-            bool isEmpty = string.IsNullOrWhiteSpace(line) && !insideCodeBlock;
-            bool typeChanged = !insideCodeBlock &&
-                               DetectLineType(line) != DetectLineType(currentBlock[0]);
-
-            if (isEmpty || typeChanged)
-            {
-                if (currentBlock.Any(l => !string.IsNullOrWhiteSpace(l)))
-                    blocks.Add(string.Join('\n', currentBlock));
-                currentBlock.Clear();
-            }
-
-            if (!isEmpty)
-                currentBlock.Add(line);
+            if (isCodeFence) insideCodeBlock = !insideCodeBlock;
+            currentBlock.Add(line);
+            continue;
         }
 
-        if (currentBlock.Count > 0)
-            blocks.Add(string.Join('\n', currentBlock));
+        // перевірка перед зміною insideCodeBlock
+        bool isEmpty = string.IsNullOrWhiteSpace(line) && !insideCodeBlock;
+        bool typeChanged = !insideCodeBlock &&
+                           DetectLineType(line) != DetectLineType(currentBlock[0]);
 
-        return blocks;
+        if (isEmpty || typeChanged)
+        {
+            if (currentBlock.Any(l => !string.IsNullOrWhiteSpace(l)))
+                blocks.Add(string.Join('\n', currentBlock));
+            currentBlock.Clear();
+        }
+
+        // тогл після перевірки
+        if (isCodeFence) insideCodeBlock = !insideCodeBlock;
+
+        if (!isEmpty)
+            currentBlock.Add(line);
     }
+
+    if (currentBlock.Count > 0)
+        blocks.Add(string.Join('\n', currentBlock));
+
+    return blocks;
+}
 
     private string DetectLineType(string line)
     {

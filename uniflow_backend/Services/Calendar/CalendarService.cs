@@ -55,17 +55,16 @@ public class CalendarService : ICalendarService
 
     public async Task<UpcomingDashboardDto> GetUpcomingAsync(Guid userId, Guid subjectId)
     {
-        var eventsTask = _eventService.GetUpcomingByTypeAsync(userId, EventType.Event, subjectId);
-        var deadlinesTask = _eventService.GetUpcomingByTypeAsync(userId, EventType.Deadline, subjectId);
-        var queuesTask = _queueService.GetUpcomingAsync(userId, subjectId);
 
-        await Task.WhenAll(eventsTask, deadlinesTask, queuesTask);
+        var events = await _eventService.GetUpcomingByTypeAsync(userId, EventType.Event, subjectId);
+        var deadlines = await _eventService.GetUpcomingByTypeAsync(userId, EventType.Deadline, subjectId);
+        var queues = await _queueService.GetUpcomingAsync(userId, subjectId);
 
         var dashboard = new UpcomingDashboardDto()
         {
-            Events = eventsTask.Result,
-            Deadlines = deadlinesTask.Result,
-            Queues = queuesTask.Result
+            Events = events,
+            Deadlines = deadlines,
+            Queues = queues
         };
 
         return dashboard;

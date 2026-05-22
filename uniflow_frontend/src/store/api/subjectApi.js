@@ -76,6 +76,7 @@ export const {
   useGetSubjectsShortQuery,
   useGetSubjectByIdQuery,
   useGetSubjectMarkdownQuery,
+  useLazyGetSubjectMarkdownQuery,
   useCreateSubjectMutation,
   useUpdateSubjectMutation,
   useUpdateMarkdownMutation,

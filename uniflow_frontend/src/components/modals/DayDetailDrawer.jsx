@@ -191,21 +191,6 @@ const ItemsList = styled.div`
   /* Виносимо скролбар до краю панелі, зберігаючи внутрішні відступи */
   margin: 0 -0.75rem;
   padding: 0 0.75rem;
-
-  /* Кастомний скролбар */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--grey-40, #d5d5d5);
-    border-radius: 10px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: var(--grey-60, #bfbfbf);
-  }
 `;
 
 const DateContainer = styled.div`

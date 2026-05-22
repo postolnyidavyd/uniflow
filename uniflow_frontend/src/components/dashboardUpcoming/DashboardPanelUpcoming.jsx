@@ -1,6 +1,6 @@
 // orientation: 'horizontal' | 'vertical'
 import {
-    useGetUpcomingBySubjectQuery,
+  useGetUpcomingBySubjectQuery,
   useGetUpcomingQuery,
 } from '../../store/api/calendarApi.js';
 import styled from 'styled-components';
@@ -17,7 +17,7 @@ const DashboardPanelUpcoming = ({ orientation = 'horizontal', subjectId }) => {
   return (
     <PanelContainer $orientation={orientation}>
       <UpcomingDeadlines deadlines={data?.deadlines} />
-      <UpcomingQueues queues={data?.queues} />
+      <UpcomingQueues queues={data?.queues} isSubjectUpcoming={!!subjectId} />
       <UpcomingEvents events={data?.events} />
     </PanelContainer>
   );
@@ -26,9 +26,10 @@ const PanelContainer = styled.div`
   display: flex;
   flex-direction: ${({ $orientation }) =>
     $orientation === 'horizontal' ? 'row' : 'column'};
-  align-items: ${({ $orientation }) =>
-    $orientation === 'horizontal' ? 'stretch' : 'stretch'};
+  align-items: stretch;
   gap: 0.5rem;
-  width: 100%;
+
+  width: ${({ $orientation }) =>
+    $orientation === 'horizontal' ? '100%' : '22rem'};
 `;
 export default DashboardPanelUpcoming;

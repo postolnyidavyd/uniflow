@@ -48,11 +48,15 @@ public class SubjectService : ISubjectService
         return subjectSummaries;
     }
 
-    public async Task<SubjectDetailResponseDto> GetByIdAsync(Guid subjectId)
+    public async Task<SubjectDetailResponseDto> GetByIdAsync(Guid subjectId, Guid userId)
     {
         var subject = await _appDbContext.Subjects
             .Where(s => s.Id == subjectId)
-            .Select(s => new { s.Name, s.Lecturer, s.Id, s.MarkdownContent })
+            .Select(s => new
+            {
+            s.Name, s.Lecturer, s.Id, s.MarkdownContent,
+            IsSubscribed = s.Subscribers.Any(u => u.Id == userId)
+            })
             .FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Предмет не знайдено");
 
         return new SubjectDetailResponseDto
@@ -60,11 +64,12 @@ public class SubjectService : ISubjectService
             Name = subject.Name,
             Lecturer = subject.Lecturer,
             Id = subject.Id,
+            IsSubscribed = subject.IsSubscribed,
             RenderedContent = subject.MarkdownContent != null
-                ? _markdownParser.Parse(subject.MarkdownContent)
-                : null
+            ? _markdownParser.Parse(subject.MarkdownContent)
+            : null
         };
-    }
+}
 
     public async Task<Guid> CreateSubjectAsync(Guid userId, CreateSubjectDto dto)
     {
@@ -129,6 +134,7 @@ public class SubjectService : ISubjectService
             throw new KeyNotFoundException("Предмет не знайдено");
 
         subject.MarkdownContent = dto.MarkdownContent;
+        subject.LastUpdatedAt = DateTime.UtcNow;
 
         await _appDbContext.SaveChangesAsync();
     }

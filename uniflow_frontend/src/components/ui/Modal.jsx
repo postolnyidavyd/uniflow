@@ -183,21 +183,6 @@ const ModalBody = styled.div`
   gap: 2rem;
   flex: 1;
   overflow-y: auto;
-
-  /* Кастомний скролбар */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--grey-40, #d5d5d5);
-    border-radius: 10px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: var(--grey-60, #bfbfbf);
-  }
 `;
 
 export default Modal;

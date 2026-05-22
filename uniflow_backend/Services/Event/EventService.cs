@@ -16,25 +16,24 @@ public class EventService : IEventService
 
     public async Task<IEnumerable<EventShortResponseDto>> GetBySubjectAsync(Guid userId, Guid subjectId)
     {
-        var events = await _appDbContext.Events
+        var autoAdd = await GetAutoAddAsync(userId);
+        return await _appDbContext.Events
             .Where(e => e.SubjectId == subjectId)
             .OrderBy(e => e.Date)
-            .ProjectToShortDto(userId)
+            .ProjectToShortDto(userId, autoAdd)
             .ToListAsync();
-
-        return events;
     }
 
     public async Task<EventDetailResponseDto> GetByIdAsync(Guid userId, Guid eventId)
     {
-        var eventDetail = await _appDbContext.Events
-                              .Where(e => e.Id == eventId)
-                              .ProjectToDetailDto(userId)
-                              .FirstOrDefaultAsync()
-                          ?? throw new KeyNotFoundException("Подію не знайдено");
-
-        return eventDetail;
+        var autoAdd = await GetAutoAddAsync(userId);
+        return await _appDbContext.Events
+                   .Where(e => e.Id == eventId)
+                   .ProjectToDetailDto(userId, autoAdd)
+                   .FirstOrDefaultAsync()
+               ?? throw new KeyNotFoundException("Подію не знайдено");
     }
+
 
     public async Task CreateEventAsync(Guid userId, CreateEventDto dto)
     {
@@ -99,38 +98,47 @@ public class EventService : IEventService
         await _appDbContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type,
-        int take = 3)
+    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(
+        Guid userId, EventType type, int take = 3)
     {
+        var autoAdd = await GetAutoAddAsync(userId);
         return await _appDbContext.Events
             .Where(e => e.Date >= DateTime.UtcNow && e.EventType == type)
             .OrderBy(e => e.Date)
             .Take(take)
-            .ProjectToShortDto(userId)
+            .ProjectToShortDto(userId, autoAdd)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(Guid userId, EventType type,
-        Guid subjectId, int take = 3)
+    public async Task<IEnumerable<EventShortResponseDto>> GetUpcomingByTypeAsync(
+        Guid userId, EventType type, Guid subjectId, int take = 3)
     {
+        var autoAdd = await GetAutoAddAsync(userId);
         return await _appDbContext.Events
             .Where(e => e.Date >= DateTime.UtcNow && e.EventType == type)
             .Where(e => e.SubjectId == subjectId)
             .OrderBy(e => e.Date)
             .Take(take)
-            .ProjectToShortDto(userId)
+            .ProjectToShortDto(userId, autoAdd)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<EventSummaryResponseDto>> GetEventsByMonthAsync(Guid userId, int year, int month)
+    public async Task<IEnumerable<EventSummaryResponseDto>> GetEventsByMonthAsync(
+        Guid userId, int year, int month)
     {
+        var autoAdd = await GetAutoAddAsync(userId);
         var startOfMonth = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
-
         var startOfNextMonth = startOfMonth.AddMonths(1);
         return await _appDbContext.Events
             .Where(e => e.Date >= startOfMonth && e.Date < startOfNextMonth)
             .OrderBy(e => e.Date)
-            .ProjectToSummaryDto(userId)
+            .ProjectToSummaryDto(userId, autoAdd)
             .ToListAsync();
     }
+
+    private async Task<bool> GetAutoAddAsync(Guid userId) =>
+        await _appDbContext.UserCalendarSettings
+            .Where(s => s.UserId == userId)
+            .Select(s => s.AutoAddAllEvents)
+            .FirstOrDefaultAsync();
 }

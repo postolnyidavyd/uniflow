@@ -10,9 +10,13 @@ public class InlineParser
         
         content = Regex.Replace(content, @"`([^`]+)`", match =>
         {
-            codeBlocks.Add($"<code>{match.Groups[1].Value}</code>");
-            return $"%%CODE_{codeBlocks.Count - 1}%%"; // плейсхолдер
-        }); 
+            var innerText = match.Groups[1].Value
+                .Replace("&", "&amp;")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;");
+            codeBlocks.Add($"<code class=\"inline-code\">{innerText}</code>");
+            return $"%%CODE_{codeBlocks.Count - 1}%%";
+        });
         
         // вони не торкнуться %%CODE_0%% бо не знають такого патерну
         content = ParseBold(content);

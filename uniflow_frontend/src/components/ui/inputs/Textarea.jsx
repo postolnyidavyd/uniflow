@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { forwardRef } from 'react';
+import { forwardRef, useEffect, useRef, useImperativeHandle } from 'react';
 
 const Wrapper = styled.div`
   display: flex;
@@ -87,12 +87,25 @@ const ErrorText = styled.p`
 `;
 
 const Textarea = forwardRef(({ label, id, error, ...props }, ref) => {
+  const innerRef = useRef(null);
+  useImperativeHandle(ref, () => innerRef.current);
+
   const textareaId =
     id || `textarea-${Math.random().toString(36).substring(2, 9)}`;
 
-  const handleInput = (e) => {
-    e.target.style.height = 'auto';
-    e.target.style.height = e.target.scrollHeight + 'px';
+  const adjustHeight = () => {
+    if (innerRef.current) {
+      innerRef.current.style.height = 'auto';
+      innerRef.current.style.height = innerRef.current.scrollHeight + 'px';
+    }
+  };
+
+  useEffect(() => {
+    adjustHeight();
+  }, [props.value]);
+
+  const handleInput = () => {
+    adjustHeight();
   };
 
   return (
@@ -100,7 +113,7 @@ const Textarea = forwardRef(({ label, id, error, ...props }, ref) => {
       <InputContainer>
         <StyledTextarea
           id={textareaId}
-          ref={ref}
+          ref={innerRef}
           $error={!!error}
           placeholder=" "
           onInput={handleInput}

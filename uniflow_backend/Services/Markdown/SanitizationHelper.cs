@@ -46,25 +46,25 @@ public static class SanitizationHelper
         });
     }
 
-    private static string SanitizeAttributes(string attributesRaw)
-    {
-        string attrPattern = @"(\w+)\s*=\s*[""']([^""']*)[""']";
-        var matches = Regex.Matches(attributesRaw, attrPattern);
+private static string SanitizeAttributes(string attributesRaw)
+{
+    string attrPattern = @"(\w+)\s*=\s*[""']([^""']*)[""']";
+    var matches = Regex.Matches(attributesRaw, attrPattern);
 
-        var cleanAttrs = matches.Cast<Match>()
-            .Select(m => new
-            {
-                Name = m.Groups[1].Value.ToLower(),
-                Value = m.Groups[2].Value
-            })
-            // Залишаємо лише дозволені атрибути, перевіряємо на XSS в значеннях, перевіряємо посилання
-            .Where(a => AllowedAttributes.Contains(a.Name) &&
-                        !IsXssValue(a.Value) &&
-                        !(a.Name == "href" && !a.Value.StartsWith("http://") && !a.Value.StartsWith("https://")));
+    var cleanAttrs = matches.Cast<Match>()
+        .Select(m => new
+        {
+            Name = m.Groups[1].Value.ToLower(),
+            Value = m.Groups[2].Value
+        })
+        .Where(a => AllowedAttributes.Contains(a.Name) &&
+                    !IsXssValue(a.Value) &&
+                    !(a.Name == "href" && !a.Value.StartsWith("http://") && !a.Value.StartsWith("https://")))
+        .Select(a => $"{a.Name}=\"{a.Value}\""); // ← ось фікс, додати цей .Select
 
-        string result = string.Join(" ", cleanAttrs);
-        return string.IsNullOrEmpty(result) ? "" : " " + result;
-    }
+    string result = string.Join(" ", cleanAttrs);
+    return string.IsNullOrEmpty(result) ? "" : " " + result;
+}
 
     private static bool IsXssValue(string value)
     {

@@ -29,12 +29,12 @@ public class SubjectController: RequireAuthController
         return Ok(await _subjectService.GetAllShortAsync());
     }
     
-    [HttpGet("{subjectId}")] 
-    public async Task<IActionResult> GetSubjectById([FromRoute]Guid subjectId)
+    [HttpGet("{subjectId}")]
+    public async Task<IActionResult> GetSubjectById([FromRoute] Guid subjectId)
     {
-        return Ok(await _subjectService.GetByIdAsync(subjectId));
+        var userId = GetUserId();
+        return Ok(await _subjectService.GetByIdAsync(subjectId, userId));
     }
-
     [HttpPost("")]
     [Authorize(Roles = Roles.Headman)]
     public async Task<IActionResult> CreateSubject([FromForm]CreateSubjectDto dto)
