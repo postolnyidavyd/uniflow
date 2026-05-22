@@ -7,6 +7,8 @@ import PlusIcon from '../assets/Plus.svg?react';
 import { useGetSubjectsQuery } from '../store/api/subjectApi.js';
 import Spinner from '../components/ui/Spinner.jsx';
 import { SubjectCard } from '../components/SubjectCard.jsx';
+import EmptyState from '../components/ui/EmptyState.jsx';
+import BookIcon from '../assets/BookBig.svg?react';
 
 function SubjectsPage() {
   const dispatch = useDispatch();
@@ -15,6 +17,9 @@ function SubjectsPage() {
 
   if (isLoading) return <Spinner fullscreen />;
   const handleAddSubject = () => dispatch(openCreateSubjectModal());
+
+  const isEmpty = !subjects || subjects.length === 0;
+
   return (
     <PageWrapper>
       <Header>
@@ -26,21 +31,38 @@ function SubjectsPage() {
           </Button>
         )}
       </Header>
-      <CardsGrid>
-        {subjects.map((subject) => (
-          <SubjectCard
-            key={subject.id}
-            id={subject.id}
-            imgUrl={subject.imgUrl}
-            name={subject.name}
-            lecturer={subject.lecturer}
-            lastUpdatedAt={subject.lastUpdatedAt}
+      
+      {isEmpty ? (
+        <EmptyStateWrapper>
+          <EmptyState 
+            variant="large"
+            icon={BookIcon}
+            title="Поки що тихо..."
+            description="Ще не додано жодного предмету"
           />
-        ))}
-      </CardsGrid>
+        </EmptyStateWrapper>
+      ) : (
+        <CardsGrid>
+          {subjects?.map((subject) => (
+            <SubjectCard
+              key={subject.id}
+              id={subject.id}
+              imgUrl={subject.imgUrl}
+              name={subject.name}
+              lecturer={subject.lecturer}
+              lastUpdatedAt={subject.lastUpdatedAt}
+            />
+          ))}
+        </CardsGrid>
+      )}
     </PageWrapper>
   );
 }
+
+const EmptyStateWrapper = styled.div`
+  margin-top: 2rem;
+  width: 100%;
+`;
 
 const CardsGrid = styled.div`
     margin-top: 2rem;

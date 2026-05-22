@@ -6,7 +6,7 @@ public interface ISubjectService
 {
     Task<IEnumerable<SubjectSummaryResponseDto>> GetAllSummariesAsync();
     Task<IEnumerable<SubjectShortResponseDto>> GetAllShortAsync();
-    Task<SubjectDetailResponseDto> GetByIdAsync(Guid subjectId);
+    Task<SubjectDetailResponseDto> GetByIdAsync(Guid subjectId, Guid userId);
     Task<Guid> CreateSubjectAsync(Guid userId, CreateSubjectDto dto );
     Task UpdateSubjectAsync(Guid subjectId, UpdateSubjectDto dto);
     Task UpdateMarkdownContentAsync(Guid subjectId, UpdateMarkdownDto dto);
