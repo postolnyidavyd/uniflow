@@ -5,7 +5,6 @@ import {
   useLazyGetSubjectMarkdownQuery,
   useUpdateMarkdownMutation,
 } from '../store/api/subjectApi.js';
-import Spinner from '../components/ui/Spinner.jsx';
 import DashboardPanelUpcoming from '../components/dashboardUpcoming/DashboardPanelUpcoming.jsx';
 import HtmlRenderer from '../components/HtmlRenderer.jsx';
 import Button from '../components/ui/Button.jsx';
@@ -21,10 +20,12 @@ import BackButton from '../components/ui/BackButton.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import InfoIcon from '../assets/Info.svg?react';
 
+import { SubjectDetailSkeleton } from '../components/ui/skeletons/SubjectDetailSkeleton.jsx';
+
 function SubjectDetailPage() {
   const role = useSelector(selectUserRole);
   const { subjectId } = useParams();
-  const { data: subjectDetail, isLoading } = useGetSubjectByIdQuery(subjectId, {
+  const { data: subjectDetail, isFetching } = useGetSubjectByIdQuery(subjectId, {
     skip: !subjectId,
   });
   const [fetchMarkdown, { isFetching: isMarkdownLoading }] =
@@ -34,8 +35,6 @@ function SubjectDetailPage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState('');
-
-  if (isLoading) return <Spinner fullscreen />;
 
   const handleEdit = async () => {
     if (isEditing) {
@@ -63,55 +62,59 @@ function SubjectDetailPage() {
   return (
     <PageWrapper>
       <MainContent>
-        <CenteredContainer>
-          <BackButton to="/subjects" label="До предметів" />
-          <HeaderWrapper>
-            <HeaderInfo>
-              <h1>{subjectDetail?.name}</h1>
-              <h4>Викладач: {subjectDetail?.lecturer}</h4>
-            </HeaderInfo>
+        {isFetching ? (
+          <SubjectDetailSkeleton />
+        ) : (
+          <CenteredContainer>
+            <BackButton to="/subjects" label="До предметів" />
+            <HeaderWrapper>
+              <HeaderInfo>
+                <h1>{subjectDetail?.name}</h1>
+                <h4>Викладач: {subjectDetail?.lecturer}</h4>
+              </HeaderInfo>
 
-            <ActionButtons>
-              <SubjectSubscriptionButton
-                subjectId={subjectId}
-                isSubscribed={subjectDetail?.isSubscribed}
-                subjectName={subjectDetail?.name}
+              <ActionButtons>
+                <SubjectSubscriptionButton
+                  subjectId={subjectId}
+                  isSubscribed={subjectDetail?.isSubscribed}
+                  subjectName={subjectDetail?.name}
+                />
+                {role === 'Headman' && (
+                  <Button
+                    fullWidth
+                    variant="secondary"
+                    onClick={handleEdit}
+                    isLoading={isMarkdownLoading}
+                  >
+                    {isEditing ? (
+                      <>
+                        <SaveIcon width="1.5rem" height="1.5rem" />
+                        Зберегти зміни
+                      </>
+                    ) : (
+                      <>
+                        <EditIcon width="1.5rem" height="1.5rem" />
+                        Змінити інформацію
+                      </>
+                    )}
+                  </Button>
+                )}
+              </ActionButtons>
+            </HeaderWrapper>
+            {isEditing ? (
+              <MarkdownEditor value={editValue} onChange={setEditValue} />
+            ) : subjectDetail?.renderedContent ? (
+              <HtmlRenderer htmlContent={subjectDetail.renderedContent} />
+            ) : (
+              <EmptyState
+                variant="medium"
+                icon={InfoIcon}
+                title="Інформація відсутня"
+                description="Для цього предмета ще не додано опис або додаткові матеріали."
               />
-              {role === 'Headman' && (
-                <Button
-                  fullWidth
-                  variant="secondary"
-                  onClick={handleEdit}
-                  isLoading={isMarkdownLoading}
-                >
-                  {isEditing ? (
-                    <>
-                      <SaveIcon width="1.5rem" height="1.5rem" />
-                      Зберегти зміни
-                    </>
-                  ) : (
-                    <>
-                      <EditIcon width="1.5rem" height="1.5rem" />
-                      Змінити інформацію
-                    </>
-                  )}
-                </Button>
-              )}
-            </ActionButtons>
-          </HeaderWrapper>
-          {isEditing ? (
-            <MarkdownEditor value={editValue} onChange={setEditValue} />
-          ) : subjectDetail?.renderedContent ? (
-            <HtmlRenderer htmlContent={subjectDetail.renderedContent} />
-          ) : (
-            <EmptyState
-              variant="medium"
-              icon={InfoIcon}
-              title="Інформація відсутня"
-              description="Для цього предмета ще не додано опис або додаткові матеріали."
-            />
-          )}
-        </CenteredContainer>
+            )}
+          </CenteredContainer>
+        )}
       </MainContent>
 
       <SidePanelWrapper>

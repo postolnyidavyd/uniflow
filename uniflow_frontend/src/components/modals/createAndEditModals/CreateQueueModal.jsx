@@ -29,7 +29,7 @@ const formatOptions = [
 const CreateQueueModal = () => {
   const dispatch = useDispatch();
   const { isOpen } = useSelector((state) => state.ui.createQueueModal);
-  const [createQueue, { isLoading }] = useCreateQueueMutation();
+  const [createQueue] = useCreateQueueMutation();
 
   const { data: subjectList } = useGetSubjectsShortQuery(undefined, {
     skip: !isOpen,
@@ -44,7 +44,7 @@ const CreateQueueModal = () => {
   const guaranteedSlots =
     avgMinutes > 0 ? Math.floor(durationMinutes / avgMinutes) : 0;
 
-  const [{ values, errors }, formAction] = useActionState(submitAction, {
+  const [{ values, errors }, formAction, isPending] = useActionState(submitAction, {
     values: {},
     errors: null,
   });
@@ -252,9 +252,9 @@ const CreateQueueModal = () => {
             </ModeSection>
           )}
         </InputGroup>
-        <Button type="submit" fullWidth variant="primary" disabled={isLoading}>
+        <Button type="submit" fullWidth variant="primary" disabled={isPending}>
           <PlusIcon width="1rem" height="1rem" />
-          {isLoading ? 'Збереження...' : 'Додати чергу'}
+          {isPending ? 'Збереження...' : 'Додати чергу'}
         </Button>
 
         {errors?.server && <ErrorText>{errors.server}</ErrorText>}

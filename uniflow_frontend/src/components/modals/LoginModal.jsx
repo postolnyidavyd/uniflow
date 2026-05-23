@@ -11,7 +11,7 @@ import { toast } from '../../utils/toast.js';
 const LoginModal = ({ isOpen, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [login, { isLoading }] = useLoginMutation();
+  const [login] = useLoginMutation();
 
   const submitAction = async (prevState, formData) => {
     const formValues = Object.fromEntries(formData.entries());
@@ -46,7 +46,7 @@ const LoginModal = ({ isOpen, onClose }) => {
       return { values: formValues, errors };
     }
   };
-  const [{ values, errors }, formAction] = useActionState(submitAction, {
+  const [{ values, errors }, formAction, isPending] = useActionState(submitAction, {
     values: {},
     errors: null,
   });
@@ -73,8 +73,8 @@ const LoginModal = ({ isOpen, onClose }) => {
           type="password"
         />
         <FieldGroup>
-          <Button type="submit" disabled={isLoading}>
-            {!isLoading ? 'Увійти' : 'Зачекайте...'}
+          <Button type="submit" disabled={isPending}>
+            {!isPending ? 'Увійти' : 'Зачекайте...'}
           </Button>
           {errors?.server && <ErrorText>{errors?.server}</ErrorText>}
         </FieldGroup>

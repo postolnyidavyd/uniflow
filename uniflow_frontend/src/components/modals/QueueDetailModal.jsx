@@ -16,10 +16,7 @@ import {
   useGetQueueEntriesQuery,
 } from '../../store/api/queueApi.js';
 import { useToggleQueueSubscriptionMutation } from '../../store/api/subscriptionApi.js';
-import {
-  queueStatusFormating,
-  colorStatusFormating,
-} from '../../utils/queueStatusFormating.js';
+
 import {
   AddToCalendarButton,
   CountdownSeparator,
@@ -41,6 +38,8 @@ import { formatDateModal, formatShortTime } from '../../utils/ISODateParser.js';
 import { toast } from '../../utils/toast.js';
 import QueueStatusBadge from '../ui/QueueStatusBadge.jsx';
 
+import { QueueDetailSkeleton } from '../ui/skeletons/QueueDetailSkeleton.jsx';
+
 const PLANNED = 'Planned';
 const REGISTRATION = 'Registration';
 const ACTIVE = 'Active';
@@ -54,7 +53,7 @@ const QueueDetailModal = () => {
   const isOpen = useSelector(selectQueueDetailModalIsOpen);
   const sessionId = useSelector(selectQueueDetailSessionId);
 
-  const { data: session, isLoading } = useGetQueueByIdQuery(sessionId, {
+  const { data: session, isFetching } = useGetQueueByIdQuery(sessionId, {
     skip: !sessionId,
   });
 
@@ -109,23 +108,33 @@ const QueueDetailModal = () => {
     navigate(`/queues/${sessionId}`);
   };
 
-  const customTitle = session ? (
-    <ModalTitleWrapper>
-      <ModalSubjectText>{session.subjectName}</ModalSubjectText>
-      <EventTypeBadge type="Queue" />
-    </ModalTitleWrapper>
-  ) : null;
+  const customTitle =
+    session && !isFetching ? (
+      <ModalTitleWrapper>
+        <ModalSubjectText>{session.subjectName}</ModalSubjectText>
+        <EventTypeBadge type="Queue" />
+      </ModalTitleWrapper>
+    ) : isFetching ? (
+      <ModalTitleWrapper>
+        <SkeletonLine $width="14rem" $height="1.25rem" />
+        <SkeletonLine $width="4rem" $height="1.5rem" $borderRadius="2rem" />
+      </ModalTitleWrapper>
+    ) : null;
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={customTitle}>
-      {isLoading && <SkeletonLine $height="40px" />}
-      {!isLoading && !session && isOpen && (
+      {isFetching && (
+        <ModalContent>
+          <QueueDetailSkeleton />
+        </ModalContent>
+      )}
+      {!isFetching && !session && isOpen && (
         <ModalContent>
           <ModalBigTitle>Чергу не знайдено</ModalBigTitle>
           <Button onClick={handleClose}>Закрити</Button>
         </ModalContent>
       )}
-      {!isLoading && session && (
+      {!isFetching && session && (
         <ModalContent>
           <ModalBigTitle>{session.title}</ModalBigTitle>
           <HeaderRow>

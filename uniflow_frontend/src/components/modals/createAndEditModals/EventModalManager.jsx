@@ -27,7 +27,7 @@ const EventModalManager = () => {
       ? initialData.calendarItemType
       : createModal.eventType || 'Event';
 
-  const { data: initialData, isLoading } = useGetEventByIdQuery(eventId, {
+  const { data: initialData, isFetching } = useGetEventByIdQuery(eventId, {
     skip: !isEditMode || !eventId,
   });
 
@@ -55,7 +55,7 @@ const EventModalManager = () => {
   };
 
   if (!isOpen) return null;
-  if (isEditMode && isLoading) return <SkeletonLine />;
+  if (isEditMode && isFetching) return <SkeletonLine />;
 
   return (
     <EventFormModal

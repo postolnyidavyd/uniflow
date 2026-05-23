@@ -16,7 +16,7 @@ import { toast } from '../../utils/toast.js';
 const RegisterModal = ({ isOpen, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [register, { isLoading }] = useRegisterMutation();
+  const [register] = useRegisterMutation();
 
   const submitAction = async (prevState, formData) => {
     const formValues = Object.fromEntries(formData.entries());
@@ -63,7 +63,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
       return { values: formValues, errors };
     }
   };
-  const [{ values, errors }, formAction] = useActionState(submitAction, {
+  const [{ values, errors }, formAction, isPending] = useActionState(submitAction, {
     values: {},
     errors: null,
   });
@@ -140,8 +140,8 @@ const RegisterModal = ({ isOpen, onClose }) => {
           />
         </GroupAndInviteCodeContainer>
         <FieldGroup>
-          <Button type="submit" disabled={isLoading}>
-            {!isLoading ? 'Створити акаунт' : 'Створення акаунта...'}
+          <Button type="submit" disabled={isPending}>
+            {!isPending ? 'Створити акаунт' : 'Створення акаунта...'}
           </Button>
           {errors?.server && <ErrorText>{errors?.server}</ErrorText>}
         </FieldGroup>

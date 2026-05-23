@@ -16,7 +16,7 @@ const CalendarSection = () => {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  const { data, isLoading } = useGetMonthlyCalendarQuery({
+  const { data, isFetching } = useGetMonthlyCalendarQuery({
     year,
     month: month + 1,
   });
@@ -38,6 +38,7 @@ const CalendarSection = () => {
         year={year}
         month={month}
         onDayClick={handleDayCellClick}
+        isLoading={isFetching}
       />
 
     </SectionWrapper>

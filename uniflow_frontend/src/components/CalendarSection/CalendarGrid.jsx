@@ -3,6 +3,7 @@ import { buildCalendarCells } from '../../utils/buildCalendarCells.js';
 import styled from 'styled-components';
 import { fullWeekDays } from '../../utils/daysNames.js';
 import CalendarDayCell from './CalendarDayCell.jsx';
+import { CalendarDaySkeleton } from '../ui/skeletons/CalendarDaySkeleton.jsx';
 
 const getTodayISO = () => {
   const d = new Date();
@@ -12,7 +13,7 @@ const getTodayISO = () => {
   return `${year}-${month}-${day}`;
 };
 
-const CalendarGrid = ({ calendarItems = [], year, month, onDayClick }) => {
+const CalendarGrid = ({ calendarItems = [], year, month, onDayClick, isLoading }) => {
   const calendarItemsMap = useMemo(() => {
     return calendarItems.reduce((acc, event) => {
       const dateKey = event.startTime.substring(0, 10);
@@ -37,16 +38,20 @@ const CalendarGrid = ({ calendarItems = [], year, month, onDayClick }) => {
           <DayHeader key={day}>{day}</DayHeader>
         ))}
 
-        {calendarCells.map((cell) => (
-          <CalendarDayCell
-            key={cell.date}
-            onClick={onDayClick}
-            date={cell.date}
-            isCurrentMonth={cell.currentMonth}
-            items={cell.items}
-            isToday = {cell.date === today}
-          />
-        ))}
+        {isLoading
+          ? calendarCells.map((cell) => (
+              <CalendarDaySkeleton key={cell.date} />
+            ))
+          : calendarCells.map((cell) => (
+              <CalendarDayCell
+                key={cell.date}
+                onClick={onDayClick}
+                date={cell.date}
+                isCurrentMonth={cell.currentMonth}
+                items={cell.items}
+                isToday={cell.date === today}
+              />
+            ))}
       </Grid>
     </GridWrapper>
   );
