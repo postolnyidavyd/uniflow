@@ -5,17 +5,16 @@ import { selectUserRole } from '../store/selectors/authSelector.js';
 import Button from '../components/ui/Button.jsx';
 import PlusIcon from '../assets/Plus.svg?react';
 import { useGetSubjectsQuery } from '../store/api/subjectApi.js';
-import Spinner from '../components/ui/Spinner.jsx';
 import { SubjectCard } from '../components/SubjectCard.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import BookIcon from '../assets/BookBig.svg?react';
+import { SubjectCardSkeleton } from '../components/ui/skeletons/SubjectCardSkeleton.jsx';
 
 function SubjectsPage() {
   const dispatch = useDispatch();
   const role = useSelector(selectUserRole);
-  const { data: subjects, isLoading } = useGetSubjectsQuery();
+  const { data: subjects, isFetching } = useGetSubjectsQuery();
 
-  if (isLoading) return <Spinner fullscreen />;
   const handleAddSubject = () => dispatch(openCreateSubjectModal());
 
   const isEmpty = !subjects || subjects.length === 0;
@@ -32,7 +31,13 @@ function SubjectsPage() {
         )}
       </Header>
       
-      {isEmpty ? (
+      {isFetching ? (
+        <CardsGrid>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SubjectCardSkeleton key={i} />
+          ))}
+        </CardsGrid>
+      ) : isEmpty ? (
         <EmptyStateWrapper>
           <EmptyState 
             variant="large"

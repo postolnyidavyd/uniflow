@@ -13,10 +13,10 @@ import CopyIcon from '../assets/CopyBig.svg?react';
 import ExitIcon from '../assets/Exit.svg?react';
 import Toggle from '../components/ui/Toggle.jsx';
 import { toast } from '../utils/toast.js';
-import Spinner from '../components/ui/Spinner.jsx';
 import { useLogoutMutation } from '../store/api/authApi.js';
-
 import { useNavigate } from 'react-router-dom';
+import { SettingsSkeleton } from '../components/ui/skeletons/SettingsSkeleton.jsx';
+
 const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 function SettingsPage() {
   const user = useSelector(selectUser);
@@ -26,7 +26,7 @@ function SettingsPage() {
   const [logout] = useLogoutMutation();
   const navigate = useNavigate();
 
-  if (isLoading || !settings) return <Spinner fullscreen />;
+  if (isLoading || !settings) return <SettingsSkeleton />;
 
   const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`;
 

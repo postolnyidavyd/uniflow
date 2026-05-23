@@ -33,11 +33,13 @@ import FileIcon from '../../assets/File_Document.svg?react';
 import { formatDateModal } from '../../utils/ISODateParser.js';
 import { toast } from '../../utils/toast.js';
 
+import { EventDetailSkeleton } from '../ui/skeletons/EventDetailSkeleton.jsx';
+
 const EventDetailModal = () => {
   const dispatch = useDispatch();
   const { isOpen, eventId } = useSelector((state) => state.ui.eventDetailModal);
 
-  const { data: event, isLoading } = useGetEventByIdQuery(eventId, {
+  const { data: event, isFetching } = useGetEventByIdQuery(eventId, {
     skip: !eventId,
   });
 
@@ -60,23 +62,33 @@ const EventDetailModal = () => {
     }
   };
 
-  const customTitle = event ? (
-    <ModalTitleWrapper>
-      <ModalSubjectText>{event.subjectName}</ModalSubjectText>
-      <EventTypeBadge type={event.eventType} />
-    </ModalTitleWrapper>
-  ) : null;
+  const customTitle =
+    event && !isFetching ? (
+      <ModalTitleWrapper>
+        <ModalSubjectText>{event.subjectName}</ModalSubjectText>
+        <EventTypeBadge type={event.eventType} />
+      </ModalTitleWrapper>
+    ) : isFetching ? (
+      <ModalTitleWrapper>
+        <SkeletonLine $width="14rem" $height="1.25rem" />
+        <SkeletonLine $width="4rem" $height="1.5rem" $borderRadius="2rem" />
+      </ModalTitleWrapper>
+    ) : null;
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={customTitle}>
-      {isLoading && <SkeletonLine $height="40px" />}
-      {!isLoading && !event && isOpen && (
+      {isFetching && (
+        <ModalContent>
+          <EventDetailSkeleton />
+        </ModalContent>
+      )}
+      {!isFetching && !event && isOpen && (
         <ModalContent>
           <ModalBigTitle>Подію не знайдено</ModalBigTitle>
           <Button onClick={handleClose}>Закрити</Button>
         </ModalContent>
       )}
-      {!isLoading && event && (
+      {!isFetching && event && (
         <ModalContent>
           <ModalBigTitle>{event.title}</ModalBigTitle>
 

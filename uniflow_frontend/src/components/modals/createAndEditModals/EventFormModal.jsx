@@ -40,7 +40,7 @@ const EventFormModal = ({
     skip: !isOpen,
   });
   const [format, setFormat] = useState('Offline');
-  const [{ values, errors }, formAction] = useActionState(submitAction, {
+  const [{ values, errors }, formAction , isPending] = useActionState(submitAction, {
     values: initialValues ?? {},
     errors: null,
   });
@@ -175,9 +175,9 @@ const EventFormModal = ({
           id="create-event-description"
           defaultValue={values.description || ''}
         />
-        <Button type="submit" fullWidth variant="primary">
+        <Button type="submit" fullWidth variant="primary" disabled={isPending}>
           <PlusIcon width={'1rem'} height={'1rem'} />
-          {buttonText}
+          {!isPending ? buttonText : "Зачекайте..."}
         </Button>
         {errors?.server && <ErrorText>{errors.server}</ErrorText>}
       </form>

@@ -7,13 +7,25 @@ import styled from 'styled-components';
 import UpcomingDeadlines from './UpcomingDeadlines.jsx';
 import UpcomingEvents from './UpcomingEvents.jsx';
 import UpcomingQueues from './UpcomingQueues.jsx';
+import { UpcomingSectionSkeleton } from '../ui/skeletons/UpcomingSectionSkeleton.jsx';
 
 const DashboardPanelUpcoming = ({ orientation = 'horizontal', subjectId }) => {
   const globalQuery = useGetUpcomingQuery(undefined, { skip: !!subjectId });
   const subjectQuery = useGetUpcomingBySubjectQuery(subjectId, {
     skip: !subjectId,
   });
-  const { data, isLoading, error } = subjectId ? subjectQuery : globalQuery;
+  const { data, isFetching } = subjectId ? subjectQuery : globalQuery;
+
+  if (isFetching) {
+    return (
+      <PanelContainer $orientation={orientation}>
+        <UpcomingSectionSkeleton />
+        <UpcomingSectionSkeleton />
+        <UpcomingSectionSkeleton />
+      </PanelContainer>
+    );
+  }
+
   return (
     <PanelContainer $orientation={orientation}>
       <UpcomingDeadlines deadlines={data?.deadlines} />
@@ -22,6 +34,7 @@ const DashboardPanelUpcoming = ({ orientation = 'horizontal', subjectId }) => {
     </PanelContainer>
   );
 };
+
 const PanelContainer = styled.div`
   display: flex;
   flex-direction: ${({ $orientation }) =>

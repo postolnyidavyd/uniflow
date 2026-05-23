@@ -12,12 +12,18 @@ import {
 } from '../store/selectors/authSelector.js';
 import { useSelector } from 'react-redux';
 import TokenBalanceBadge from './TokenBalanceBadge.jsx';
-import {useGetBalanceQuery} from "../store/api/walletApi.js";
+import { useGetBalanceQuery } from "../store/api/walletApi.js";
+import { SkeletonLine, SkeletonCircle } from './ui/skeletons/SkeletonBase.jsx';
+import { TokenBalanceSkeleton } from './ui/skeletons/TokenBalanceSkeleton.jsx';
+
 function Sidebar() {
-  const {data:balance} = useGetBalanceQuery();
+  const { data: balance, isFetching: isBalanceFetching } = useGetBalanceQuery();
   const firstName = useSelector(selectUserFirstName);
   const lastName = useSelector(selectUserLastName);
+  
+  const isUserLoading = !firstName && !lastName;
   const initials = `${firstName?.[0] ?? ''}${lastName?.[0] ?? ''}`;
+
   return (
     <SidebarContainer>
       <TopSection>
@@ -42,12 +48,29 @@ function Sidebar() {
         </LinksContainer>
       </TopSection>
       <BottomSection>
-        <ProfilePicture size={'sm'} initials={initials} />
-        <NameContainer>
-          <span>{lastName}</span>
-          <span>{firstName}</span>
-        </NameContainer>
-        <TokenBalanceBadge balance={balance}/>
+        {isUserLoading ? (
+          <>
+            <SkeletonCircle $size="2.5rem" $variant="light" />
+            <NameContainer>
+              <SkeletonLine $width="7rem" $height="0.75rem" $variant="light" style={({marginBottom: "0.375rem"})}/>
+              <SkeletonLine $width="6rem" $height="0.75rem" $variant="light" />
+            </NameContainer>
+          </>
+        ) : (
+          <>
+            <ProfilePicture size={'sm'} initials={initials} />
+            <NameContainer>
+              <span>{lastName}</span>
+              <span>{firstName}</span>
+            </NameContainer>
+          </>
+        )}
+        
+        {isBalanceFetching ? (
+          <TokenBalanceSkeleton />
+        ) : (
+          <TokenBalanceBadge balance={balance} />
+        )}
       </BottomSection>
     </SidebarContainer>
   );

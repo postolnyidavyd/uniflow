@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import Button from '../../ui/Button.jsx';
 import BellIcon from '../../../assets/BellSmall.svg?react';
 import { useGetCalendarSettingsQuery } from '../../../store/api/subscriptionApi.js';
@@ -160,16 +160,6 @@ const AutoAddLabel = styled.div`
   box-sizing: border-box;
 `;
 
-const skeletonPulse = keyframes`
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
-`;
+import { SkeletonLine as BaseSkeletonLine } from '../../ui/skeletons/SkeletonBase.jsx';
 
-export const SkeletonLine = styled.div`
-  width: ${({ $width }) => $width || '100%'};
-  height: ${({ $height }) => $height || '20px'};
-  background: var(--base-bright-grey, #e7eef3);
-  border-radius: 8px;
-  animation: ${skeletonPulse} 1.5s infinite ease-in-out;
-`;
+export const SkeletonLine = BaseSkeletonLine;
