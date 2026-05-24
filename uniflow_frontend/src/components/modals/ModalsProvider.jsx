@@ -5,6 +5,7 @@ import CreateOptionsModal from './createAndEditModals/CreateOptionsModal.jsx';
 import EventModalManager from './createAndEditModals/EventModalManager.jsx';
 import CreateSubjectModal from './createAndEditModals/CreateSubjectModal.jsx';
 import CreateQueueModal from './createAndEditModals/CreateQueueModal.jsx';
+import LeaveQueueModal from './LeaveQueueModal.jsx';
 
 const ModalsProvider = () => {
   return (
@@ -16,6 +17,7 @@ const ModalsProvider = () => {
       <EventModalManager />
       <CreateSubjectModal />
       <CreateQueueModal />
+      <LeaveQueueModal />
     </>
   );
 };

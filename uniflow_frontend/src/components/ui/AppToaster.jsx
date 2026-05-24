@@ -6,6 +6,7 @@ export function AppToaster() {
       position="bottom-right"
       duration={4000}
       gap={8}
+      containerStyle={{ zIndex: 99999 }}
       toastOptions={{
         classNames: {
           toast: 'uniflow-toast',

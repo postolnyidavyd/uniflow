@@ -77,7 +77,9 @@ function Sidebar() {
 }
 const SidebarContainer = styled.aside`
   display: flex;
-  height: 100%;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
 
   padding: 2.5rem 1.5rem;
   flex-direction: column;

@@ -8,7 +8,6 @@ import Sidebar from '../components/Sidebar.jsx';
 import { useGetMeQuery } from '../store/api/authApi.js';
 import Spinner from '../components/ui/Spinner.jsx';
 import styled from 'styled-components';
-import EventDetailModal from '../components/modals/EventDetailModal.jsx';
 import { useGetCalendarSettingsQuery } from '../store/api/subscriptionApi.js';
 import ModalsProvider from '../components/modals/ModalsProvider.jsx';
 
@@ -37,6 +36,10 @@ const LayoutContainer = styled.div`
   display: grid;
   grid-template-columns: 258px 1fr;
   min-height: 100dvh;
+
+  & > main {
+    min-width: 0;
+  }
 `;
 // const PageWrapper = styled.div`
 //     flex: 1;

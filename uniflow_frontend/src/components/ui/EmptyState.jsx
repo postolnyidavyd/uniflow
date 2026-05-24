@@ -91,23 +91,25 @@ const Title = styled.h2`
   ${({ $variant }) =>
     $variant === 'large'
       ? css`
-          font-size: var(--desktop-headings-h2);
-          line-height: 2.5rem;
+          font-size: var(--desktop-headings-h3);
+          line-height: 2rem; /* 32px */
+          letter-spacing: -0.035rem;
         `
       : css`
-          font-size: var(--desktop-headings-h3);
-          line-height: 2rem;
+          font-size: var(--desktop-headings-h5);
+          line-height: 1.5rem; /* 24px */
+          letter-spacing: -0.025rem;
         `}
 `;
 
 const Description = styled.p`
-  color: var(--base-secondary-text);
+  color: var(--base-black);
   font-family: 'e-Ukraine', sans-serif;
   font-size: var(--desktop-headings-h5);
   font-weight: 300;
-  line-height: 1.5rem;
+  line-height: 1.5rem; /* 24px */
   margin: 0;
-  letter-spacing: -0.015rem;
+  letter-spacing: -0.025rem;
 `;
 
 export default EmptyState;
