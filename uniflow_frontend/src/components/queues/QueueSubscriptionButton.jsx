@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import {
   useToggleQueueSubscriptionMutation,
   useGetCalendarSettingsQuery,
-} from '../../store/api/subscriptionApi.js';
+} from '../store/api/subscriptionApi.js';
 import Button from './ui/Button.jsx';
 import BellIcon from '../assets/BellSmall.svg?react';
 import { toast } from '../utils/toast.js';

@@ -6,6 +6,7 @@ export const authApi = apiSlice.injectEndpoints({
 
         register: builder.mutation({
             query: (body) => ({ url: '/auth/register', method: 'POST', body }),
+            invalidatesTags: ["Me"],
             async onQueryStarted(_, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
@@ -16,6 +17,7 @@ export const authApi = apiSlice.injectEndpoints({
 
         login: builder.mutation({
             query: (body) => ({ url: '/auth/login', method: 'POST', body }),
+            invalidatesTags: ["Me"],
             async onQueryStarted(_, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;

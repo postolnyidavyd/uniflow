@@ -28,7 +28,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-  border: 2px dashed var(--base-bright-grey);
+  border: 2px dashed var(--base-black);
   border-radius: 1.25rem;
   background: transparent;
   text-align: center;
@@ -79,7 +79,7 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  max-width: 500px;
+  max-width: 600px;
 `;
 
 const Title = styled.h2`
@@ -91,14 +91,14 @@ const Title = styled.h2`
   ${({ $variant }) =>
     $variant === 'large'
       ? css`
-          font-size: var(--desktop-headings-h3);
-          line-height: 2rem; /* 32px */
-          letter-spacing: -0.035rem;
+          font-size: var(--desktop-headings-h2);
+          line-height: 2.5rem;
+          letter-spacing: -0.05rem;
         `
       : css`
-          font-size: var(--desktop-headings-h5);
-          line-height: 1.5rem; /* 24px */
-          letter-spacing: -0.025rem;
+          font-size: var(--desktop-headings-h3);
+          line-height: 2rem;
+          letter-spacing: -0.035rem;
         `}
 `;
 

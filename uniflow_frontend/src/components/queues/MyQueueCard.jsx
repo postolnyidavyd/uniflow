@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 const REGISTRATION = 'Registration';
 const ACTIVE = 'Active';
 
+
 const myCardStyles = {
   focus: {
     color: 'var(--brick-red-100)',
@@ -61,8 +62,8 @@ const MyQueueCard = ({
   const dispatch = useDispatch();
   const [completeCurrentEntry] = useCompleteCurrentEntryMutation();
   const navigate = useNavigate();
-  const focus = queueStatus === ACTIVE || userPosition === 1;
   const isPresenting = userPosition === 1 && queueStatus === ACTIVE;
+  const focus = queueStatus === ACTIVE;
 
   const styles = isPresenting
     ? myCardStyles.presenting
@@ -151,7 +152,7 @@ const MyQueueCard = ({
       </LeftSide>
       <RightSide>
         {isPresenting ? (
-          <Button onClick={handleFinish}>Я здав</Button>
+          <Button onClick={handleFinish}>Я здав(ла)</Button>
         ) : (
           <>
             <h3>Ваша позиція</h3>
