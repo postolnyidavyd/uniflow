@@ -18,7 +18,7 @@ const Dot = styled.span`
   height: 0.5rem;
   border-radius: 50%;
   background-color: ${({ $isRecent }) =>
-    $isRecent ? 'var(--malachite-100, #04C65D);' : 'var(--base-secondary-text, #6B6B6B);'};
+    $isRecent ? 'var(--malachite-100, #04C65D);' : 'var(--grey-100, #CCCCCC);'};
 `;
 
 

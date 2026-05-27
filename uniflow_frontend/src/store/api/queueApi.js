@@ -59,17 +59,15 @@ export const queueApi = apiSlice.injectEndpoints({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: (_, __, { sessionId }) => [
+            invalidatesTags:[
                 { type: 'MyQueues' },
-                { type: 'Queue', id: sessionId },
             ],
         }),
 
         leaveQueue: builder.mutation({
             query: (sessionId) => ({ url: `/queue/${sessionId}/leave`, method: 'POST' }),
-            invalidatesTags: (_, __, sessionId) => [
+            invalidatesTags:[
                 { type: 'MyQueues' },
-                { type: 'Queue', id: sessionId },
             ],
         }),
 

@@ -8,6 +8,7 @@ public class QueueSessionDetailResponseDto
     public Guid Id { get; set; }
     
     public required string Title { get; set; }
+    public required string ShortTitle { get; set; }
 
     public EventFormat EventFormat { get; set; }
     
@@ -27,7 +28,7 @@ public class QueueSessionDetailResponseDto
     public bool IsAllowedToSubmitMoreThanOne { get; set; }
     public SubmissionMode? SubmissionMode { get; set; }
 
-    // public Guid SubjectId { get; set; }
+    public Guid SubjectId { get; set; }
     public string SubjectName { get; set; }
     
     public bool IsSubscribed { get; set; }

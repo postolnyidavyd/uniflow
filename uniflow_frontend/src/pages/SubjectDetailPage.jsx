@@ -10,7 +10,7 @@ import HtmlRenderer from '../components/HtmlRenderer.jsx';
 import Button from '../components/ui/Button.jsx';
 import EditIcon from '../assets/Edit.svg?react';
 import SaveIcon from '../assets/SaveBig.svg?react';
-import SubjectSubscriptionButton from '../components/SubjectSubscriptionButton.jsx';
+import SubjectSubscriptionButton from '../components/subjects/SubjectSubscriptionButton.jsx';
 import { useSelector } from 'react-redux';
 import { selectUserRole } from '../store/selectors/authSelector.js';
 import { useState} from 'react';

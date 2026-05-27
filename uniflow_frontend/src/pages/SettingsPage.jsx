@@ -127,7 +127,7 @@ function SettingsPage() {
           <Toggle
             checked={settings.autoAddEvents}
             onChange={handleToggleEvents}
-            label="Автоматично додавати всі записи"
+            label="Автоматично додавати всі події та дедлайни(без черг)"
           />
           <Toggle
             checked={settings.autoAddQueues}
@@ -144,6 +144,7 @@ function SettingsPage() {
 }
 const CalendarLinkSection = styled.div`
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 0.25rem;
   svg {

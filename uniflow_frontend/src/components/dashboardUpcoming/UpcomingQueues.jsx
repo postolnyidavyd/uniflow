@@ -14,6 +14,7 @@ const UpcomingQueues = ({ queues = [], isSubjectUpcoming }) => {
         queues.map((queue) => (
           <UpcomingQueueBlock
             key={queue.id}
+            id={queue.id}
             shortTitle={queue.shortTitle}
             subjectName={queue.subjectName}
             queueStatus={queue.queueStatus}

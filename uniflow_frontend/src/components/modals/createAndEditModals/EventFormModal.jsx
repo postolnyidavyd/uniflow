@@ -16,7 +16,7 @@ import PlusIcon from '../../../assets/Plus.svg?react';
 import {
   useGetSubjectsShortQuery,
 } from '../../../store/api/subjectApi.js';
-import {localToUTC} from "../../../utils/timeConvertor.js";
+import {localToUTC, utcToLocal} from "../../../utils/timeConvertor.js";
 
 const eventFormatSelectValues = [
   {
@@ -39,9 +39,15 @@ const EventFormModal = ({
   const { data: subjectList } = useGetSubjectsShortQuery(undefined, {
     skip: !isOpen,
   });
-  const [format, setFormat] = useState('Offline');
+  
+  const formattedInitialValues = {
+    ...initialValues,
+    date: isEditMode && initialValues?.date ? utcToLocal(initialValues.date) : initialValues?.date || ''
+  };
+
+  const [format, setFormat] = useState(initialValues?.eventFormat || 'Offline');
   const [{ values, errors }, formAction , isPending] = useActionState(submitAction, {
-    values: initialValues ?? {},
+    values: formattedInitialValues,
     errors: null,
   });
   if (!isOpen) return null;

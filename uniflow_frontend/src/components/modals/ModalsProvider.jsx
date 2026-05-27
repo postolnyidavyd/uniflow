@@ -3,8 +3,8 @@ import QueueDetailModal from './QueueDetailModal.jsx';
 import DayDetailDrawer from './DayDetailDrawer.jsx';
 import CreateOptionsModal from './createAndEditModals/CreateOptionsModal.jsx';
 import EventModalManager from './createAndEditModals/EventModalManager.jsx';
-import CreateSubjectModal from './createAndEditModals/CreateSubjectModal.jsx';
-import CreateQueueModal from './createAndEditModals/CreateQueueModal.jsx';
+import SubjectModalManager from './createAndEditModals/SubjectModalManager.jsx';
+import QueueModalManager from './createAndEditModals/QueueModalManager.jsx';
 import LeaveQueueModal from './LeaveQueueModal.jsx';
 
 const ModalsProvider = () => {
@@ -15,8 +15,8 @@ const ModalsProvider = () => {
       <QueueDetailModal />
       <CreateOptionsModal />
       <EventModalManager />
-      <CreateSubjectModal />
-      <CreateQueueModal />
+      <SubjectModalManager />
+      <QueueModalManager />
       <LeaveQueueModal />
     </>
   );

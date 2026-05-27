@@ -11,8 +11,11 @@ import {
 } from './UpcomingBlockShared.jsx';
 import styled from 'styled-components';
 import QueueStatusBadge from '../../ui/QueueStatusBadge.jsx';
+import { useDispatch } from 'react-redux';
+import { openQueueDetailModal } from '../../../store/uiSlice.js';
 
 const UpcomingQueueBlock = ({
+  id,
   shortTitle,
   subjectName,
   entriesCount,
@@ -20,6 +23,7 @@ const UpcomingQueueBlock = ({
   queueStatus,
   queueStartTime,
 }) => {
+  const dispatch = useDispatch();
   const d =
     queueStartTime instanceof Date ? queueStartTime : new Date(queueStartTime);
 
@@ -30,8 +34,10 @@ const UpcomingQueueBlock = ({
   const additionalInfo = userPosition
     ? `Ваша позиція: ${userPosition}`
     : `В черзі: ${entriesCount} людей`;
+
+  const handleClick = () => dispatch(openQueueDetailModal(id));
   return (
-    <QueueWrapper $color={color}>
+    <QueueWrapper $color={color} onClick={handleClick}>
       <LeftSide>
         <QueueTime $color={color}>
           <DateText>{day}</DateText>
@@ -44,7 +50,7 @@ const UpcomingQueueBlock = ({
           <AdditionalInfoText>{additionalInfo}</AdditionalInfoText>
         </Info>
       </LeftSide>
-        <QueueStatusBadge status={queueStatus} size="sm" />
+      <QueueStatusBadge status={queueStatus} size="sm" />
     </QueueWrapper>
   );
 };
@@ -60,5 +66,6 @@ const LeftSide = styled.div`
   align-self: stretch;
 `;
 const QueueTime = styled(Time)`
-color: var(--base-black)`
+  color: var(--base-black);
+`;
 export default UpcomingQueueBlock;

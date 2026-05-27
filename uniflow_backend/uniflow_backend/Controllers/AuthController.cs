@@ -84,7 +84,7 @@ public class AuthController : ControllerBase
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true, 
-            Secure = true, // TODO Впевнетися що працюватиме на локальному хості
+            Secure = true, 
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddDays(30)
         };

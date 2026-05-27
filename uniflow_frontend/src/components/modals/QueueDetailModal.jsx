@@ -2,11 +2,12 @@ import { useMemo } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { closeQueueDetailModal } from '../../store/uiSlice.js';
+import { closeQueueDetailModal, openEditQueueModal } from '../../store/uiSlice.js';
 import {
   selectQueueDetailModalIsOpen,
   selectQueueDetailSessionId,
 } from '../../store/selectors/uiSelector.js';
+import { selectIsHeadman } from '../../store/selectors/authSelector.js';
 import Modal from '../ui/Modal.jsx';
 import Button from '../ui/Button.jsx';
 import EventTypeBadge from '../ui/EventTypeBadge.jsx';
@@ -14,8 +15,10 @@ import { useCountdown } from '../../hooks/useCountdown.js';
 import {
   useGetQueueByIdQuery,
   useGetQueueEntriesQuery,
+  useDeleteQueueMutation,
 } from '../../store/api/queueApi.js';
 import { useToggleQueueSubscriptionMutation } from '../../store/api/subscriptionApi.js';
+import SectionSeparator from '../ui/SectionSeparator.jsx';
 
 import {
   AddToCalendarButton,
@@ -33,6 +36,8 @@ import {
 import CalendarIcon from '../../assets/Calendar.svg?react';
 import PeopleIcon from '../../assets/UsersSmall.svg?react';
 import ClockIcon from '../../assets/ClockSmall.svg?react';
+import EditIcon from '../../assets/Edit.svg?react';
+import DeleteIcon from '../../assets/Close_MD.svg?react';
 
 import { formatDateModal, formatShortTime } from '../../utils/ISODateParser.js';
 import { toast } from '../../utils/toast.js';
@@ -52,10 +57,13 @@ const QueueDetailModal = () => {
 
   const isOpen = useSelector(selectQueueDetailModalIsOpen);
   const sessionId = useSelector(selectQueueDetailSessionId);
+  const isHeadman = useSelector(selectIsHeadman);
 
   const { data: session, isFetching } = useGetQueueByIdQuery(sessionId, {
     skip: !sessionId,
   });
+
+  const [deleteQueue, { isLoading: isDeleting }] = useDeleteQueueMutation();
 
   const isActive =
     session?.queueStatus === REGISTRATION || session?.queueStatus === ACTIVE;
@@ -106,6 +114,22 @@ const QueueDetailModal = () => {
   const handleNavigate = () => {
     handleClose();
     navigate(`/queues/${sessionId}`);
+  };
+
+  const handleEdit = () => {
+    dispatch(openEditQueueModal(sessionId));
+    handleClose();
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('Ви впевнені, що хочете видалити цю чергу?')) return;
+    try {
+      await deleteQueue(sessionId).unwrap();
+      toast.success('Чергу видалено');
+      handleClose();
+    } catch {
+      toast.error('Не вдалося видалити чергу');
+    }
   };
 
   const customTitle =
@@ -228,6 +252,33 @@ const QueueDetailModal = () => {
                 />
               )}
           </ButtonGroup>
+
+          {isHeadman && (
+            <HeadmanSection>
+              <SectionSeparator size="sm" />
+              <HeadmanActions>
+                <Button 
+                  variant="secondary" 
+                  fullWidth 
+                  onClick={handleEdit}
+                  disabled={isDeleting}
+                >
+                  <EditIcon width={24} height={24} />
+                  Редагувати
+                </Button>
+                <Button 
+                  variant="secondary" 
+                  fullWidth 
+                  onClick={handleDelete}
+                  isLoading={isDeleting}
+                  disabled={isDeleting}
+                >
+                  <DeleteIcon width={24} height={24} />
+                  Видалити
+                </Button>
+              </HeadmanActions>
+            </HeadmanSection>
+          )}
         </ModalContent>
       )}
     </Modal>
@@ -311,6 +362,19 @@ const ButtonGroup = styled.div`
   flex-direction: column;
   gap: 1rem;
   align-self: stretch;
+`;
+
+const HeadmanSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const HeadmanActions = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+  width: 100%;
 `;
 
 export default QueueDetailModal;
