@@ -19,7 +19,6 @@ public class UpdateEventDtoValidator : AbstractValidator<UpdateEventDto>
             .When(x => x.ShortTitle != null);
 
         RuleFor(x => x.Date)
-            .GreaterThan(DateTime.UtcNow).WithMessage("Дата події має бути в майбутньому")
             .When(x => x.Date.HasValue);
 
         RuleFor(x => x.MeetUrl)

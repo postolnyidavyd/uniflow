@@ -57,57 +57,52 @@ public static class QueueMapping
             .Select(e => e.User!.LastName + " " + e.User!.FirstName.Substring(0, 1) + ".")
             .FirstOrDefault(),
 
-        // Обчислюємо позицію
-        UserPosition = qs.QueueEntries.Count(other =>
-            (other.EntryStatus == QueueEntryStatus.Waiting || other.EntryStatus == QueueEntryStatus.InProgress) &&
-            (
-                other.EffectiveWeight > qs.QueueEntries
-                    .Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                    .Select(my => my.EffectiveWeight).FirstOrDefault()
-                ||
-                (other.EffectiveWeight == qs.QueueEntries
-                     .Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                     .Select(my => my.EffectiveWeight).FirstOrDefault() &&
-                 other.JoinedAt < qs.QueueEntries.Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                     .Select(my => my.JoinedAt).FirstOrDefault())
-            )
-        ) + 1,
+        // Обчислюємо позицію для першого активного запису юзера
+        UserPosition = qs.QueueEntries
+            .Where(my => my.UserId == userId && (my.EntryStatus == QueueEntryStatus.Waiting || my.EntryStatus == QueueEntryStatus.InProgress))
+            .OrderBy(my => my.EntryType == EntryType.Primary ? 0 : 1)
+            .Select(my => qs.QueueEntries.Count(other =>
+                (other.EntryStatus == QueueEntryStatus.Waiting || other.EntryStatus == QueueEntryStatus.InProgress) &&
+                (
+                    other.EffectiveWeight > my.EffectiveWeight
+                    ||
+                    (other.EffectiveWeight == my.EffectiveWeight && other.JoinedAt < my.JoinedAt)
+                )
+            ) + 1)
+            .FirstOrDefault(),
 
         // Гарантовано якщо позиція <= кількості місць
-        IsGuaranteed = (qs.QueueEntries.Count(other =>
-            (other.EntryStatus == QueueEntryStatus.Waiting || other.EntryStatus == QueueEntryStatus.InProgress) &&
-            (
-                other.EffectiveWeight > qs.QueueEntries
-                    .Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                    .Select(my => my.EffectiveWeight).FirstOrDefault()
-                ||
-                (other.EffectiveWeight == qs.QueueEntries
-                     .Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                     .Select(my => my.EffectiveWeight).FirstOrDefault() &&
-                 other.JoinedAt < qs.QueueEntries.Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                     .Select(my => my.JoinedAt).FirstOrDefault())
-            )
-        ) + 1) <= ((int)qs.Duration.TotalMinutes / qs.AverageMinutesPerStudent),
+        IsGuaranteed = qs.QueueEntries
+            .Where(my => my.UserId == userId && (my.EntryStatus == QueueEntryStatus.Waiting || my.EntryStatus == QueueEntryStatus.InProgress))
+            .OrderBy(my => my.EntryType == EntryType.Primary ? 0 : 1)
+            .Select(my => (qs.QueueEntries.Count(other =>
+                (other.EntryStatus == QueueEntryStatus.Waiting || other.EntryStatus == QueueEntryStatus.InProgress) &&
+                (
+                    other.EffectiveWeight > my.EffectiveWeight
+                    ||
+                    (other.EffectiveWeight == my.EffectiveWeight && other.JoinedAt < my.JoinedAt)
+                )
+            ) + 1) <= ((int)qs.Duration.TotalMinutes / qs.AverageMinutesPerStudent))
+            .FirstOrDefault(),
 
-        // Час очікування = Кількість людей * Середній час
-        EstimatedWaitMinutes = qs.QueueEntries.Count(other =>
-            (other.EntryStatus == QueueEntryStatus.Waiting || other.EntryStatus == QueueEntryStatus.InProgress) &&
-            (
-                other.EffectiveWeight > qs.QueueEntries
-                    .Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                    .Select(my => my.EffectiveWeight).FirstOrDefault()
-                ||
-                (other.EffectiveWeight == qs.QueueEntries
-                     .Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                     .Select(my => my.EffectiveWeight).FirstOrDefault() &&
-                 other.JoinedAt < qs.QueueEntries.Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                     .Select(my => my.JoinedAt).FirstOrDefault())
-            )
-        ) * qs.AverageMinutesPerStudent,
+        // Час очікування = Кількість людей ПЕРЕД тобою * Середній час
+        EstimatedWaitMinutes = qs.QueueEntries
+            .Where(my => my.UserId == userId && (my.EntryStatus == QueueEntryStatus.Waiting || my.EntryStatus == QueueEntryStatus.InProgress))
+            .OrderBy(my => my.EntryType == EntryType.Primary ? 0 : 1)
+            .Select(my => qs.QueueEntries.Count(other =>
+                (other.EntryStatus == QueueEntryStatus.Waiting || other.EntryStatus == QueueEntryStatus.InProgress) &&
+                (
+                    other.EffectiveWeight > my.EffectiveWeight
+                    ||
+                    (other.EffectiveWeight == my.EffectiveWeight && other.JoinedAt < my.JoinedAt)
+                )
+            ) * qs.AverageMinutesPerStudent)
+            .FirstOrDefault(),
         
         QueueStatus = qs.QueueStatus,
         UsedToken = qs.QueueEntries
-            .Where(e => e.UserId == userId && e.EntryType == EntryType.Primary)
+            .Where(e => e.UserId == userId && (e.EntryStatus == QueueEntryStatus.Waiting || e.EntryStatus == QueueEntryStatus.InProgress))
+            .OrderBy(e => e.EntryType == EntryType.Primary ? 0 : 1)
             .Select(e => e.UsedToken)
             .FirstOrDefault(),
     };
@@ -126,6 +121,7 @@ public static class QueueMapping
     {
         Id = q.Id,
         Title = q.Title,
+        ShortTitle = q.ShortTitle,
         EventFormat = q.EventFormat,
         Location = q.Location,
         MeetUrl = q.MeetUrl,
@@ -137,6 +133,7 @@ public static class QueueMapping
         QueueStatus = q.QueueStatus,
         IsAllowedToSubmitMoreThanOne = q.IsAllowedToSubmitMoreThanOne,
         SubmissionMode = q.SubmissionMode,
+        SubjectId = q.SubjectId,
         SubjectName = q.Subject!.Name,
         IsSubscribed = q.Subscribers.Any(u => u.Id == userId)
     };
@@ -213,26 +210,20 @@ public static class QueueMapping
 
         SubjectName = qs.Subject!.ShortName,
 
-        UserPosition = !userId.HasValue || !qs.QueueEntries.Any(qn =>
-            qn.UserId == userId && qn.EntryType == EntryType.Primary && (qn.EntryStatus == QueueEntryStatus.Waiting ||
-                                                                         qn.EntryStatus == QueueEntryStatus.InProgress))
-            ? null
-            : qs.QueueEntries.Count(other =>
-                (other.EntryStatus == QueueEntryStatus.Waiting || other.EntryStatus == QueueEntryStatus.InProgress) &&
-                (
-                    other.EffectiveWeight > qs.QueueEntries
-                        .Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                        .Select(my => my.EffectiveWeight).FirstOrDefault()
-                    ||
-                    (other.EffectiveWeight == qs.QueueEntries
-                         .Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                         .Select(my => my.EffectiveWeight).FirstOrDefault()
-                     &&
-                     other.JoinedAt < qs.QueueEntries
-                         .Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
-                         .Select(my => my.JoinedAt).FirstOrDefault())
-                )
-            ) + 1
+        UserPosition = !userId.HasValue ? null :
+            qs.QueueEntries
+                .Where(my => my.UserId == userId && (my.EntryStatus == QueueEntryStatus.Waiting || my.EntryStatus == QueueEntryStatus.InProgress))
+                .OrderBy(my => my.EntryType == EntryType.Primary ? 0 : 1)
+                .Select(my => qs.QueueEntries.Count(other =>
+                    (other.EntryStatus == QueueEntryStatus.Waiting || other.EntryStatus == QueueEntryStatus.InProgress) &&
+                    (
+                        other.EffectiveWeight > my.EffectiveWeight
+                        ||
+                        (other.EffectiveWeight == my.EffectiveWeight && other.JoinedAt < my.JoinedAt)
+                    )
+                ) + 1)
+                .Cast<int?>()
+                .FirstOrDefault()
     };
 
     public static IQueryable<QueueSessionShortResponseDto> ProjectToSessionShortDto(this IQueryable<QueueSession> query,

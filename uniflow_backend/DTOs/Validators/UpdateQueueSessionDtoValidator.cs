@@ -30,7 +30,6 @@ public class UpdateQueueSessionDtoValidator : AbstractValidator<UpdateQueueSessi
             .When(x => x.AverageMinutesPerStudent.HasValue);
 
         RuleFor(x => x.RegistrationStartTime)
-            .GreaterThan(DateTime.UtcNow).WithMessage("Час початку реєстрації має бути в майбутньому")
             .When(x => x.RegistrationStartTime.HasValue);
 
         RuleFor(x => x.MeetUrl)
