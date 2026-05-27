@@ -5,7 +5,7 @@ import { selectUserRole } from '../store/selectors/authSelector.js';
 import Button from '../components/ui/Button.jsx';
 import PlusIcon from '../assets/Plus.svg?react';
 import { useGetSubjectsQuery } from '../store/api/subjectApi.js';
-import { SubjectCard } from '../components/SubjectCard.jsx';
+import { SubjectCard } from '../components/subjects/SubjectCard.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import BookIcon from '../assets/BookBig.svg?react';
 import { SubjectCardSkeleton } from '../components/ui/skeletons/SubjectCardSkeleton.jsx';
@@ -90,6 +90,7 @@ const PageWrapper = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 0.625rem;
+  box-sizing: border-box;
 
   h1 {
     font-size: 3.5rem;

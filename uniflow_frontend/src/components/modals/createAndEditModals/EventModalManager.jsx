@@ -22,14 +22,14 @@ const EventModalManager = () => {
   const isEditMode = editModal.isOpen;
   const eventId = editModal.eventId;
 
+  const { data: initialData, isFetching } = useGetEventByIdQuery(eventId, {
+    skip: !isEditMode || !eventId,
+  });
+
   const eventType =
     isEditMode && initialData
       ? initialData.calendarItemType
       : createModal.eventType || 'Event';
-
-  const { data: initialData, isFetching } = useGetEventByIdQuery(eventId, {
-    skip: !isEditMode || !eventId,
-  });
 
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
@@ -50,7 +50,9 @@ const EventModalManager = () => {
       }
       handleClose();
     } catch (error) {
-      toast.error('Помилка збереження:' + error?.data?.message);
+      const errorMessage = error?.data?.message || 'Не вдалося зберегти зміни';
+      toast.error(errorMessage);
+      throw error; // Перекидаємо далі для форми
     }
   };
 
@@ -59,6 +61,7 @@ const EventModalManager = () => {
 
   return (
     <EventFormModal
+      key={eventId || 'create'}
       isOpen={isOpen}
       onClose={handleClose}
       onSubmit={handleSubmit}

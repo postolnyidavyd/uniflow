@@ -1,4 +1,5 @@
 import styled, { css, keyframes } from 'styled-components';
+import Spinner from './Spinner.jsx';
 
 const granimateRadial = keyframes`
   0% { background-position: 10% 10%; }
@@ -175,6 +176,7 @@ const Button = ({
   variant = 'primary',
   size = 'md',
   fullWidth = false,
+  isLoading, // Витягуємо, щоб не пішов у ...props
   children,
   ...props
 }) => {
@@ -183,6 +185,7 @@ const Button = ({
       $variant={variant}
       $size={size}
       $fullWidth={fullWidth}
+      disabled={isLoading || props.disabled}
       {...props}
     >
       {children}

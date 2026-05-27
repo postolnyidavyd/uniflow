@@ -1,12 +1,15 @@
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { closeEventDetailModal } from '../../store/uiSlice.js';
+import { closeEventDetailModal, openEditEventModal } from '../../store/uiSlice.js';
+import { selectIsHeadman } from '../../store/selectors/authSelector.js';
 import Modal from '../ui/Modal.jsx';
 import Button from '../ui/Button.jsx';
 import EventTypeBadge from '../ui/EventTypeBadge.jsx';
 import { useCountdown } from '../../hooks/useCountdown.js';
-import { useGetEventByIdQuery } from '../../store/api/eventApi.js';
+import { useGetEventByIdQuery, useDeleteEventMutation } from '../../store/api/eventApi.js';
 import { useToggleEventSubscriptionMutation } from '../../store/api/subscriptionApi.js';
+import SectionSeparator from '../ui/SectionSeparator.jsx';
+
 import {
   AddToCalendarButton,
   CountdownSeparator,
@@ -30,6 +33,9 @@ import PaperclipIcon from '../../assets/Paperclip_Attechment_Tilt.svg?react';
 import LocationIcon from '../../assets/Map_Pin.svg?react';
 import ExternalLinkIcon from '../../assets/External_Link.svg?react';
 import FileIcon from '../../assets/File_Document.svg?react';
+import EditIcon from '../../assets/Edit.svg?react';
+import DeleteIcon from '../../assets/Close_MD.svg?react';
+
 import { formatDateModal } from '../../utils/ISODateParser.js';
 import { toast } from '../../utils/toast.js';
 
@@ -38,11 +44,13 @@ import { EventDetailSkeleton } from '../ui/skeletons/EventDetailSkeleton.jsx';
 const EventDetailModal = () => {
   const dispatch = useDispatch();
   const { isOpen, eventId } = useSelector((state) => state.ui.eventDetailModal);
+  const isHeadman = useSelector(selectIsHeadman);
 
   const { data: event, isFetching } = useGetEventByIdQuery(eventId, {
     skip: !eventId,
   });
 
+  const [deleteEvent, { isLoading: isDeleting }] = useDeleteEventMutation();
   const [toggleSubscription] = useToggleEventSubscriptionMutation();
 
   const isDeadline = event?.eventType === 'Deadline';
@@ -59,6 +67,22 @@ const EventDetailModal = () => {
       );
     } catch {
       toast.error('Не вдалося оновити статус підписки');
+    }
+  };
+
+  const handleEdit = () => {
+    dispatch(openEditEventModal(eventId));
+    handleClose();
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('Ви впевнені, що хочете видалити цю подію?')) return;
+    try {
+      await deleteEvent(eventId).unwrap();
+      toast.success('Подію видалено');
+      handleClose();
+    } catch {
+      toast.error('Не вдалося видалити подію');
     }
   };
 
@@ -162,6 +186,33 @@ const EventDetailModal = () => {
             isSubscribed={event.isSubscribed}
             onToggle={handleToggleCalendar}
           />
+
+          {isHeadman && (
+            <HeadmanSection>
+              <SectionSeparator size="sm" />
+              <HeadmanActions>
+                <Button 
+                  variant="secondary" 
+                  fullWidth 
+                  onClick={handleEdit}
+                  disabled={isDeleting}
+                >
+                  <EditIcon width={24} height={24} />
+                  Редагувати
+                </Button>
+                <Button 
+                  variant="secondary" 
+                  fullWidth 
+                  onClick={handleDelete}
+                  isLoading={isDeleting}
+                  disabled={isDeleting}
+                >
+                  <DeleteIcon width={24} height={24} />
+                  Видалити
+                </Button>
+              </HeadmanActions>
+            </HeadmanSection>
+          )}
         </ModalContent>
       )}
     </Modal>
@@ -181,6 +232,19 @@ const SecondaryText = styled.span`
   line-height: 24px;
   letter-spacing: -0.32px;
   color: var(--base-secondary-text, #6b6b6b);
+`;
+
+const HeadmanSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const HeadmanActions = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+  width: 100%;
 `;
 
 export default EventDetailModal;

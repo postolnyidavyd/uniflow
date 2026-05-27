@@ -73,7 +73,7 @@ const Grid = styled.div`
   grid-template-columns: repeat(7, 1fr);
 
   /* шапка по контенту, інші ділять висоту порівну */
-  grid-template-rows: auto repeat(${(props) => props.$rows}, 1fr);
+  grid-template-rows: auto repeat(${({ $rows }) => $rows}, 1fr);
 
   gap: 0.25rem;
 `;
