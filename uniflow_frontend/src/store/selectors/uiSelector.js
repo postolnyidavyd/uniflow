@@ -43,8 +43,7 @@ export const selectJoinQueueModalIsOpen = (state) =>
 export const selectJoinQueueSessionId = (state) =>
   state.ui.joinQueueModal.sessionId;
 
-export const selectLeaveQueueModal = (state) => state.ui.leaveQueueModal;
-export const selectLeaveQueueModalIsOpen = (state) =>
+export const selectLeaveQueueModalOpen = (state) =>
   state.ui.leaveQueueModal.isOpen;
 export const selectLeaveQueueSessionId = (state) =>
   state.ui.leaveQueueModal.sessionId;
@@ -52,6 +51,8 @@ export const selectLeaveQueueUsedToken = (state) =>
   state.ui.leaveQueueModal.usedToken;
 export const selectLeaveQueueStatus = (state) =>
   state.ui.leaveQueueModal.queueStatus;
+export const selectLeaveQueueUserPosition = (state) =>
+  state.ui.leaveQueueModal.userPosition;
 
 export const selectQueueDetailModal = (state) => state.ui.queueDetailModal;
 export const selectQueueDetailModalIsOpen = (state) =>

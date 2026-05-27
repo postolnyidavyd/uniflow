@@ -1,3 +1,5 @@
+using Domain.Enums;
+
 namespace DTOs.QueueDTOs;
 
 public class MyQueueCardResponseDto
@@ -16,4 +18,6 @@ public class MyQueueCardResponseDto
     
     public string? CurrentStudentName { get; set; } 
     public int? EstimatedWaitMinutes { get; set; }
+    public QueueStatus QueueStatus { get; set; }
+    public bool UsedToken { get; set; }
 }

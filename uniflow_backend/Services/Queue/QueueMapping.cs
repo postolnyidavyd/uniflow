@@ -103,7 +103,13 @@ public static class QueueMapping
                  other.JoinedAt < qs.QueueEntries.Where(my => my.UserId == userId && my.EntryType == EntryType.Primary)
                      .Select(my => my.JoinedAt).FirstOrDefault())
             )
-        ) * qs.AverageMinutesPerStudent
+        ) * qs.AverageMinutesPerStudent,
+        
+        QueueStatus = qs.QueueStatus,
+        UsedToken = qs.QueueEntries
+            .Where(e => e.UserId == userId && e.EntryType == EntryType.Primary)
+            .Select(e => e.UsedToken)
+            .FirstOrDefault(),
     };
 
     public static IQueryable<MyQueueCardResponseDto> ProjectToMyQueueCardDto(this IQueryable<QueueSession> query,

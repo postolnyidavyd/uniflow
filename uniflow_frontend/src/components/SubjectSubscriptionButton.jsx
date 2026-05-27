@@ -5,13 +5,13 @@ import BellIcon from '../assets/BellSmall.svg?react';
 import { toast } from '../utils/toast.js';
 
 const SubjectSubscriptionButton = ({ subjectId, isSubscribed, subjectName }) => {
-  const [toggleSubjectSubscription] = useToggleSubjectSubscriptionMutation();
+  const [toggleSubjectSubscription, { isLoading }] = useToggleSubjectSubscriptionMutation();
   const { data: settings } = useGetCalendarSettingsQuery();
 
   const isAuto = settings?.autoAddEvents; 
 
   const handleSubscription = async () => {
-    if (!subjectId) return;
+    if (!subjectId || isLoading) return;
     try {
       await toggleSubjectSubscription(subjectId).unwrap();
       toast.success(
@@ -34,7 +34,13 @@ const SubjectSubscriptionButton = ({ subjectId, isSubscribed, subjectName }) => 
   }
 
   return (
-    <Button fullWidth variant="secondary" onClick={handleSubscription}>
+    <Button 
+      fullWidth 
+      variant="secondary" 
+      onClick={handleSubscription}
+      isLoading={isLoading}
+      disabled={isLoading}
+    >
       <BellIcon width="1.5rem" height="1.5rem" />
       {isSubscribed ? 'Скасувати підписку' : 'Підписатися на предмет'}
     </Button>
@@ -51,7 +57,7 @@ const AutoAddLabel = styled.div`
   border: 2px solid var(--base-bright-grey, #e7eef3);
   font-family: 'e-Ukraine', sans-serif;
   font-size: 1rem;
-  color: var(--base-secondary-text, #6b6b6b);
+  color: var(--base-black);
   width: 100%;
   box-sizing: border-box;
 `;

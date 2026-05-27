@@ -1,26 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import Close_MD from '../../assets/Close_MD.svg?react';
 
 const Modal = ({ isOpen, onClose, title, children, width }) => {
-  const dialogRef = useRef(null);
-  const shouldIgnoreClose = useRef(false);
-
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    if (isOpen && !dialog.open) dialog.showModal();
-    else if (!isOpen && dialog.open) dialog.close();
-
-    return () => {
-      if (dialog.open) dialog.close();
-    };
-  }, [isOpen]);
-
-
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -35,31 +18,6 @@ const Modal = ({ isOpen, onClose, title, children, width }) => {
   useEffect(() => {
     if (!isOpen) return;
 
-    let filePickerOpened = false;
-
-    const handleBlur = () => {
-      filePickerOpened = true;
-      shouldIgnoreClose.current = true;
-    };
-
-    const handleFocus = () => {
-      if (filePickerOpened) {
-        filePickerOpened = false;
-      }
-    };
-
-    window.addEventListener('blur', handleBlur);
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      window.removeEventListener('blur', handleBlur);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose?.();
     };
@@ -68,66 +26,49 @@ const Modal = ({ isOpen, onClose, title, children, width }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  const isInsideDialog = (e) => {
-    if (!dialogRef.current) return false;
-    const rect = dialogRef.current.getBoundingClientRect();
-    return (
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom
-    );
-  };
-
-  const handleMouseDown = (e) => {
-    shouldIgnoreClose.current = isInsideDialog(e);
-  };
-
-  const handleMouseUp = (e) => {
-    if (e.clientX === 0 && e.clientY === 0) {
-      shouldIgnoreClose.current = false;
-      return;
-    }
-
-    if (shouldIgnoreClose.current) {
-      shouldIgnoreClose.current = false;
-      return;
-    }
-
-    if (!isInsideDialog(e) && onClose) {
-      onClose();
-    }
-  };
-
-  const handleCancel = (e) => {
-    e.preventDefault();
-  };
+  if (!isOpen) return null;
 
   return createPortal(
-      <StyledDialog
-          ref={dialogRef}
-          $width={width}
-          onCancel={handleCancel}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-      >
+    <ModalOverlay>
+      <Backdrop onClick={onClose} />
+      <StyledDialog $width={width} open>
         {(title || onClose) && (
-            <ModalHeader>
-              <ModalTitle>{title}</ModalTitle>
-              {onClose && (
-                  <CloseButton type="button" onClick={onClose}>
-                    <Close_MD />
-                  </CloseButton>
-              )}
-            </ModalHeader>
+          <ModalHeader>
+            <ModalTitle>{title}</ModalTitle>
+            {onClose && (
+              <CloseButton type="button" onClick={onClose}>
+                <Close_MD />
+              </CloseButton>
+            )}
+          </ModalHeader>
         )}
         <ModalBody>{children}</ModalBody>
-      </StyledDialog>,
-      document.getElementById('modal')
+      </StyledDialog>
+    </ModalOverlay>,
+    document.getElementById('modal')
   );
 };
 
+const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+`;
+
+const Backdrop = styled.div`
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: -1;
+`;
+
 const StyledDialog = styled.dialog`
+  position: relative;
   width: ${({ $width }) => $width || 'max-content'};
   min-width: 34.375rem;
   max-height: 90dvh;
@@ -135,17 +76,15 @@ const StyledDialog = styled.dialog`
   border-radius: 1.25rem;
   background: var(--base-white);
   padding: 0;
-  margin: auto;
+  margin: 0; /* Remove default margin */
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  color: inherit; /* Reset default dialog color */
 
-  &[open] {
-    display: flex;
-    flex-direction: column;
-  }
-
+  /* Reset default dialog styles */
   &::backdrop {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
+    display: none;
   }
 `;
 

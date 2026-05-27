@@ -16,6 +16,7 @@ const initialState = {
     sessionId: null,
     usedToken: false,
     queueStatus: null,
+    userPosition: null,
   },
   queueDetailModal: { isOpen: false, sessionId: null },
 
@@ -153,3 +154,4 @@ export const {
 } = uiSlice.actions;
 
 export default uiSlice.reducer;
+
