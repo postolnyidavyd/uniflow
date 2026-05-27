@@ -43,11 +43,18 @@ public class QueueService : IQueueService
     public async Task<QueueStateResponseDto> GetSessionEntriesAsync(Guid userId, Guid sessionId)
     {
         var entries = await GetQueueEntryDtosAsync(sessionId);
+        var userEntry = await _appDbContext.QueueEntries
+            .Where(e => e.QueueSessionId == sessionId && e.UserId == userId)
+            .Where(e => e.EntryStatus != QueueEntryStatus.Cancelled)
+            .OrderBy(e => e.EntryStatus == QueueEntryStatus.InProgress ? 0 : 
+                         e.EntryStatus == QueueEntryStatus.Waiting ? 1 : 2)
+            .ProjectToDto()
+            .FirstOrDefaultAsync();
 
         return new QueueStateResponseDto
         {
             Entries = entries,
-            UserEntry = entries.FirstOrDefault(e => e.UserId == userId)
+            UserEntry = userEntry
         };
     }
 
@@ -64,8 +71,10 @@ public class QueueService : IQueueService
     public async Task<PaginationResult<QueueCardResponseDto>> GetAllSessions(Guid userId, int page, int pageSize)
     {
         var query = _appDbContext.QueueSessions
-            .Where(qs => qs.QueueStartTime > DateTime.UtcNow)
-            .Where(qs => qs.QueueStatus != QueueStatus.Cancelled && qs.QueueStatus != QueueStatus.Closed);
+            .Where(qs => qs.QueueStatus != QueueStatus.Cancelled && qs.QueueStatus != QueueStatus.Closed)
+            .Where(qs => qs.QueueStartTime > DateTime.UtcNow || 
+                         qs.QueueStatus == QueueStatus.Active || 
+                         qs.QueueStatus == QueueStatus.Registration);
 
         var totalCount = await query.CountAsync();
 
@@ -92,9 +101,11 @@ public class QueueService : IQueueService
             throw new KeyNotFoundException("Предмет для якого ви шукаєте черги не існує");
 
         var query = _appDbContext.QueueSessions
-            .Where(qs => qs.QueueStartTime > DateTime.UtcNow)
             .Where(qs => qs.QueueStatus != QueueStatus.Cancelled && qs.QueueStatus != QueueStatus.Closed)
-            .Where(qs => qs.SubjectId == subjectId);
+            .Where(qs => qs.SubjectId == subjectId)
+            .Where(qs => qs.QueueStartTime > DateTime.UtcNow || 
+                         qs.QueueStatus == QueueStatus.Active || 
+                         qs.QueueStatus == QueueStatus.Registration);
 
         var totalCount = await query.CountAsync();
 
@@ -201,12 +212,6 @@ public class QueueService : IQueueService
         if (dto.RegistrationStartTime.HasValue)
             session.RegistrationStartTime = dto.RegistrationStartTime.Value;
 
-        // TODO Зберігати десь Id background тасків для створення нових при оновленні даних
-        // if (dto.QueueStartTime.HasValue)
-        //     session.QueueStartTime = dto.QueueStartTime.Value;
-        //
-        // if (dto.DurationMinutes.HasValue)
-        //     session.Duration = TimeSpan.FromMinutes(dto.DurationMinutes.Value);
         await _appDbContext.SaveChangesAsync();
 
         await BroadcastSessionDetailAsync(sessionId);
@@ -320,10 +325,11 @@ public class QueueService : IQueueService
         bool alreadyJoined = await _appDbContext.QueueEntries
             .AnyAsync(qn => qn.QueueSessionId == sessionId
                             && qn.UserId == userId && (qn.EntryStatus == QueueEntryStatus.Waiting ||
-                                                       qn.EntryStatus == QueueEntryStatus.InProgress));
+                                                       qn.EntryStatus == QueueEntryStatus.InProgress ||
+                                                       qn.EntryStatus == QueueEntryStatus.Completed));
 
         if (alreadyJoined)
-            throw new ArgumentException("Ви вже зареєстровані в цій черзі.");
+            throw new ArgumentException("Ви вже зареєстровані в цій черзі або вже здали роботу.");
 
         int currentGreenOccupancy = await _appDbContext.QueueEntries.CountAsync(qn =>
             qn.QueueSessionId == sessionId && qn.EffectiveWeight > 10 && (qn.EntryStatus == QueueEntryStatus.Waiting ||

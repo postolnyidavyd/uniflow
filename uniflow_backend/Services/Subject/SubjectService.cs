@@ -113,7 +113,6 @@ public class SubjectService : ISubjectService
 
         if (dto.RemoveExistingImage)
         {
-            // TODO: додати в IPhotoService метод DeleteImageAsync(string ImgUrl)
             subject.ImgUrl = null;
         }
 
