@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
+import { motion, AnimatePresence } from 'framer-motion';
 import Close_MD from '../../assets/Close_MD.svg?react';
 
 const Modal = ({ isOpen, onClose, title, children, width }) => {
@@ -26,30 +27,49 @@ const Modal = ({ isOpen, onClose, title, children, width }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
-
   return createPortal(
-    <ModalOverlay>
-      <Backdrop onClick={onClose} />
-      <StyledDialog $width={width} open>
-        {(title || onClose) && (
-          <ModalHeader>
-            <ModalTitle>{title}</ModalTitle>
-            {onClose && (
-              <CloseButton type="button" onClick={onClose}>
-                <Close_MD />
-              </CloseButton>
+    <AnimatePresence>
+      {isOpen && (
+        <ModalOverlay
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Backdrop 
+            onClick={onClose}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          />
+          <StyledDialog
+            $width={width}
+            open
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300, duration: 0.2 }}
+          >
+            {(title || onClose) && (
+              <ModalHeader>
+                <ModalTitle>{title}</ModalTitle>
+                {onClose && (
+                  <CloseButton type="button" onClick={onClose}>
+                    <Close_MD />
+                  </CloseButton>
+                )}
+              </ModalHeader>
             )}
-          </ModalHeader>
-        )}
-        <ModalBody>{children}</ModalBody>
-      </StyledDialog>
-    </ModalOverlay>,
+            <ModalBody>{children}</ModalBody>
+          </StyledDialog>
+        </ModalOverlay>
+      )}
+    </AnimatePresence>,
     document.getElementById('modal')
   );
 };
 
-const ModalOverlay = styled.div`
+const ModalOverlay = styled(motion.div)`
   position: fixed;
   inset: 0;
   display: flex;
@@ -59,7 +79,7 @@ const ModalOverlay = styled.div`
   padding: 1rem;
 `;
 
-const Backdrop = styled.div`
+const Backdrop = styled(motion.div)`
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
@@ -67,10 +87,10 @@ const Backdrop = styled.div`
   z-index: -1;
 `;
 
-const StyledDialog = styled.dialog`
+const StyledDialog = styled(motion.dialog)`
   position: relative;
-  width: ${({ $width }) => $width || 'max-content'};
-  min-width: 34.375rem;
+  width: 100%;
+  max-width: ${({ $width }) => $width || '42rem'};
   max-height: 90dvh;
   border: 1.901px solid var(--base-bright-grey);
   border-radius: 1.25rem;

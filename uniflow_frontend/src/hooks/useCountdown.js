@@ -8,14 +8,17 @@ const getTimeLeft = (targetDate) => {
   if (diff <= 0) return null;
 
   const totalSeconds = Math.floor(diff / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
 
   return {
+    days: days > 0 ? pad(days) : null,
     hours: pad(hours),
     minutes: pad(minutes),
     seconds: pad(seconds),
+    totalHours: Math.floor(totalSeconds / 3600), // Для зворотної сумісності якщо треба
   };
 };
 

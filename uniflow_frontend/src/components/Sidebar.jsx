@@ -138,10 +138,10 @@ const StyledNavLink = styled(NavLink)`
 
 const BottomSection = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   align-self: stretch;
-  gap: 0.625rem;
+  gap: 0.75rem;
 `;
 const NameContainer = styled.div`
   display: flex;
@@ -149,6 +149,14 @@ const NameContainer = styled.div`
   gap: 0;
   color: var(--base-white);
   font-size: var(--desktop-headings-h7);
+  flex: 1;
+  min-width: 0;
+  
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 export default Sidebar;

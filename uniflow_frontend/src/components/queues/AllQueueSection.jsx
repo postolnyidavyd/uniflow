@@ -38,7 +38,6 @@ const AllQueuesSection = () => {
     <SectionWrapper>
       <SectionTitle>Всі черги</SectionTitle>
 
-      {/* Ніякого ChipsContainer — SubjectFilterChips сам скролиться */}
       <SubjectFilterChips
         subjects={subjects ?? []}
         selectedId={selectedSubjectId}

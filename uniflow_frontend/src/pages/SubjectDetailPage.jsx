@@ -1,20 +1,30 @@
 import styled from 'styled-components';
-import { useParams } from 'react-router-dom';
 import {
   useGetSubjectByIdQuery,
   useLazyGetSubjectMarkdownQuery,
   useUpdateMarkdownMutation,
+  useDeleteSubjectMutation,
 } from '../store/api/subjectApi.js';
 import DashboardPanelUpcoming from '../components/dashboardUpcoming/DashboardPanelUpcoming.jsx';
 import HtmlRenderer from '../components/HtmlRenderer.jsx';
 import Button from '../components/ui/Button.jsx';
 import EditIcon from '../assets/Edit.svg?react';
 import SaveIcon from '../assets/SaveBig.svg?react';
+import DeleteIcon from '../assets/Close_MD.svg?react';
 import SubjectSubscriptionButton from '../components/subjects/SubjectSubscriptionButton.jsx';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectUserRole } from '../store/selectors/authSelector.js';
-import { useState} from 'react';
+import { 
+  openEditSubjectModal, 
+  openConfirmationModal, 
+  closeConfirmationModal, 
+  setConfirmationLoading 
+} from '../store/uiSlice.js';
+import { setConfirmCallback } from '../store/confirmationService.js';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from '../utils/toast.js';
+import SectionSeparator from '../components/ui/SectionSeparator.jsx';
 import MarkdownEditor from "../components/MarkdownEditor.jsx";
 import BackButton from '../components/ui/BackButton.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
@@ -23,11 +33,17 @@ import InfoIcon from '../assets/Info.svg?react';
 import { SubjectDetailSkeleton } from '../components/ui/skeletons/SubjectDetailSkeleton.jsx';
 
 function SubjectDetailPage() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const role = useSelector(selectUserRole);
   const { subjectId } = useParams();
+  
   const { data: subjectDetail, isFetching } = useGetSubjectByIdQuery(subjectId, {
     skip: !subjectId,
   });
+
+  const [deleteSubject] = useDeleteSubjectMutation();
+
   const [fetchMarkdown, { isFetching: isMarkdownLoading }] =
     useLazyGetSubjectMarkdownQuery();
 
@@ -59,6 +75,33 @@ function SubjectDetailPage() {
     }
   };
 
+  const handleEditSubject = () => {
+    dispatch(openEditSubjectModal(subjectId));
+  };
+
+  const handleDeleteSubject = () => {
+    setConfirmCallback(async () => {
+      try {
+        dispatch(setConfirmationLoading(true));
+        await deleteSubject(subjectId).unwrap();
+        toast.success('Предмет видалено');
+        dispatch(closeConfirmationModal());
+        navigate('/subjects');
+      } catch {
+        toast.error('Не вдалося видалити предмет');
+      } finally {
+        dispatch(setConfirmationLoading(false));
+      }
+    });
+
+    dispatch(openConfirmationModal({
+      title: 'Видалити предмет?',
+      description: 'Усі пов’язані черги та події будуть видалені назавжди. Цю дію не можна скасувати.',
+      confirmText: 'Так, видалити',
+      cancelText: 'Скасувати'
+    }));
+  };
+
   return (
     <PageWrapper>
       <MainContent>
@@ -79,6 +122,33 @@ function SubjectDetailPage() {
                   isSubscribed={subjectDetail?.isSubscribed}
                   subjectName={subjectDetail?.name}
                 />
+                
+                {role === 'Headman' && (
+                  <HeadmanControls>
+                    <SectionSeparator size="sm" label="Керування" />
+                    <ButtonGroupRow>
+                      <Button
+                        fullWidth
+                        variant="secondary"
+                        onClick={handleEditSubject}
+                      >
+                        <EditIcon width="1.25rem" height="1.25rem" />
+                        Редагувати
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="secondary"
+                        onClick={handleDeleteSubject}
+                      >
+                        <DeleteIcon width="1.25rem" height="1.25rem" />
+                        Видалити
+                      </Button>
+                    </ButtonGroupRow>
+                  </HeadmanControls>
+                )}
+
+                <SectionSeparator size="sm" label="Контент" />
+
                 {role === 'Headman' && (
                   <Button
                     fullWidth
@@ -161,6 +231,19 @@ const ActionButtons = styled.div`
   svg {
     flex-shrink: 0;
   }
+`;
+
+const HeadmanControls = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const ButtonGroupRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  width: 100%;
 `;
 
 const PageWrapper = styled.div`

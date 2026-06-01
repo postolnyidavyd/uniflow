@@ -28,9 +28,7 @@ public class UpdateQueueSessionDtoValidator : AbstractValidator<UpdateQueueSessi
             .GreaterThan(0).WithMessage("Середній час на студента має бути більше 0")
             .LessThanOrEqualTo(60).WithMessage("Середній час не може перевищувати 60 хвилин")
             .When(x => x.AverageMinutesPerStudent.HasValue);
-
-        RuleFor(x => x.RegistrationStartTime)
-            .When(x => x.RegistrationStartTime.HasValue);
+        
 
         RuleFor(x => x.MeetUrl)
             .NotEmpty().WithMessage("Посилання обов'язкове для онлайн черги")

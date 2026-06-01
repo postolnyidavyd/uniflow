@@ -28,7 +28,11 @@ export const subjectApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: formData,
       }),
-      invalidatesTags: [{ type: 'SubjectList' }],
+      invalidatesTags: [
+        { type: 'SubjectList' },
+        { type: 'Calendar' },
+        { type: 'CalendarUpcoming' }
+      ],
     }),
 
     updateSubject: builder.mutation({
@@ -51,7 +55,10 @@ export const subjectApi = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: { markdownContent },
       }),
-      invalidatesTags: (_, __, { id }) => [{ type: 'Subject', id }],
+      invalidatesTags: (_, __, { id }) => [
+        { type: 'Subject', id },
+        { type: 'Subject', id: `${id}-markdown` }
+      ],
     }),
 
     deleteSubject: builder.mutation({
@@ -62,7 +69,7 @@ export const subjectApi = apiSlice.injectEndpoints({
       invalidatesTags: (_, __, id) => [
         { type: 'Subject', id },
         { type: 'SubjectList' },
-        { type: 'EventList', id },
+        { type: 'EventList' },
         { type: 'QueueList' },
         { type: 'Calendar' },
         { type: 'CalendarUpcoming' },

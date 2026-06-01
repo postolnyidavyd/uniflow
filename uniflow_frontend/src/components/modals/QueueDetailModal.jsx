@@ -2,7 +2,14 @@ import { useMemo } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { closeQueueDetailModal, openEditQueueModal } from '../../store/uiSlice.js';
+import { 
+  closeQueueDetailModal, 
+  openEditQueueModal,
+  openConfirmationModal,
+  closeConfirmationModal,
+  setConfirmationLoading
+} from '../../store/uiSlice.js';
+import { setConfirmCallback } from '../../store/confirmationService.js';
 import {
   selectQueueDetailModalIsOpen,
   selectQueueDetailSessionId,
@@ -23,11 +30,18 @@ import SectionSeparator from '../ui/SectionSeparator.jsx';
 import {
   AddToCalendarButton,
   CountdownSeparator,
+  CountdownSegment,
+  CountdownLabel,
   ModalBigTitle,
   ModalContent,
   ModalCountdown,
   ModalDateRow,
   ModalDateText,
+  ModalLinkBox,
+  ModalLinkContent,
+  ModalLinkLeft,
+  ModalLinkLabel,
+  ModalLinkValue,
   ModalSubjectText,
   ModalTitleWrapper,
   SkeletonLine,
@@ -38,6 +52,9 @@ import PeopleIcon from '../../assets/UsersSmall.svg?react';
 import ClockIcon from '../../assets/ClockSmall.svg?react';
 import EditIcon from '../../assets/Edit.svg?react';
 import DeleteIcon from '../../assets/Close_MD.svg?react';
+import LocationIcon from '../../assets/Map_Pin.svg?react';
+import PaperclipIcon from '../../assets/Paperclip_Attechment_Tilt.svg?react';
+import ExternalLinkIcon from '../../assets/External_Link.svg?react';
 
 import { formatDateModal, formatShortTime } from '../../utils/ISODateParser.js';
 import { toast } from '../../utils/toast.js';
@@ -121,15 +138,27 @@ const QueueDetailModal = () => {
     handleClose();
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm('Ви впевнені, що хочете видалити цю чергу?')) return;
-    try {
-      await deleteQueue(sessionId).unwrap();
-      toast.success('Чергу видалено');
-      handleClose();
-    } catch {
-      toast.error('Не вдалося видалити чергу');
-    }
+  const handleDelete = () => {
+    setConfirmCallback(async () => {
+      try {
+        dispatch(setConfirmationLoading(true));
+        await deleteQueue(sessionId).unwrap();
+        toast.success('Чергу видалено');
+        dispatch(closeConfirmationModal());
+        handleClose();
+      } catch {
+        toast.error('Не вдалося видалити чергу');
+      } finally {
+        dispatch(setConfirmationLoading(false));
+      }
+    });
+
+    dispatch(openConfirmationModal({
+      title: 'Видалити чергу?',
+      description: 'Усі записи та дані цієї черги будуть видалені назавжди. Студентам, що використали токени, вони будуть повернуті.',
+      confirmText: 'Так, видалити',
+      cancelText: 'Скасувати'
+    }));
   };
 
   const customTitle =
@@ -161,26 +190,80 @@ const QueueDetailModal = () => {
       {!isFetching && session && (
         <ModalContent>
           <ModalBigTitle>{session.title}</ModalBigTitle>
-          <HeaderRow>
-            <ModalDateRow>
-              <CalendarIcon width={22} height={22} />
-              <ModalDateText>
-                {formatDateModal(session.queueStartTime)}
-              </ModalDateText>
-            </ModalDateRow>
-            <QueueStatusBadge status={session.queueStatus} />
-          </HeaderRow>
+          <InfoBlock>
+            <HeaderRow>
+              <ModalDateRow>
+                <CalendarIcon width={22} height={22} />
+                <ModalDateText>
+                  {formatDateModal(session.queueStartTime)}
+                </ModalDateText>
+              </ModalDateRow>
+              <QueueStatusBadge status={session.queueStatus} />
+            </HeaderRow>
+
+            {session.meetUrl && (
+              <ModalLinkBox
+                as="a"
+                href={session.meetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                $clickable
+              >
+                <ModalLinkLeft>
+                  <PaperclipIcon width={22} height={22} />
+                  <ModalLinkContent>
+                    <ModalLinkLabel>Посилання</ModalLinkLabel>
+                    <ModalLinkValue>{session.meetUrl}</ModalLinkValue>
+                  </ModalLinkContent>
+                </ModalLinkLeft>
+                <ExternalLinkIcon width={24} height={24} color="#6b6b6b" />
+              </ModalLinkBox>
+            )}
+
+            {session.location && (
+              <ModalLinkBox>
+                <ModalLinkLeft>
+                  <LocationIcon width={22} height={22} />
+                  <ModalLinkContent>
+                    <ModalLinkLabel>Локація</ModalLinkLabel>
+                    <ModalLinkValue>{session.location}</ModalLinkValue>
+                  </ModalLinkContent>
+                </ModalLinkLeft>
+              </ModalLinkBox>
+            )}
+          </InfoBlock>
 
           {session.queueStatus === PLANNED && (
             <CountdownSection>
-              <CountdownLabel>Початок запису</CountdownLabel>
+              <CountdownLabelHeader>Початок запису</CountdownLabelHeader>
               {timeLeft ? (
                 <ModalCountdown>
-                  <span>{timeLeft.hours}</span>
-                  <CountdownSeparator>:</CountdownSeparator>
-                  <span>{timeLeft.minutes}</span>
-                  <CountdownSeparator>:</CountdownSeparator>
-                  <span>{timeLeft.seconds}</span>
+                  {timeLeft.days ? (
+                    <>
+                      <CountdownSegment>
+                        <span>{timeLeft.days}</span>
+                        <CountdownLabel>дн</CountdownLabel>
+                      </CountdownSegment>
+                      <CountdownSeparator>:</CountdownSeparator>
+                      <CountdownSegment>
+                        <span>{timeLeft.hours}</span>
+                        <CountdownLabel>год</CountdownLabel>
+                      </CountdownSegment>
+                      <CountdownSeparator>:</CountdownSeparator>
+                      <CountdownSegment>
+                        <span>{timeLeft.minutes}</span>
+                        <CountdownLabel>хв</CountdownLabel>
+                      </CountdownSegment>
+                    </>
+                  ) : (
+                    <>
+                      <span>{timeLeft.hours}</span>
+                      <CountdownSeparator>:</CountdownSeparator>
+                      <span>{timeLeft.minutes}</span>
+                      <CountdownSeparator>:</CountdownSeparator>
+                      <span>{timeLeft.seconds}</span>
+                    </>
+                  )}
                 </ModalCountdown>
               ) : (
                 <ModalCountdown>—</ModalCountdown>
@@ -285,6 +368,12 @@ const QueueDetailModal = () => {
   );
 };
 
+const InfoBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
 const CountdownSection = styled.div`
   display: flex;
   flex-direction: column;
@@ -298,7 +387,7 @@ const HeaderRow = styled.div`
   align-items: flex-start;
   align-self: stretch;
 `;
-const CountdownLabel = styled.span`
+const CountdownLabelHeader = styled.span`
   font-family: 'e-Ukraine', sans-serif;
   font-size: 1.25rem;
   font-weight: 400;
