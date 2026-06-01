@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import UploadIcon from '../../../assets/File_dock_add.svg?react';
 
-const FileDropzone = ({
+const FileDropZone = ({
   value,
   onChange,
   accept = 'image/*',
@@ -230,4 +230,4 @@ const ErrorText = styled.p`
   margin: 0;
 `;
 
-export default FileDropzone;
+export default FileDropZone;
