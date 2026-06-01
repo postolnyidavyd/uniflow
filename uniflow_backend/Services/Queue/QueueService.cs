@@ -536,13 +536,17 @@ public class QueueService : IQueueService
     public async Task<IEnumerable<QueueSummaryResponseDto>> GetSessionsByMonthAsync(Guid userId, int year, int month)
     {
         var startOfMonth = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var autoAdd = await _appDbContext.UserCalendarSettings
+            .Where(s => s.UserId == userId)
+            .Select(s => s.AutoAddAllEvents)
+            .FirstOrDefaultAsync();
 
         var startOfNextMonth = startOfMonth.AddMonths(1);
         return await _appDbContext.QueueSessions
             .Where(qs => qs.QueueStartTime >= startOfMonth && qs.QueueStartTime < startOfNextMonth)
             .Where(qs => qs.QueueStatus != QueueStatus.Cancelled)
             .OrderBy(qs => qs.QueueStartTime)
-            .ProjectToSummaryDto(userId)
+            .ProjectToSummaryDto(userId, autoAdd)
             .ToListAsync();
     }
 
