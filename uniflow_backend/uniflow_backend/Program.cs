@@ -34,9 +34,32 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Логіка для роботи з Connection String (підтримка формату Railway postgres://)
+string GetConnectionString()
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+    if (string.IsNullOrEmpty(connectionString) && !string.IsNullOrEmpty(databaseUrl))
+    {
+        // Парсимо формат postgres://user:pass@host:port/db
+        var databaseUri = new Uri(databaseUrl);
+        var userInfo = databaseUri.UserInfo.Split(':');
+
+        connectionString = $"Host={databaseUri.Host};" +
+                           $"Port={databaseUri.Port};" +
+                           $"Database={databaseUri.AbsolutePath.Trim('/')};" +
+                           $"Username={userInfo[0]};" +
+                           $"Password={userInfo[1]};" +
+                           $"SSL Mode=Require;Trust Server Certificate=true;";
+    }
+
+    return connectionString ?? throw new InvalidOperationException("Connection string not found.");
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(GetConnectionString());
 });
 
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
@@ -87,7 +110,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddHangfire(config =>
     config.UsePostgreSqlStorage(options =>
     {
-        options.UseNpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection"));
+        options.UseNpgsqlConnection(GetConnectionString());
     })
 );
 
@@ -97,14 +120,6 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policyBuilder =>
-        policyBuilder.WithOrigins("http://localhost:3000", "http://localhost:5173")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
-});
 builder.Services.AddHangfireServer();
 
 builder.Services.AddOpenApi();
@@ -123,19 +138,25 @@ builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IICalbuilder, ICalBuilder>();
 builder.Services.AddScoped<IMarkdownParser, MarkdownParser>();
-builder.Services.AddSignalR();
-
-builder.Services.AddControllers();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
 
 builder.Services.AddSignalR()
     .AddJsonProtocol(options => {
         options.PayloadSerializerOptions.Converters
-            .Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+            .Add(new JsonStringEnumConverter());
     });
 
-    
+builder.Services.AddCors(options =>
+{
+    var frontendUrl = builder.Configuration["FrontendUrl"] ?? "http://localhost:5173";
+    options.AddPolicy("AllowFrontend", policyBuilder =>
+        policyBuilder.WithOrigins(frontendUrl.Split(','))
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
+
 var app = builder.Build();
 
 app.MapOpenApi();
