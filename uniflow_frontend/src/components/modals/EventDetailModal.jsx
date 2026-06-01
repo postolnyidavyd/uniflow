@@ -1,6 +1,13 @@
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { closeEventDetailModal, openEditEventModal } from '../../store/uiSlice.js';
+import { 
+  closeEventDetailModal, 
+  openEditEventModal,
+  openConfirmationModal,
+  closeConfirmationModal,
+  setConfirmationLoading 
+} from '../../store/uiSlice.js';
+import { setConfirmCallback } from '../../store/confirmationService.js';
 import { selectIsHeadman } from '../../store/selectors/authSelector.js';
 import Modal from '../ui/Modal.jsx';
 import Button from '../ui/Button.jsx';
@@ -13,6 +20,8 @@ import SectionSeparator from '../ui/SectionSeparator.jsx';
 import {
   AddToCalendarButton,
   CountdownSeparator,
+  CountdownSegment,
+  CountdownLabel,
   ModalBigTitle,
   ModalContent,
   ModalCountdown,
@@ -20,9 +29,10 @@ import {
   ModalDateText,
   ModalLinkBox,
   ModalLinkContent,
-  ModalLinkHref,
-  ModalLinkLabel,
   ModalLinkLeft,
+  ModalLinkLabel,
+  ModalLinkValue,
+  ExpandableLinkValue,
   ModalSubjectText,
   ModalTitleWrapper,
   SkeletonLine,
@@ -76,14 +86,26 @@ const EventDetailModal = () => {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Ви впевнені, що хочете видалити цю подію?')) return;
-    try {
-      await deleteEvent(eventId).unwrap();
-      toast.success('Подію видалено');
-      handleClose();
-    } catch {
-      toast.error('Не вдалося видалити подію');
-    }
+    setConfirmCallback(async () => {
+      try {
+        dispatch(setConfirmationLoading(true));
+        await deleteEvent(eventId).unwrap();
+        toast.success('Подію видалено');
+        dispatch(closeConfirmationModal());
+        handleClose();
+      } catch {
+        toast.error('Не вдалося видалити подію');
+      } finally {
+        dispatch(setConfirmationLoading(false));
+      }
+    });
+
+    dispatch(openConfirmationModal({
+      title: 'Видалити подію?',
+      description: 'Цю дію не можна буде скасувати.',
+      confirmText: 'Так, видалити',
+      cancelText: 'Скасувати'
+    }));
   };
 
   const customTitle =
@@ -118,11 +140,32 @@ const EventDetailModal = () => {
 
           {isDeadline && timeLeft && (
             <ModalCountdown>
-              <span>{timeLeft.hours}</span>
-              <CountdownSeparator>:</CountdownSeparator>
-              <span>{timeLeft.minutes}</span>
-              <CountdownSeparator>:</CountdownSeparator>
-              <span>{timeLeft.seconds}</span>
+              {timeLeft.days ? (
+                <>
+                  <CountdownSegment>
+                    <span>{timeLeft.days}</span>
+                    <CountdownLabel>дн</CountdownLabel>
+                  </CountdownSegment>
+                  <CountdownSeparator>:</CountdownSeparator>
+                  <CountdownSegment>
+                    <span>{timeLeft.hours}</span>
+                    <CountdownLabel>год</CountdownLabel>
+                  </CountdownSegment>
+                  <CountdownSeparator>:</CountdownSeparator>
+                  <CountdownSegment>
+                    <span>{timeLeft.minutes}</span>
+                    <CountdownLabel>хв</CountdownLabel>
+                  </CountdownSegment>
+                </>
+              ) : (
+                <>
+                  <span>{timeLeft.hours}</span>
+                  <CountdownSeparator>:</CountdownSeparator>
+                  <span>{timeLeft.minutes}</span>
+                  <CountdownSeparator>:</CountdownSeparator>
+                  <span>{timeLeft.seconds}</span>
+                </>
+              )}
             </ModalCountdown>
           )}
 
@@ -133,28 +176,21 @@ const EventDetailModal = () => {
             </ModalDateRow>
 
             {event.meetUrl && (
-              <ModalLinkBox>
+              <ModalLinkBox
+                as="a"
+                href={event.meetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                $clickable
+              >
                 <ModalLinkLeft>
                   <PaperclipIcon width={22} height={22} />
                   <ModalLinkContent>
                     <ModalLinkLabel>Посилання</ModalLinkLabel>
-                    <ModalLinkHref
-                      href={event.meetUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {event.meetUrl}
-                    </ModalLinkHref>
+                    <ModalLinkValue>{event.meetUrl}</ModalLinkValue>
                   </ModalLinkContent>
                 </ModalLinkLeft>
-                <a
-                  href={event.meetUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ display: 'flex', alignItems: 'center' }}
-                >
-                  <ExternalLinkIcon width={24} height={24} />
-                </a>
+                <ExternalLinkIcon width={24} height={24} color="#6b6b6b" />
               </ModalLinkBox>
             )}
 
@@ -164,18 +200,18 @@ const EventDetailModal = () => {
                   <LocationIcon width={22} height={22} />
                   <ModalLinkContent>
                     <ModalLinkLabel>Локація</ModalLinkLabel>
-                    <SecondaryText>{event.location}</SecondaryText>
+                    <ModalLinkValue>{event.location}</ModalLinkValue>
                   </ModalLinkContent>
                 </ModalLinkLeft>
               </ModalLinkBox>
             )}
             {event.description && (
-              <ModalLinkBox>
-                <ModalLinkLeft>
+              <ModalLinkBox $alignTop>
+                <ModalLinkLeft $alignTop>
                   <FileIcon width={22} height={22} />
                   <ModalLinkContent>
                     <ModalLinkLabel>Деталі</ModalLinkLabel>
-                    <SecondaryText>{event.description}</SecondaryText>
+                    <ExpandableLinkValue text={event.description} />
                   </ModalLinkContent>
                 </ModalLinkLeft>
               </ModalLinkBox>
@@ -223,15 +259,6 @@ const InfoBlock = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-`;
-
-const SecondaryText = styled.span`
-  font-family: 'e-Ukraine', sans-serif;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 24px;
-  letter-spacing: -0.32px;
-  color: var(--base-secondary-text, #6b6b6b);
 `;
 
 const HeadmanSection = styled.div`

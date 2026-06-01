@@ -22,13 +22,44 @@ const initialState = {
 
   calendarDayPanel: { isOpen: false, date: null, items: null }, // date: ISO string 'YYYY-MM-DD'
 
-  createOptionsModal: {isOpen:false }
+  createOptionsModal: {isOpen:false },
+
+  confirmationModal: {
+    isOpen: false,
+    title: '',
+    description: '',
+    confirmText: '',
+    cancelText: '',
+    isLoading: false,
+    actionType: null,
+    payload: null
+  }
 };
 
 const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
+    // Confirmation
+    openConfirmationModal(state, action) {
+      state.confirmationModal = {
+        isOpen: true,
+        title: action.payload.title,
+        description: action.payload.description,
+        confirmText: action.payload.confirmText,
+        cancelText: action.payload.cancelText,
+        isLoading: false,
+        actionType: action.payload.actionType,
+        payload: action.payload.payload
+      };
+    },
+    setConfirmationLoading(state, action) {
+      state.confirmationModal.isLoading = action.payload;
+    },
+    closeConfirmationModal(state) {
+      state.confirmationModal.isOpen = false;
+    },
+
     // Subject
     openCreateSubjectModal(state) {
       state.createSubjectModal.isOpen = true;
@@ -150,7 +181,10 @@ export const {
   openCalendarDayPanel,
   closeCalendarDayPanel,
   openCreateOptionsModal,
-  closeCreateOptionsModal
+  closeCreateOptionsModal,
+  openConfirmationModal,
+  closeConfirmationModal,
+  setConfirmationLoading
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

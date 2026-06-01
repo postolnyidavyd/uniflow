@@ -70,6 +70,7 @@ private IEnumerable<string> SplitIntoBlocks(string markdown)
         if (line.StartsWith('#')) return "header";
         if (line.StartsWith('|')) return "table";
         if (line.StartsWith("- ") || line.StartsWith("* ")) return "list";
+        if (char.IsDigit(line.FirstOrDefault()) && Regex.IsMatch(line, @"^\d+[\.)]\s")) return "list";
         if (line.StartsWith("> ")) return "alert";
         if (line.StartsWith("```")) return "code";
         return "paragraph";

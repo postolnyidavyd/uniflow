@@ -6,6 +6,7 @@ import EventModalManager from './createAndEditModals/EventModalManager.jsx';
 import SubjectModalManager from './createAndEditModals/SubjectModalManager.jsx';
 import QueueModalManager from './createAndEditModals/QueueModalManager.jsx';
 import LeaveQueueModal from './LeaveQueueModal.jsx';
+import ConfirmationModal from './shared/ConfirmationModal.jsx';
 
 const ModalsProvider = () => {
   return (
@@ -18,6 +19,7 @@ const ModalsProvider = () => {
       <SubjectModalManager />
       <QueueModalManager />
       <LeaveQueueModal />
+      <ConfirmationModal />
     </>
   );
 };

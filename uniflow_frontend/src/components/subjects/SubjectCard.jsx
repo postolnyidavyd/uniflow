@@ -1,4 +1,4 @@
-import { LastUpdatedAtBadge } from './LastUpdatedAtBadge.jsx';
+import { LastUpdatedAtBadge } from '../LastUpdatedAtBadge.jsx';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 

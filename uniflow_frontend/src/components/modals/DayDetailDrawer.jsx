@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   calendarItemFormattingBackgroundColor,
   calendarItemFormattingColor,
@@ -54,97 +55,101 @@ const DayDetailsDrawer = () => {
     handleClose();
     dispatch(openCreateOptionsModal());
   };
-  if (!isOpen) return null;
 
   return createPortal(
-    <>
-      <Overlay onClick={handleClose} />
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <Overlay 
+            onClick={handleClose}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          />
 
-      <DrawerPanel>
-        <Header>
-          <DateContainer>
-            <DateTitle>{formattedDate}</DateTitle>
-            <DayOfWeek>{dayOfWeek}</DayOfWeek>
-          </DateContainer>
-          <CloseButton onClick={handleClose}>
-            <CloseLG />
-          </CloseButton>
-        </Header>
+          <DrawerPanel
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          >
+            <Header>
+              <DateContainer>
+                <DateTitle>{formattedDate}</DateTitle>
+                <DayOfWeek>{dayOfWeek}</DayOfWeek>
+              </DateContainer>
+              <CloseButton onClick={handleClose}>
+                <CloseLG />
+              </CloseButton>
+            </Header>
 
-        <ItemsList>
-          {items.map((item) => (
-            <EventRow
-              key={item.id}
-              onClick={() =>
-                handleEventCardClick(item.calendarItemType, item.id)
-              }
-            >
-              <TimeBlock>{getTimeFromISO(item.startTime) || 'XX:XX'}</TimeBlock>
+            <ItemsList>
+              {items.map((item) => (
+                <EventRow
+                  key={item.id}
+                  onClick={() =>
+                    handleEventCardClick(item.calendarItemType, item.id)
+                  }
+                >
+                  <TimeBlock>{getTimeFromISO(item.startTime) || 'XX:XX'}</TimeBlock>
 
-              <EventDetailsCard
-                $bgColor={
-                  calendarItemFormattingBackgroundColor[item.calendarItemType]
-                }
-                $borderColor={calendarItemFormattingColor[item.calendarItemType]}
-              >
-                <EventTitle>
-                  {item.subjectShortName} - {item.itemShortTitle}
-                </EventTitle>
-
-                {item.meetUrl ? (
-                  <EventUrl
-                    href={item.meetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
+                  <EventDetailsCard
+                    $bgColor={
+                      calendarItemFormattingBackgroundColor[item.calendarItemType]
+                    }
+                    $borderColor={calendarItemFormattingColor[item.calendarItemType]}
                   >
-                    {item.meetUrl}
-                  </EventUrl>
-                ) : (
-                  <EventLocation>{item.location}</EventLocation>
-                )}
-              </EventDetailsCard>
-            </EventRow>
-          ))}
-        </ItemsList>
+                    <EventTitle>
+                      {item.subjectShortName} - {item.itemShortTitle}
+                    </EventTitle>
 
-        {role === 'Headman' && (
-          <ButtonContainer>
-            <Button onClick={handleAddEventClick}>
-              <PlusIcon width="1rem" height="1rem" /> Додати
-            </Button>
-          </ButtonContainer>
-        )}
-      </DrawerPanel>
-    </>,
+                    {item.meetUrl ? (
+                      <EventUrl
+                        href={item.meetUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        {item.meetUrl}
+                      </EventUrl>
+                    ) : (
+                      <EventLocation>{item.location}</EventLocation>
+                    )}
+                  </EventDetailsCard>
+                </EventRow>
+              ))}
+            </ItemsList>
+
+            {role === 'Headman' && (
+              <ButtonContainer>
+                <Button onClick={handleAddEventClick}>
+                  <PlusIcon width="1rem" height="1rem" /> Додати
+                </Button>
+              </ButtonContainer>
+            )}
+          </DrawerPanel>
+        </>
+      )}
+    </AnimatePresence>,
     document.getElementById('modal')
   );
 };
 
-const Overlay = styled.div`
+const Overlay = styled(motion.div)`
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  animation: fadeIn 0.3s ease;
   background: rgba(0, 0, 0, 0.15);
-  z-index: 1000; /* Має бути вище за все інше */
-
+  z-index: 1000;
   backdrop-filter: blur(1px);
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
 `;
 
-const DrawerPanel = styled.div`
+const DrawerPanel = styled(motion.div)`
   position: fixed;
   top: 0;
   right: 0;
@@ -153,7 +158,7 @@ const DrawerPanel = styled.div`
   height: 100dvh;
 
   background-color: var(--base-white, #ffffff);
-  z-index: 1001; /* Вище за оверлей */
+  z-index: 1001;
 
   padding: 0.75rem;
   gap: 0.75rem;
@@ -161,17 +166,6 @@ const DrawerPanel = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-
-  animation: slideIn 0.3s ease;
-
-  @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-    }
-    to {
-      transform: translateX(0);
-    }
-  }
 `;
 
 const Header = styled.div`
@@ -309,9 +303,7 @@ const EventUrl = styled.a`
   text-underline-position: from-font;
 
   display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-all;
 
   transition: color 180ms ease;
 

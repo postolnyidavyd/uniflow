@@ -17,9 +17,7 @@ public class UpdateEventDtoValidator : AbstractValidator<UpdateEventDto>
         RuleFor(x => x.ShortTitle)
             .MaximumLength(20).WithMessage("Коротка назва не може перевищувати 20 символів")
             .When(x => x.ShortTitle != null);
-
-        RuleFor(x => x.Date)
-            .When(x => x.Date.HasValue);
+            
 
         RuleFor(x => x.MeetUrl)
             .NotEmpty().WithMessage("Посилання обов'язкове для онлайн події")

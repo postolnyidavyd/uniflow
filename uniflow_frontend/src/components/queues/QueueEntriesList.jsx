@@ -348,6 +348,7 @@ const EntryNameWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 0.625rem;
+  flex: 0 1 auto;
 `;
 
 const StatusBar = styled.div`
@@ -365,7 +366,11 @@ const EntryIndex = styled.span`
   text-align: center;
 `;
 
-const EntryName = styled.span`font-size: var(--desktop-headings-h5); font-weight: 400; color: var(--base-black);`;
+const EntryName = styled.span`
+  font-size: var(--desktop-headings-h5);
+  font-weight: 400;
+  color: var(--base-black);
+`;
 
 const MeBadge = styled.div`
   padding: 0.25rem 0.5rem;

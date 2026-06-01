@@ -160,6 +160,8 @@ public static class QueueMapping
         IsSubscribed =
             qs.Subscribers.Any(u => u.Id == userId)
             ||
+            qs.Subject!.Subscribers.Any(u => u.Id == userId)
+            ||
             qs.QueueEntries.Any(qe =>
                 qe.UserId == userId &&
                 (qe.EntryStatus == QueueEntryStatus.Waiting || qe.EntryStatus == QueueEntryStatus.InProgress) &&

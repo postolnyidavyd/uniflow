@@ -1,5 +1,7 @@
 import styled from 'styled-components';
+import { useState } from 'react';
 import Button from '../../ui/Button.jsx';
+import TextButton from '../../ui/TextButton.jsx';
 import BellIcon from '../../../assets/BellSmall.svg?react';
 import { useGetCalendarSettingsQuery } from '../../../store/api/subscriptionApi.js';
 
@@ -83,25 +85,42 @@ export const ModalDateText = styled.span`
 
 export const ModalLinkBox = styled.div`
   display: flex;
-  align-items: center;
+  align-items: ${({ $alignTop }) => ($alignTop ? 'flex-start' : 'center')};
   justify-content: space-between;
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem;
   border: 2px solid var(--base-bright-grey, #e7eef3);
   border-radius: 0.75rem;
   width: 100%;
   box-sizing: border-box;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  color: inherit;
+
+  ${(props) =>
+    props.$clickable &&
+    `
+    cursor: pointer;
+    &:hover {
+      border-color: var(--base-primary, #007AFF);
+      background-color: #F8FAFC;
+    }
+  `}
 `;
 
 export const ModalLinkLeft = styled.div`
   display: flex;
-  align-items: center;
+  align-items: ${({ $alignTop }) => ($alignTop ? 'flex-start' : 'center')};
   gap: 0.5rem;
+  overflow: hidden;
+  ${({ $alignTop }) => $alignTop && 'padding-top: 0.125rem;'}
 `;
 
 export const ModalLinkContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  overflow: hidden;
+  flex: 1;
 `;
 
 export const ModalLinkLabel = styled.span`
@@ -122,10 +141,73 @@ export const ModalLinkHref = styled.a`
   color: var(--base-secondary-text, #6b6b6b);
   text-decoration: underline;
   text-decoration-skip-ink: none;
-  max-width: 200px;
+  word-break: break-all;
+`;
+
+export const ModalLinkValue = styled.span`
+  font-family: 'e-Ukraine', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: -0.32px;
+  color: var(--base-secondary-text, #6b6b6b);
+  word-break: break-word;
+`;
+
+export const ExpandableLinkValue = ({ text }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  if (!text) return null;
+
+  // Показуємо кнопку, якщо текст довший за 60 символів
+  const shouldShowButton = text.length > 60;
+
+  return (
+    <ExpandableContainer>
+      <ExpandableContent $isExpanded={isExpanded}>
+        {text}
+      </ExpandableContent>
+      {shouldShowButton && (
+        <TextButton
+          size="sm"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          }}
+          style={{
+            padding: '0.25rem 0',
+            height: 'auto',
+            marginTop: '0.25rem',
+          }}
+        >
+          {isExpanded ? 'Згорнути' : 'Розгорнути'}
+        </TextButton>
+      )}
+    </ExpandableContainer>
+  );
+};
+
+const ExpandableContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+`;
+
+const ExpandableContent = styled.div`
+  font-family: 'e-Ukraine', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+  letter-spacing: -0.32px;
+  color: var(--base-secondary-text, #6b6b6b);
+  word-break: break-word;
+
+  display: ${({ $isExpanded }) => ($isExpanded ? 'block' : '-webkit-box')};
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 `;
 
 export const ModalCountdown = styled.div`
@@ -143,6 +225,21 @@ export const ModalCountdown = styled.div`
 
 export const CountdownSeparator = styled.span`
   color: var(--base-secondary-text, #e7eef3);
+`;
+
+export const CountdownSegment = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+`;
+
+export const CountdownLabel = styled.span`
+  font-size: 0.875rem;
+  line-height: 1rem;
+  font-weight: 300;
+  color: var(--base-secondary-text);
+  margin-top: 0.25rem;
 `;
 
 const AutoAddLabel = styled.div`

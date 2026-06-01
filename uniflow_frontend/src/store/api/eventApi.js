@@ -27,6 +27,7 @@ export const eventApi = apiSlice.injectEndpoints({
                 { type: 'Event', id },
                 { type: 'Calendar' },
                 { type: 'CalendarUpcoming' },
+                { type: 'EventList' }
             ],
         }),
 
@@ -36,6 +37,7 @@ export const eventApi = apiSlice.injectEndpoints({
                 { type: 'Event', id },
                 { type: 'Calendar' },
                 { type: 'CalendarUpcoming' },
+                { type: 'EventList' }
             ],
         }),
     }),
