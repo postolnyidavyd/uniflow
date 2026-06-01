@@ -34,32 +34,54 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Логіка для роботи з Connection String (підтримка формату Railway postgres://)
+// Розумна логіка для Connection String
 string GetConnectionString()
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    var configConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+    
+    // Пріоритет змінній DATABASE_URL (Railway)
+    string? rawConnection = !string.IsNullOrEmpty(databaseUrl) ? databaseUrl : configConnection;
 
-    if (string.IsNullOrEmpty(connectionString) && !string.IsNullOrEmpty(databaseUrl))
+    if (string.IsNullOrEmpty(rawConnection))
     {
-        // Парсимо формат postgres://user:pass@host:port/db
-        var databaseUri = new Uri(databaseUrl);
-        var userInfo = databaseUri.UserInfo.Split(':');
-
-        connectionString = $"Host={databaseUri.Host};" +
-                           $"Port={databaseUri.Port};" +
-                           $"Database={databaseUri.AbsolutePath.Trim('/')};" +
-                           $"Username={userInfo[0]};" +
-                           $"Password={userInfo[1]};" +
-                           $"SSL Mode=Require;Trust Server Certificate=true;";
+        throw new InvalidOperationException("Connection string not found in DATABASE_URL or Configuration.");
     }
 
-    return connectionString ?? throw new InvalidOperationException("Connection string not found.");
+    // Якщо це формат URI (postgres://...) - парсимо його
+    if (rawConnection.Contains("://"))
+    {
+        try
+        {
+            var databaseUri = new Uri(rawConnection);
+            var userInfo = databaseUri.UserInfo.Split(':');
+
+            var result = $"Host={databaseUri.Host};" +
+                         $"Port={databaseUri.Port};" +
+                         $"Database={databaseUri.AbsolutePath.Trim('/')};" +
+                         $"Username={userInfo[0]};" +
+                         $"Password={userInfo[1]};" +
+                         $"SSL Mode=Require;Trust Server Certificate=true;";
+            
+            Console.WriteLine("Successfully parsed URI connection string.");
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error parsing URI connection string: {ex.Message}");
+            // Якщо не вдалося спарсити - повертаємо як є, можливо це валідний DSN
+            return rawConnection;
+        }
+    }
+
+    return rawConnection;
 }
+
+var finalConnectionString = GetConnectionString();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseNpgsql(GetConnectionString());
+    options.UseNpgsql(finalConnectionString);
 });
 
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
@@ -110,7 +132,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddHangfire(config =>
     config.UsePostgreSqlStorage(options =>
     {
-        options.UseNpgsqlConnection(GetConnectionString());
+        options.UseNpgsqlConnection(finalConnectionString);
     })
 );
 
