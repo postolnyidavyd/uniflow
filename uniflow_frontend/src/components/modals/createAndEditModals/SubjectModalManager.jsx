@@ -6,7 +6,7 @@ import { useCreateSubjectMutation, useUpdateSubjectMutation, useGetSubjectByIdQu
 import Modal from '../../ui/Modal.jsx';
 import Button from '../../ui/Button.jsx';
 import Input from '../../ui/inputs/Input.jsx';
-import FileDropzone from '../../ui/inputs/FileDropzone.jsx';
+import FileDropZone from "../../ui/inputs/FileDropZone.jsx";
 import {
   maxLengthHelper,
   required,
@@ -146,7 +146,7 @@ const SubjectFormModal = ({ isOpen, onClose, onSubmit, initialData, isEditMode }
           />
         </FieldGroup>
 
-        <FileDropzone
+        <FileDropZone
           label="Обкладинка"
           value={coverFile}
           onChange={(file) => {
