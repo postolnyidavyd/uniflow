@@ -148,7 +148,7 @@ public static class QueueMapping
     #region Calendar Summary
 
     private static Expression<Func<Domain.Models.QueueSession, QueueSummaryResponseDto>>
-        SummaryDtoExpression(Guid userId) => qs => new QueueSummaryResponseDto()
+        SummaryDtoExpression(Guid userId, bool autoAdd) => qs => new QueueSummaryResponseDto()
     {
         Id = qs.Id,
         ShortTitle = qs.ShortTitle,
@@ -158,6 +158,8 @@ public static class QueueMapping
         MeetUrl = qs.MeetUrl,
 
         IsSubscribed =
+            autoAdd
+            ||
             qs.Subscribers.Any(u => u.Id == userId)
             ||
             qs.Subject!.Subscribers.Any(u => u.Id == userId)
@@ -170,8 +172,8 @@ public static class QueueMapping
     };
 
     public static IQueryable<QueueSummaryResponseDto> ProjectToSummaryDto(this IQueryable<QueueSession> query,
-        Guid userId) =>
-        query.Select(SummaryDtoExpression(userId));
+        Guid userId, bool autoAdd = false) =>
+        query.Select(SummaryDtoExpression(userId, autoAdd));
 
     #endregion
 

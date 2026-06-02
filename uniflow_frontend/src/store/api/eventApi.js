@@ -27,7 +27,7 @@ export const eventApi = apiSlice.injectEndpoints({
                 { type: 'Event', id },
                 { type: 'Calendar' },
                 { type: 'CalendarUpcoming' },
-                { type: 'EventList' }
+                { type: 'EventList' } // Бродкастимо оновлення списків
             ],
         }),
 

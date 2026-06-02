@@ -48,7 +48,9 @@ export const subscriptionApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (_, __, id) => [
         { type: 'Subject', id },
+        { type: 'SubjectList' },
         { type: 'Calendar' },
+        { type: 'CalendarUpcoming' }
       ],
     }),
 
@@ -60,6 +62,7 @@ export const subscriptionApi = apiSlice.injectEndpoints({
       invalidatesTags: (_, __, id) => [
         { type: 'Event', id },
         { type: 'Calendar' },
+        { type: 'CalendarUpcoming' }
       ],
     }),
 
@@ -71,6 +74,7 @@ export const subscriptionApi = apiSlice.injectEndpoints({
       invalidatesTags: (_, __, id) => [
         { type: 'Queue', id },
         { type: 'Calendar' },
+        { type: 'CalendarUpcoming' }
       ],
     }),
   }),

@@ -87,20 +87,25 @@ public class CalendarService : ICalendarService
             throw new KeyNotFoundException("Користувача не знайдено");
 
         var eventsQuery = _appDbContext.Events
-            .Where(e => e.Date >= startDate && e.Date <= endDate)
-            .Where(e =>
+            .Where(e => e.Date >= startDate && e.Date <= endDate);
+
+        var queuesQuery = _appDbContext.QueueSessions
+            .Where(e => e.QueueStartTime >= startDate && e.QueueStartTime <= endDate);
+
+        if (!userCalendarSettings.AutoAddAllEvents)
+        {
+            eventsQuery = eventsQuery.Where(e =>
                 e.Subscribers.Any(u => u.Id == userId) ||
                 e.Subject!.Subscribers.Any(u => u.Id == userId));
 
-        var queuesQuery = _appDbContext.QueueSessions
-            .Where(e => e.QueueStartTime >= startDate && e.QueueStartTime <= endDate)
-            .Where(qs =>
+            queuesQuery = queuesQuery.Where(qs =>
                 qs.Subscribers.Any(u => u.Id == userId) ||
                 qs.Subject!.Subscribers.Any(u => u.Id == userId) ||
                 qs.QueueEntries.Any(qe =>
                     qe.UserId == userId &&
                     (qe.EntryStatus == QueueEntryStatus.Waiting || qe.EntryStatus == QueueEntryStatus.InProgress) &&
                     userCalendarSettings.AutoAddUserQueueEvents));
+        }
 
         var events = await eventsQuery.ProjectToICalItem().ToListAsync();
         var queues = await queuesQuery.ProjectToICalItem().ToListAsync();
