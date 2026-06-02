@@ -14,7 +14,7 @@ export const calendarApi = apiSlice.injectEndpoints({
 
         getUpcomingBySubject: builder.query({
             query: (subjectId) => `/calendar/upcoming/subject/${subjectId}`,
-            providesTags: (_, __, id) => [{ type: 'CalendarUpcoming', id }],
+            providesTags: (_, __, subjectId) => [{ type: 'CalendarUpcoming', id: subjectId }],
         }),
     }),
 });

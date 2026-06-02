@@ -59,28 +59,47 @@ export const queueApi = apiSlice.injectEndpoints({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags:[
+            invalidatesTags: (_, __, { sessionId }) => [
                 { type: 'MyQueues' },
+                { type: 'QueueEntries', id: sessionId },
+                { type: 'Calendar' },
+                { type: 'CalendarUpcoming' },
+                { type: 'Balance' }
             ],
         }),
 
         leaveQueue: builder.mutation({
             query: (sessionId) => ({ url: `/queue/${sessionId}/leave`, method: 'POST' }),
-            invalidatesTags:[
+            invalidatesTags: (_, __, sessionId) => [
                 { type: 'MyQueues' },
+                { type: 'QueueEntries', id: sessionId },
+                { type: 'Calendar' },
+                { type: 'CalendarUpcoming' },
             ],
         }),
 
         completeCurrentEntry: builder.mutation({
             query: (sessionId) => ({ url: `/queue/${sessionId}/complete`, method: 'POST' }),
+            invalidatesTags: (_, __, sessionId) => [
+                { type: 'QueueEntries', id: sessionId },
+                { type: 'MyQueues' }
+            ],
         }),
 
         skipCurrentEntry: builder.mutation({
             query: (sessionId) => ({ url: `/queue/${sessionId}/skip`, method: 'POST' }),
+            invalidatesTags: (_, __, sessionId) => [
+                { type: 'QueueEntries', id: sessionId },
+                { type: 'MyQueues' }
+            ],
         }),
 
         forceCompleteEntry: builder.mutation({
             query: (sessionId) => ({ url: `/queue/${sessionId}/force-complete`, method: 'POST' }),
+            invalidatesTags: (_, __, sessionId) => [
+                { type: 'QueueEntries', id: sessionId },
+                { type: 'MyQueues' }
+            ],
         }),
     }),
 });
