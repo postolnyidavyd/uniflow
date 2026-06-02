@@ -4,7 +4,7 @@ import UserStatusCard from './UserStatusCard.jsx';
 import QueueEntriesList from './QueueEntriesList.jsx';
 
 const QueueMainSection = ({ sessionId, session }) => {
-  const { data: entriesData, isFetching: isEntriesLoading } =
+  const { data: entriesData, isLoading: isEntriesLoading } =
     useGetQueueEntriesQuery(sessionId);
 
   const isActive = session.queueStatus === 'Active';

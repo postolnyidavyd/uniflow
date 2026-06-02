@@ -182,7 +182,7 @@ const QueueEntriesList = ({ entries, userEntry, isEntriesLoading, session }) => 
               />
             ) : (
               <AnimatePresence mode="popLayout">
-                {waitingEntries.map((entry, index) => {
+                {waitingEntries.flatMap((entry, index) => {
                   const globalIndex = entries.findIndex((e) => e.id === entry.id);
                   const isGuaranteed = globalIndex < session.guaranteedSlots;
                   const isCurrentUser = entry.id === userEntry?.id;
@@ -196,58 +196,60 @@ const QueueEntriesList = ({ entries, userEntry, isEntriesLoading, session }) => 
                     !!inProgressEntry
                   );
 
-                  return (
+                  const items = [];
+
+                  if (showLimitDivider) {
+                    items.push(
+                      <motion.div
+                        key="limit-divider"
+                        variants={dividerVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        layout
+                      >
+                        <LimitDivider>
+                          <DividerLine />
+                          <LimitBadge>
+                            <TriangleWarningIcon width={24} height={24} />
+                            Межа гарантованого часу
+                          </LimitBadge>
+                          <DividerLine />
+                        </LimitDivider>
+                      </motion.div>
+                    );
+                  }
+
+                  items.push(
                     <motion.div
                       key={entry.id}
                       layout
-                      layoutId={entry.id}
                       variants={entryVariants}
                       initial="initial"
                       animate="animate"
                       exit="exit"
                       style={{ width: '100%' }}
                     >
-                      <EntryWrapper>
-                        <AnimatePresence>
-                          {showLimitDivider && (
-                            <motion.div
-                              key="divider"
-                              variants={dividerVariants}
-                              initial="initial"
-                              animate="animate"
-                              exit="exit"
-                            >
-                              <LimitDivider>
-                                <DividerLine />
-                                <LimitBadge>
-                                  <TriangleWarningIcon width={24} height={24} />
-                                  Межа гарантованого часу
-                                </LimitBadge>
-                                <DividerLine />
-                              </LimitDivider>
-                            </motion.div>
+                      <EntryItem $isCurrentUser={isCurrentUser}>
+                        <ItemLeft>
+                          <StatusBar $color={isGuaranteed ? 'var(--malachite-100)' : 'var(--gorse-100)'} />
+                          <EntryIndex>{globalIndex + 1}</EntryIndex>
+                          <ProfilePicture size="sm" initials={getInitials(entry.username)} />
+                          <EntryNameWrapper>
+                            <EntryName>{entry.username}</EntryName>
+                            {entry.usedToken && entry.entryType !== 'Secondary' && <PriorityIcon />}
+                          </EntryNameWrapper>
+                          {isCurrentUser && <MeBadge>Ви</MeBadge>}
+                          {entry.entryType === 'Secondary' && (
+                            <SecondaryLabel>2-га робота</SecondaryLabel>
                           )}
-                        </AnimatePresence>
-
-                        <EntryItem $isCurrentUser={isCurrentUser}>
-                          <ItemLeft>
-                            <StatusBar $color={isGuaranteed ? 'var(--malachite-100)' : 'var(--gorse-100)'} />
-                            <EntryIndex>{globalIndex + 1}</EntryIndex>
-                            <ProfilePicture size="sm" initials={getInitials(entry.username)} />
-                            <EntryNameWrapper>
-                                <EntryName>{entry.username}</EntryName>
-                                {entry.usedToken && entry.entryType !== 'Secondary' && <PriorityIcon />}
-                            </EntryNameWrapper>
-                            {isCurrentUser && <MeBadge>Ви</MeBadge>}
-                            {entry.entryType === 'Secondary' && (
-                              <SecondaryLabel>2-га робота</SecondaryLabel>
-                            )}
-                          </ItemLeft>
-                          {estimatedTime && <TimeText>{estimatedTime}</TimeText>}
-                        </EntryItem>
-                      </EntryWrapper>
+                        </ItemLeft>
+                        {estimatedTime && <TimeText>{estimatedTime}</TimeText>}
+                      </EntryItem>
                     </motion.div>
                   );
+
+                  return items;
                 })}
               </AnimatePresence>
             )}
@@ -348,7 +350,6 @@ const EntryNameWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  flex: 0 1 auto;
 `;
 
 const StatusBar = styled.div`
