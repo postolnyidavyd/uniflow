@@ -9,7 +9,7 @@ import useQueueHub from '../hooks/useQueueHub.jsx';
 
 const QueueDetailPage = () => {
   const { sessionId } = useParams();
-  const { data: session, isFetching: isSessionLoading } =
+  const { data: session, isLoading: isSessionLoading } =
     useGetQueueByIdQuery(sessionId);
   useQueueHub(sessionId);
 
